@@ -4,7 +4,7 @@ github: cpostnikoff
 github: elenajou 
 github: hpang19
 github: alice.in.realityland@gmail.com
-icheung24@my.bcit.ca
+github: izcheung
 github: aaronawylo 
 github: pkwlo 
 Daylen Smith: rockclimber147
