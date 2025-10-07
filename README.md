@@ -1,5 +1,5 @@
 # Team members
-
+```
 Edro Gonzales: edge.row A01257468
 github: cpostnikoff
 github: elenajou
@@ -12,3 +12,4 @@ Daylen Smith: rockclimber147
 github: derekology
 github: ianhdchan
 github: pkwlo
+```
