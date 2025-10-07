@@ -1,5 +1,5 @@
 # Team members
-github: edge.row 
+github: edge.row MERGECONFLICT
 github: cpostnikoff 
 github: elenajou 
 github: hpang19
