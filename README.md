@@ -2,7 +2,7 @@
 github: edge.row 
 github: cpostnikoff 
 github: elenajou 
-Hsin
+github: hpang19
 github: alice.in.realityland@gmail.com
 icheung24@my.bcit.ca
 github: aaronawylo 
