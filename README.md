@@ -7,6 +7,6 @@ github: alice.in.realityland@gmail.com
 icheung24@my.bcit.ca
 github: aaronawylo 
 github: pkwlo 
-github: rockclimber147
+Daylen Smith: rockclimber147
 github: derekology
 github: ianhdchan
