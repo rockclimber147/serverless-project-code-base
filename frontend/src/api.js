@@ -2,9 +2,7 @@
 export const API_BASE = "https://y35kgh2yf3.execute-api.us-west-2.amazonaws.com/dev";
 
 async function post(path, body, authToken) {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+  const headers = { "Content-Type": "application/json" };
   if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
 
   const res = await fetch(`${API_BASE}${path}`, {
@@ -14,11 +12,23 @@ async function post(path, body, authToken) {
   });
 
   const text = await res.text();
+  let data;
   try {
-    return JSON.parse(text);
+    data = JSON.parse(text);
   } catch {
-    return text;
+    data = text;
   }
+
+  // Unwrap Lambda proxy response if it exists
+  if (data && data.body) {
+    try {
+      return JSON.parse(data.body);
+    } catch {
+      return data.body;
+    }
+  }
+
+  return data;
 }
 
 // Lambda API functions

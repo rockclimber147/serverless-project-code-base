@@ -5,33 +5,33 @@ import { useNavigate } from "react-router-dom";
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState(""); // For inline error messages
   const navigate = useNavigate();
 
   async function submit(e) {
     e.preventDefault();
+    setErrorMsg(""); // clear previous errors
 
     if (!username || !password) {
-      alert("Please enter both username and password.");
+      setErrorMsg("Please enter both username and password.");
       return;
     }
 
-    console.log("Submitting:", { username, password }); // debug
-
     try {
       const res = await signin({ username, password });
-      console.log("Response:", res);
 
       if (res.idToken) {
         localStorage.setItem("idToken", res.idToken);
         const claims = parseJwt(res.idToken);
         localStorage.setItem("userId", claims.sub);
-        navigate("/home");
+        navigate("/"); // redirect to home page
+      } else if (res.error) {
+        setErrorMsg(res.error);
       } else {
-        alert(JSON.stringify(res));
+        setErrorMsg("Sign-in failed. Please try again.");
       }
     } catch (err) {
-      console.error("Error signing in:", err);
-      alert("Sign-in failed. Check console for details.");
+      setErrorMsg("Sign-in failed. Please try again.");
     }
   }
 
@@ -42,6 +42,10 @@ export default function SignIn() {
         className="bg-white p-8 rounded shadow-md w-96 flex flex-col gap-4"
       >
         <h1 className="text-2xl font-bold mb-4">Sign In</h1>
+
+        {errorMsg && (
+          <div className="text-red-600 bg-red-100 p-2 rounded">{errorMsg}</div>
+        )}
 
         <input
           type="text"
@@ -77,3 +81,4 @@ export default function SignIn() {
     </div>
   );
 }
+
