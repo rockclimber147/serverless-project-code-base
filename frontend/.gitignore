@@ -24,3 +24,6 @@ Thumbs.db
 .idea/
 *.sublime-workspace
 *.sublime-project
+
+# Miscellaneous
+lambdasave.py
