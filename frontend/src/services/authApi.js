@@ -1,5 +1,6 @@
 // src/api.js
-export const API_BASE = "https://y35kgh2yf3.execute-api.us-west-2.amazonaws.com/dev";
+export const API_BASE =
+  "https://y35kgh2yf3.execute-api.us-west-2.amazonaws.com/dev";
 
 async function post(path, body, authToken) {
   const headers = { "Content-Type": "application/json" };

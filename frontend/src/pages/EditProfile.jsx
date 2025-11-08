@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { editUser, uploadPhotoBase64 } from "../api";
+import { editUser, uploadPhotoBase64 } from "@/services/authApi"
 
 export default function EditProfile() {
   const [form, setForm] = useState({
@@ -7,7 +7,7 @@ export default function EditProfile() {
     givenName: "",
     familyName: "",
     prefLocation: "",
-    profileImage: ""
+    profileImage: "",
   });
   const [photoFile, setPhotoFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ export default function EditProfile() {
             const res = await uploadPhotoBase64({
               id: form.id,
               fileBase64: base64Data,
-              filename: photoFile.name
+              filename: photoFile.name,
             });
             form.profileImage = res.s3Url; // save S3 URL
             await saveProfile();
@@ -80,27 +80,30 @@ export default function EditProfile() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-96 space-y-2">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md w-96 space-y-2"
+      >
         <h1 className="text-2xl font-bold">Edit Profile</h1>
 
         <input
           placeholder="First Name"
           value={form.givenName}
-          onChange={e => update("givenName", e.target.value)}
+          onChange={(e) => update("givenName", e.target.value)}
           className="border p-2 w-full"
         />
 
         <input
           placeholder="Last Name"
           value={form.familyName}
-          onChange={e => update("familyName", e.target.value)}
+          onChange={(e) => update("familyName", e.target.value)}
           className="border p-2 w-full"
         />
 
         <input
           placeholder="Preferred Location"
           value={form.prefLocation}
-          onChange={e => update("prefLocation", e.target.value)}
+          onChange={(e) => update("prefLocation", e.target.value)}
           className="border p-2 w-full"
         />
 
