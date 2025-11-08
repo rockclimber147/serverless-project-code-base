@@ -3,6 +3,7 @@
 ### Run the development server:
 
 ```
+cd frontend
 npm run dev
 ```
 
