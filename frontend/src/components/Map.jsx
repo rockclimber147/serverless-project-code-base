@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import PropTypes from "prop-types";
 
 const Map = ({ locations = [], enablePopups = true, onMapClick = () => { } }) => {
     const mapContainer = useRef(null);
@@ -55,7 +56,7 @@ const Map = ({ locations = [], enablePopups = true, onMapClick = () => { } }) =>
     useEffect(() => {
         if (!mapRef.current) return;
 
-        const handleMapClick = (e) => {
+        const handleMapClick = () => {
             if (typeof mapRef.current.clearSelection === "function") {
                 mapRef.current.clearSelection();
             }
@@ -101,6 +102,18 @@ const Map = ({ locations = [], enablePopups = true, onMapClick = () => { } }) =>
     }, [locations, enablePopups]);
 
     return <div ref={mapContainer} className="w-full h-full" />;
+};
+
+Map.propTypes = {
+  locations: PropTypes.arrayOf(
+    PropTypes.shape({
+      location: PropTypes.arrayOf(PropTypes.number).isRequired,
+      popup: PropTypes.string,
+      onClick: PropTypes.func
+    })
+  ),
+  enablePopups: PropTypes.bool,
+  onMapClick: PropTypes.func
 };
 
 export default Map;
