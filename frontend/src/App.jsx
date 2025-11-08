@@ -5,6 +5,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Confirm from "./pages/Confirm";
 import EditProfile from "./pages/EditProfile";
+import ListingsMap from "./pages/ListingsMap";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/confirm" element={<Confirm />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/listings-map" element={<ListingsMap />} />
       </Routes>
     </BrowserRouter>
   );
