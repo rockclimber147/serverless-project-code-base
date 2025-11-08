@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { confirmUser, resendConfirmation } from "../api";
+import { confirmUser, resendConfirmation } from "@/services/authApi"
 import { useNavigate } from "react-router-dom";
 
 export default function Confirm() {
@@ -55,7 +55,10 @@ export default function Confirm() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={submit} className="bg-white p-8 rounded shadow-md w-96 flex flex-col gap-4">
+      <form
+        onSubmit={submit}
+        className="bg-white p-8 rounded shadow-md w-96 flex flex-col gap-4"
+      >
         <h1 className="text-2xl font-bold mb-4">Confirm Account</h1>
 
         <input
@@ -80,7 +83,9 @@ export default function Confirm() {
           {loading ? "Confirming..." : "Confirm"}
         </button>
 
-        {message && <p className="text-sm text-center text-gray-700">{message}</p>}
+        {message && (
+          <p className="text-sm text-center text-gray-700">{message}</p>
+        )}
 
         <button
           type="button"
@@ -89,7 +94,9 @@ export default function Confirm() {
         >
           Resend Code
         </button>
-        {resendMessage && <p className="text-sm text-center text-gray-700">{resendMessage}</p>}
+        {resendMessage && (
+          <p className="text-sm text-center text-gray-700">{resendMessage}</p>
+        )}
       </form>
     </div>
   );

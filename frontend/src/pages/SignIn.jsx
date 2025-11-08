@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signin, parseJwt } from "../api";
+import { signin, parseJwt } from "@/services/authApi"
 import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
@@ -81,4 +81,3 @@ export default function SignIn() {
     </div>
   );
 }
-
