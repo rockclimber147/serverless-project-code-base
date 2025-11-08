@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { editUser, uploadPhotoBase64 } from "../api";
+import { editUser, uploadPhotoBase64 } from "@/services/authApi"
 
 export default function EditProfile() {
   const [form, setForm] = useState({

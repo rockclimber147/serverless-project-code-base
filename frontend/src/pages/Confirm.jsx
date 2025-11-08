@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { confirmUser, resendConfirmation } from "../api";
+import { confirmUser, resendConfirmation } from "@/services/authApi"
 import { useNavigate } from "react-router-dom";
 
 export default function Confirm() {
