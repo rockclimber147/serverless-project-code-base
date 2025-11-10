@@ -86,6 +86,7 @@ const MapPage = () => {
                 enablePopups={true}
                 selectedListing={selectedListing}
                 onMapClick={() => setSelectedListing(null)}
+                centerOnUser={true}
             />
         </div>
     );
