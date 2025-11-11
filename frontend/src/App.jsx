@@ -6,6 +6,7 @@ import SignUp from "./pages/SignUp";
 import Confirm from "./pages/Confirm";
 import EditProfile from "./pages/EditProfile";
 import Navbar from "./components/Navbar";
+import Profile from "./pages/ViewProfile";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/confirm" element={<Confirm />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/view-profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
