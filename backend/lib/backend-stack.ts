@@ -1,22 +1,37 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as apigw from 'aws-cdk-lib/aws-apigateway';
-import { CRUDGatewayConstruct as CRUDGateway } from './ApiGateway/gateway';
-import { ItemsTable } from '../dynamo/itemsTable';
-import { ItemsFeature } from '../lambdas/items/itemsIntegrationConstruct';
+import * as cdk from "aws-cdk-lib";
+import { Construct } from "constructs";
+import { CognitoConstruct } from './Cognito/cognito';
+import { CRUDGatewayConstruct } from './ApiGateway/gateway';
+import { DynamoTableConstruct } from './DynamoDb/tables';
+import { SecretsManagerConstruct } from './Cognito/secretsManager';
+import { UserSignupFeatureConstruct } from './features/UserAccountFeature';
 
-export class BackendStack extends cdk.Stack {
+export class ProductionStack extends cdk.Stack {
+  public readonly cognitoConstruct: CognitoConstruct;
+  public readonly gatewayConstruct: CRUDGatewayConstruct;
+  public readonly dynamoTable: DynamoTableConstruct;
+  public readonly secretManager: SecretsManagerConstruct;
+  public readonly userAccountFeature: UserSignupFeatureConstruct;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const itemsTable = new ItemsTable(this, "ItemsTable");
-    const crudGateway = new CRUDGateway(this, "CRUDGateway");
+    this.cognitoConstruct = new CognitoConstruct(this, "Cognito");
 
-    // Create the Items feature (table + lambdas + permissions)
-    const itemsFeature = new ItemsFeature(this, 'ItemsFeature', {table: itemsTable, crudGateway: crudGateway});
+    this.gatewayConstruct = new CRUDGatewayConstruct(this, "CrusGateway");
 
-    // Optional outputs
-    new cdk.CfnOutput(this, 'ApiUrl', { value: crudGateway.api.url });
-    new cdk.CfnOutput(this, 'TableName', { value: itemsFeature.table.table.tableName });
+    this.dynamoTable = new DynamoTableConstruct(this, "DynamoTables");
+
+    this.secretManager = new SecretsManagerConstruct(this, "CognitoClientSecret", {
+      secretName: "UserPoolClientSecret",
+      clientSecret: this.cognitoConstruct.userPoolClient.userPoolClientSecret!,
+    });
+
+    this.userAccountFeature = new UserSignupFeatureConstruct(this, "userSignup", {
+      cognito: this.cognitoConstruct,
+      secretManager: this.secretManager,
+      api: this.gatewayConstruct,
+      tables: this.dynamoTable,
+    });
   }
 }

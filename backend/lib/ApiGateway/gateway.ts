@@ -8,6 +8,10 @@ export interface ApiGatewayProps {
 
 export class CRUDGatewayConstruct extends Construct {
   public readonly api: apigw.RestApi;
+  public readonly publicResource: apigw.Resource;
+  public readonly authResource: apigw.Resource;
+  public readonly userResource: apigw.Resource;
+  public readonly adminResource: apigw.Resource;
 
   constructor(scope: Construct, id: string, props?: ApiGatewayProps) {
     super(scope, id);
@@ -16,5 +20,10 @@ export class CRUDGatewayConstruct extends Construct {
       restApiName: 'Items Service',
       deployOptions: { stageName: props?.stageName ?? 'prod' },
     });
+
+    this.publicResource = this.api.root.addResource('public');
+    this.authResource = this.api.root.addResource("auth");
+    this.userResource = this.api.root.addResource('user');
+    this.adminResource = this.api.root.addResource('admin');
   }
 }
