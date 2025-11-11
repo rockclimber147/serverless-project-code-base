@@ -13,7 +13,7 @@ export default function ItemCard(props) {
   };
 
   return (
-    <div className="w-64 m-2">
+    <div className="w-full m-2">
       <div className="relative">
         <img
           src={item.imageUrl}
