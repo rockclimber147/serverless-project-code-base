@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 const Map = ({
   locations = [],
   enablePopups = true,
+  selectedListing = null,
   onMapClick = () => {},
   centerOnUser = true
 }) => {
@@ -33,7 +34,7 @@ const Map = ({
     } else if (!centerOnUser && locations.length > 0) {
       setCenter(locations[0].location);
     }
-  }, [centerOnUser, locations]);
+  }, [centerOnUser]);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -50,7 +51,7 @@ const Map = ({
     mapRef.current.on("load", () => {
       mapRef.current.setCenter(center);
     });
-  }, [center]);
+  }, []);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -62,21 +63,31 @@ const Map = ({
     mapRef.current.on("click", handleMapClick);
     return () => mapRef.current.off("click", handleMapClick);
   }, [onMapClick]);
-
+  
   useEffect(() => {
-    if (mapRef.current && mapRef.current.loaded()) {
+    if (mapRef.current) {
       mapRef.current.setCenter(center);
     }
   }, [center]);
 
   useEffect(() => {
+    if (selectedListing && mapRef.current) {
+      mapRef.current.flyTo({ center: selectedListing.location, zoom: 15 });
+    }
+  }, [selectedListing]);
+
+  useEffect(() => {
     if (!mapRef.current) return;
+
+    console.log(selectedListing?.id)
 
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    locations.forEach(({ location, popup, onClick }) => {
-      const marker = new maplibregl.Marker()
+    locations.forEach(({ id, location, popup, onClick }) => {
+      const marker = new maplibregl.Marker({
+        color: id === selectedListing?.id ? "#DD3333" : "#3FB1CE"
+      })
         .setLngLat(location)
         .addTo(mapRef.current);
 
@@ -93,7 +104,7 @@ const Map = ({
 
       markersRef.current.push(marker);
     });
-  }, [locations, enablePopups]);
+  }, [locations, enablePopups, selectedListing]);
 
   return <div ref={mapContainer} className="w-full h-full" />;
 };
@@ -101,11 +112,21 @@ const Map = ({
 Map.propTypes = {
   locations: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.number,
       location: PropTypes.arrayOf(PropTypes.number).isRequired,
       popup: PropTypes.string,
       onClick: PropTypes.func
     })
   ),
+  selectedListing: PropTypes.oneOfType([
+    PropTypes.shape({
+      id: PropTypes.number,
+      location: PropTypes.arrayOf(PropTypes.number).isRequired,
+      popup: PropTypes.string,
+      onClick: PropTypes.func,
+    }),
+    PropTypes.oneOf([null]), // allow null
+  ]),
   enablePopups: PropTypes.bool,
   onMapClick: PropTypes.func,
   centerOnUser: PropTypes.bool
