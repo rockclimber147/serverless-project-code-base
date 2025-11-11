@@ -13,7 +13,7 @@ export default function ItemCard(props) {
   };
 
   return (
-    <div className="w-64 m-2">
+    <div className="w-full m-2">
       <div className="relative">
         <img
           src={item.imageUrl}
@@ -31,7 +31,7 @@ export default function ItemCard(props) {
         </button>
       </div>
 
-      <div className="flex justify-between items-center mb-1 w-[300px]">
+      <div className="flex justify-between items-center mb-1 w-full">
         <h5 className="text-lg">{item.name}</h5>
         <b>${item.price}</b>
       </div>

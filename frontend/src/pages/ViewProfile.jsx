@@ -134,7 +134,7 @@ export default function Profile({ type = "user" }) {
         </div>
 
         {/* Grid Wrapper */}
-        <div className="w-full flex flex-wrap justify-center ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {listings.map((item) => (
             <ItemCard key={item.id} item={item} />
           ))}

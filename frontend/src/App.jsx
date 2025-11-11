@@ -7,6 +7,7 @@ import Confirm from "./pages/Confirm";
 import EditProfile from "./pages/EditProfile";
 import Navbar from "./components/Navbar";
 import UserDashboardGrid from "./pages/user/UserDashboardGrid";
+import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
 import ItemDetails from "./pages/user/ItemDetails";
 
@@ -28,6 +29,7 @@ function App() {
             element={<Profile type="seller" />}
           />
           <Route path="/item-details" element={<ItemDetails />} />
+          <Route path="/favourites" element={<Favourites />} />
         </Routes>
       </div>
     </BrowserRouter>
