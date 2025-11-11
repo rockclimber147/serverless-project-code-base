@@ -19,7 +19,8 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/confirm" element={<Confirm />} />
         <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/view-profile" element={<Profile />} />
+        <Route path="/view-user-profile" element={<Profile />} />
+        <Route path="/view-seller-profile" element={<Profile type="seller"/>} />
       </Routes>
     </BrowserRouter>
   );

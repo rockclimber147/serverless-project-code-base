@@ -16,7 +16,7 @@ export default function Navbar() {
         <Link to="/favorites">
           <FaRegHeart className="hover:text-gray-300" />
         </Link>
-        <Link to="/view-profile">
+        <Link to="/view-user-profile">
           <FaUser className="hover:text-gray-300" />
         </Link>
       </div>
