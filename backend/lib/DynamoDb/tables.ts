@@ -2,25 +2,24 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
-export class DynamoTableConstruct extends Construct {
-  public static readonly USER_TABLE_NAME = "UserTable";
-  public readonly userTable: dynamodb.Table;
+export class DynamoTablesConstruct extends Construct {
+  public readonly userTable: dynamodb.ITable;
+  public readonly listingsTable: dynamodb.Table;
 
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, usersTableArn: string) {
     super(scope, id);
 
-    this.userTable = new dynamodb.Table(
-      this,
-      DynamoTableConstruct.USER_TABLE_NAME,
-      {
-        partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
-        removalPolicy: cdk.RemovalPolicy.DESTROY, // for PoC
-      }
-    );
+    this.userTable = dynamodb.Table.fromTableArn(this, "UserTable", usersTableArn);
 
-    this.userTable.addGlobalSecondaryIndex({
-      indexName: "email-index",
-      partitionKey: { name: "email", type: dynamodb.AttributeType.STRING },
+    this.listingsTable = new dynamodb.Table(this, "ListingsTable", {
+      tableName: "Listings",
+      partitionKey: { name: "listing_id", type: dynamodb.AttributeType.STRING },
+      removalPolicy: cdk.RemovalPolicy.DESTROY, // safe for PoC
+    });
+
+    this.listingsTable.addGlobalSecondaryIndex({
+      indexName: "owner-id-index",
+      partitionKey: { name: "owner_id", type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
     });
   }

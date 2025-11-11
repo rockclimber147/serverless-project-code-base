@@ -4,6 +4,7 @@ export const API_ENDPOINTS = {
     signup: "signup",
     signin: "signin",
     confirm: "confirm",
+    resend: "resend"
   },
   public: {
     value: "public"

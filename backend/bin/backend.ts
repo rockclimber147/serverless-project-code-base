@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib/core";
-import { ProductionStack } from "../lib/backend-stack";
-import { AuthApiStack } from "../lib/auth-test-stack";
+import { ProductionStack } from "../lib/stacks/backend-stack";
 
 const app = new cdk.App();
 const productionStack = new ProductionStack(app, "ProductionStack", {
@@ -24,3 +23,5 @@ const productionStack = new ProductionStack(app, "ProductionStack", {
 //   secretManager: productionStack.secretManager,
 //   // optional: env, tags, etc.
 // });
+
+// const test = new SimpleStack(app, "SimpleStack")
