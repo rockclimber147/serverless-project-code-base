@@ -13,7 +13,7 @@ export default function Navbar() {
         <Link to="/chat">
           <FaRegCommentDots className="hover:text-gray-300 text-lg" />
         </Link>
-        <Link to="/favorites">
+        <Link to="/favourites">
           <FaRegHeart className="hover:text-gray-300 text-lg" />
         </Link>
         <Link to="/view-user-profile">

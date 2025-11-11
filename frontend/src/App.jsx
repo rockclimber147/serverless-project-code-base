@@ -7,6 +7,7 @@ import Confirm from "./pages/Confirm";
 import EditProfile from "./pages/EditProfile";
 import Navbar from "./components/Navbar";
 import UserDashboardGrid from "./pages/user/UserDashboardGrid";
+import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
 
 function App() {
@@ -22,11 +23,9 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/user-dashboard-grid" element={<UserDashboardGrid />} />
           <Route path="/view-user-profile" element={<Profile />} />
-          <Route
-            path="/view-seller-profile"
-            element={<Profile type="seller" />}
-          />
-        </Routes>
+          <Route path="/view-seller-profile" element={<Profile type="seller"/>} />
+          <Route path="/favourites" element={<Favourites />} />
+      </Routes>
       </div>
     </BrowserRouter>
   );
