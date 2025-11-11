@@ -17,13 +17,9 @@ interface ListingsFeatureProps {
 }
 
 export class ListingsFeatureConstruct extends Construct {
-  public readonly createListingLambda: lambda.Function;
-  public readonly getListingsLambda: lambda.Function;
-
   constructor(scope: Construct, id: string, props: ListingsFeatureProps) {
     super(scope, id);
 
-    // --- Helper to create Lambdas ---
     const createLambda = (name: string, handler: string) =>
       new lambda.Function(this, name, {
         runtime: lambda.Runtime.PYTHON_3_11,
@@ -32,7 +28,30 @@ export class ListingsFeatureConstruct extends Construct {
         environment: {
           LISTINGS_TABLE: props.tables.listingsTable.tableName,
           USER_POOL_ID: props.auth.userPool.userPoolId,
+          AWS_REGION: cdk.Stack.of(this).region,
         },
       });
+
+    const userAuthorizer = new apigw.CognitoUserPoolsAuthorizer(
+      this,
+      "UserPoolAuthorizer",
+      {
+        cognitoUserPools: [props.auth.userPool],
+      }
+    );
+
+    const addListingLambda = createLambda("AddListingLambda", "add_listing.lambda_handler");
+
+    props.tables.listingsTable.grantReadWriteData(addListingLambda);
+
+    const listingsResource = props.api.userResource.addResource("listings");
+    listingsResource.addMethod(
+      "POST",
+      new apigw.LambdaIntegration(addListingLambda),
+      {
+        authorizer: userAuthorizer,
+        authorizationType: apigw.AuthorizationType.COGNITO,
+      }
+    );
   }
 }
