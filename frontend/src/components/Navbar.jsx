@@ -6,7 +6,7 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between bg-gray-800 p-2 text-white fixed top-0 left-0 w-full z-50">
       <div className="text-xl font-bold">
-        <Link to="/">Crocs List</Link>
+        <Link to="/user-dashboard-grid">Crocs List</Link>
       </div>
 
       <div className="flex space-x-4 text-2xl">
