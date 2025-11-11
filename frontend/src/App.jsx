@@ -6,22 +6,24 @@ import SignUp from "./pages/SignUp";
 import Confirm from "./pages/Confirm";
 import EditProfile from "./pages/EditProfile";
 import Navbar from "./components/Navbar";
+import UserDashboardGrid from "./pages/user/UserDashboardGrid";
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/confirm" element={<Confirm />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-      </Routes>
+      <div className="mt-12">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/confirm" element={<Confirm />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/user-dashboard-grid" element={<UserDashboardGrid />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
 
 export default App;
-
