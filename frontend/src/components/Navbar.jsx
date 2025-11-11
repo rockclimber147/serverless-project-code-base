@@ -4,7 +4,7 @@ import { FaRegHeart, FaUser, FaRegCommentDots } from "react-icons/fa";
 
 export default function Navbar() {
   return (
-    <nav className="flex items-center justify-between bg-gray-800 p-4 text-white">
+    <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-800 p-4 text-white">
       <div className="text-xl font-bold">
         <Link to="/">Crocs List</Link>
       </div>
