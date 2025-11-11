@@ -1,11 +1,12 @@
 # Team members
+
 ```
 Edro Gonzales: edge.row A01257468
 github: cpostnikoff
 github: elenajou
 github: hpang19
 aliceeeeeeeeeeeeeeeeeeeeee: orangeepop
-github: izcheung
+Irene Cheung: izcheung
 github: aaronawylo HEEHEE
 github: pkwlo
 Daylen Smith: rockclimber147
