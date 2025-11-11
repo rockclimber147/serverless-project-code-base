@@ -22,8 +22,11 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/user-dashboard-grid" element={<UserDashboardGrid />} />
           <Route path="/view-user-profile" element={<Profile />} />
-        <Route path="/view-seller-profile" element={<Profile type="seller"/>} />
-      </Routes>
+          <Route
+            path="/view-seller-profile"
+            element={<Profile type="seller" />}
+          />
+        </Routes>
       </div>
     </BrowserRouter>
   );
