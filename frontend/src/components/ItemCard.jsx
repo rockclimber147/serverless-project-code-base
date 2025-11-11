@@ -31,7 +31,7 @@ export default function ItemCard(props) {
         </button>
       </div>
 
-      <div className="flex justify-between items-center mb-1 w-[300px]">
+      <div className="flex justify-between items-center mb-1 w-full">
         <h5 className="text-lg">{item.name}</h5>
         <b>${item.price}</b>
       </div>
