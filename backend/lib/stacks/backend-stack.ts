@@ -15,7 +15,7 @@ export class ProductionStack extends cdk.Stack {
 
     this.cognitoConstruct = new CognitoConstruct(this, "Cognito", {
       userPoolArn:
-        "arn:aws:cognito-idp:us-west-2:552256739229:userpool/us-west-2_E7ZiSeuwQ",
+        "arn:aws:cognito-idp:us-west-2:552256739229:userpool/us-west-2_vYH6Kzlx7",
       adminPoolArn:
         "arn:aws:cognito-idp:us-west-2:552256739229:userpool/us-west-2_nlyMhwOlw",
     });
