@@ -6,6 +6,7 @@ import { CognitoConstruct } from "../Cognito/cognito";
 import { SecretsManagerConstruct } from "../Cognito/secretsManager";
 import { CRUDGatewayConstruct } from "../ApiGateway/gateway";
 import { DynamoTableConstruct } from "../DynamoDb/tables";
+import { API_ENDPOINTS } from "../ApiGateway/endpoints";
 
 export interface UserSignupFeatureProps {
   cognito: CognitoConstruct;
@@ -56,8 +57,8 @@ export class UserSignupFeatureConstruct extends Construct {
     };
 
     // --- API Routes ---
-    addRoute("signup", signupLambda);
-    addRoute("signin", signinLambda);
-    addRoute("confirm", confirmUserLambda);
+    addRoute(API_ENDPOINTS.auth.signup, signupLambda);
+    addRoute(API_ENDPOINTS.auth.signin, signinLambda);
+    addRoute(API_ENDPOINTS.auth.confirm, confirmUserLambda);
   }
 }
