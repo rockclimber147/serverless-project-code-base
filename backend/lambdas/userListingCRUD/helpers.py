@@ -3,7 +3,6 @@ import boto3
 
 dynamodb = boto3.client("dynamodb")
 
-# ---------- Create Listing ----------
 def create_listing(table_name: str, user_id: str, data: dict) -> dict:
     """
     Creates a new listing owned by the user (user_id).
@@ -46,7 +45,6 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
     }
 
 
-# ---------- Update Listing ----------
 def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict) -> dict:
     """
     Updates fields in an existing listing if the user owns it.
@@ -110,7 +108,6 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
     }
 
 
-# ---------- Delete Listing ----------
 def delete_listing(table_name: str, listing_id: str, user_id: str) -> dict:
     """
     Deletes a listing if the user owns it.

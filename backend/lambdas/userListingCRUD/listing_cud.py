@@ -3,8 +3,6 @@ import json
 import boto3
 from helpers import create_listing, update_listing, delete_listing
 
-
-# --- Environment Variables ---
 LISTINGS_TABLE = os.environ.get("LISTINGS_TABLE")
 REGION = os.environ.get("AWS_REGION", "us-west-2")
 

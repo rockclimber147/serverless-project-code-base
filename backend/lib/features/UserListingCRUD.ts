@@ -21,47 +21,26 @@ export class ListingsFeatureConstruct extends Construct {
   constructor(scope: Construct, id: string, props: ListingsFeatureProps) {
     super(scope, id);
 
-    // --- Helper to create lambdas ---
-    const createLambda = (name: string, handler: string) =>
-      new lambda.Function(this, name, {
-        runtime: lambda.Runtime.PYTHON_3_11,
-        handler,
-        code: lambda.Code.fromAsset("lambdas/userListingCRUD"),
-        environment: {
-          LISTINGS_TABLE: props.tables.listingsTable.tableName,
-          USER_POOL_ID: props.auth.userPool.userPoolId,
-        },
-      });
-
-    // --- Cognito authorizer ---
     const userAuthorizer = new apigw.CognitoUserPoolsAuthorizer(this, "UserPoolAuthorizer", {
       cognitoUserPools: [props.auth.userPool],
     });
 
-    // --- Single Lambda for all CUD operations ---
-    const listingCUDLambda = createLambda("listingCUDLambda", "listing_cud.lambda_handler");
+    const listingCUDLambda = new lambda.Function(this, "listingCUDLambda", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: "listing_cud.lambda_handler",
+      code: lambda.Code.fromAsset("lambdas/userListingCRUD"),
+      environment: {
+        LISTINGS_TABLE: props.tables.listingsTable.tableName,
+        USER_POOL_ID: props.auth.userPool.userPoolId,
+      },
+    });
+
     props.tables.listingsTable.grantReadWriteData(listingCUDLambda);
 
-    // --- /user/listings resource ---
     const listingsResource = props.api.userResource.addResource("listings");
-
-    // POST /user/listings — Create a new listing
-    listingsResource.addMethod("POST", new apigw.LambdaIntegration(listingCUDLambda), {
-      authorizer: userAuthorizer,
-      authorizationType: apigw.AuthorizationType.COGNITO,
-    });
-
-    // PATCH /user/listings — Update an existing listing
-    listingsResource.addMethod("PATCH", new apigw.LambdaIntegration(listingCUDLambda), {
-      authorizer: userAuthorizer,
-      authorizationType: apigw.AuthorizationType.COGNITO,
-    });
-
-    // DELETE /user/listings — Delete a listing
-    listingsResource.addMethod("DELETE", new apigw.LambdaIntegration(listingCUDLambda), {
-      authorizer: userAuthorizer,
-      authorizationType: apigw.AuthorizationType.COGNITO,
-    });
+    this.addMethodWithAuthorizer(listingsResource, "POST", listingCUDLambda, userAuthorizer);
+    this.addMethodWithAuthorizer(listingsResource, "PATCH", listingCUDLambda, userAuthorizer);
+    this.addMethodWithAuthorizer(listingsResource, "DELETE", listingCUDLambda, userAuthorizer);
 
     const listingPhotoLambda = new lambda.Function(this, "listingPhotoLambda", {
       runtime: lambda.Runtime.PYTHON_3_11,
@@ -72,13 +51,20 @@ export class ListingsFeatureConstruct extends Construct {
       },
     });
 
-    // Give Lambda permission to write objects
     props.listingPhotos.bucket.grantPut(listingPhotoLambda);
 
-    // Add API Gateway route
     const photoResource = listingsResource.addResource("photo");
-    photoResource.addMethod("POST", new apigw.LambdaIntegration(listingPhotoLambda), {
-      authorizer: userAuthorizer,
+    this.addMethodWithAuthorizer(photoResource, "POST", listingPhotoLambda, userAuthorizer);
+  }
+
+  private addMethodWithAuthorizer(
+    resource: apigw.IResource,
+    method: string,
+    lambdaFn: lambda.IFunction,
+    authorizer: apigw.IAuthorizer
+  ) {
+    resource.addMethod(method, new apigw.LambdaIntegration(lambdaFn), {
+      authorizer,
       authorizationType: apigw.AuthorizationType.COGNITO,
     });
   }

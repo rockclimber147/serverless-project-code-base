@@ -17,18 +17,15 @@ CORS_HEADERS = {
 
 
 def lambda_handler(event, context):
-    # Parse body JSON
     body = json.loads(event.get("body") or "{}")
     listing_id = body.get("listing_id")
 
     if not listing_id:
         return cors_response(400, {"error": "listing_id is required"})
 
-    # Use listing_id as filename
     filename = f"{listing_id}.jpg"
 
     try:
-        # Generate presigned PUT URL
         url = s3_client.generate_presigned_url(
             "put_object",
             Params={
@@ -37,12 +34,11 @@ def lambda_handler(event, context):
                 "ContentType": "image/jpeg",
                 "ACL": "bucket-owner-full-control"
             },
-            ExpiresIn=300,  # 5 minutes
+            ExpiresIn=300,
         )
     except ClientError as e:
         return cors_response(500, {"error": str(e)})
 
-    # Public URL after upload
     public_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
     return cors_response(200, {"upload_url": url, "public_url": public_url})

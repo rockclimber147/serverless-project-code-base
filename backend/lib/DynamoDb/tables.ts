@@ -15,7 +15,7 @@ export class DynamoTablesConstruct extends Construct {
     this.listingsTable = new dynamodb.Table(this, "ListingsTable", {
       tableName: tableName,
       partitionKey: { name: "listing_id", type: dynamodb.AttributeType.STRING },
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // safe for PoC
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     this.listingsTable.addGlobalSecondaryIndex({

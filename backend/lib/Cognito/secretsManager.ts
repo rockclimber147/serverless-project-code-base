@@ -15,7 +15,7 @@ export class SecretsManagerConstruct extends Construct {
 
     this.secret = new secretsmanager.Secret(this, "CognitoClientSecret", {
       secretName: props.secretName,
-      secretStringValue: props.clientSecret, // can be SecretValue
+      secretStringValue: props.clientSecret,
     });
   }
 }
