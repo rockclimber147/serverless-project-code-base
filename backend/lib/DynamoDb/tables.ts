@@ -11,8 +11,9 @@ export class DynamoTablesConstruct extends Construct {
 
     this.userTable = dynamodb.Table.fromTableArn(this, "UserTable", usersTableArn);
 
+    const tableName = `Listings-${cdk.Stack.of(this).account}-${cdk.Stack.of(this).region}`;
     this.listingsTable = new dynamodb.Table(this, "ListingsTable", {
-      tableName: "Listings",
+      tableName: tableName,
       partitionKey: { name: "listing_id", type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY, // safe for PoC
     });

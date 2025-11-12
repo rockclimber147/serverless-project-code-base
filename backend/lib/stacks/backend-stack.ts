@@ -4,6 +4,7 @@ import { CognitoConstruct } from "../Cognito/cognito";
 import { CRUDGatewayConstruct } from "../ApiGateway/gateway";
 import { DynamoTablesConstruct } from "../DynamoDb/tables";
 import { ListingsFeatureConstruct } from "../features/UserListingCRUD";
+import { ListingPhotosBucketConstruct } from "../S3/listingPhotos";
 
 export class ProductionStack extends cdk.Stack {
   public readonly cognitoConstruct: CognitoConstruct;
@@ -27,6 +28,8 @@ export class ProductionStack extends cdk.Stack {
       "DynamoTables",
       "arn:aws:dynamodb:us-west-2:552256739229:table/usertable"
     );
+
+    const listingPhotosBucket = new ListingPhotosBucketConstruct(this, "ListingPhotosBucket");
 
     const listingFeature = new ListingsFeatureConstruct(this, "ListingFeature", {
       tables: this.dynamoTable,
