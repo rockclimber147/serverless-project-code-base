@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import SellerCard from "@/components/SellerCard";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 
