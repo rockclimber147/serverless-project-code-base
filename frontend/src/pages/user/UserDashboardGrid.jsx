@@ -4,6 +4,7 @@ import React from "react";
 import { useState } from "react";
 export default function UserDashboardGrid() {
   // TODO: replace
+
   const mockItems = [
     {
       id: 1,
@@ -11,6 +12,8 @@ export default function UserDashboardGrid() {
       price: 123,
       location: "123 Main Street, BC",
       imageUrl: "https://picsum.photos/seed/item1/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 2,
@@ -18,6 +21,8 @@ export default function UserDashboardGrid() {
       price: 234,
       location: "234 Oak Avenue, BC",
       imageUrl: "https://picsum.photos/seed/item2/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 3,
@@ -25,6 +30,8 @@ export default function UserDashboardGrid() {
       price: 345,
       location: "345 Pine Road, BC",
       imageUrl: "https://picsum.photos/seed/item3/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 4,
@@ -32,6 +39,8 @@ export default function UserDashboardGrid() {
       price: 456,
       location: "456 Maple Street, BC",
       imageUrl: "https://picsum.photos/seed/item4/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 5,
@@ -39,6 +48,8 @@ export default function UserDashboardGrid() {
       price: 567,
       location: "567 Cedar Drive, BC",
       imageUrl: "https://picsum.photos/seed/item5/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 6,
@@ -46,6 +57,8 @@ export default function UserDashboardGrid() {
       price: 678,
       location: "678 Spruce Lane, BC",
       imageUrl: "https://picsum.photos/seed/item6/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 7,
@@ -53,6 +66,8 @@ export default function UserDashboardGrid() {
       price: 789,
       location: "789 Willow Crescent, BC",
       imageUrl: "https://picsum.photos/seed/item7/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 8,
@@ -60,6 +75,8 @@ export default function UserDashboardGrid() {
       price: 890,
       location: "890 Elm Street, BC",
       imageUrl: "https://picsum.photos/seed/item8/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 9,
@@ -67,6 +84,8 @@ export default function UserDashboardGrid() {
       price: 901,
       location: "901 Birch Road, BC",
       imageUrl: "https://picsum.photos/seed/item9/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 10,
@@ -74,6 +93,8 @@ export default function UserDashboardGrid() {
       price: 1012,
       location: "1012 Aspen Way, BC",
       imageUrl: "https://picsum.photos/seed/item10/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 1,
@@ -81,6 +102,8 @@ export default function UserDashboardGrid() {
       price: 123,
       location: "123 Main Street, BC",
       imageUrl: "https://picsum.photos/seed/item1/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 2,
@@ -88,6 +111,8 @@ export default function UserDashboardGrid() {
       price: 234,
       location: "234 Oak Avenue, BC",
       imageUrl: "https://picsum.photos/seed/item2/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 3,
@@ -95,6 +120,8 @@ export default function UserDashboardGrid() {
       price: 345,
       location: "345 Pine Road, BC",
       imageUrl: "https://picsum.photos/seed/item3/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 4,
@@ -102,6 +129,8 @@ export default function UserDashboardGrid() {
       price: 456,
       location: "456 Maple Street, BC",
       imageUrl: "https://picsum.photos/seed/item4/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 5,
@@ -109,6 +138,8 @@ export default function UserDashboardGrid() {
       price: 567,
       location: "567 Cedar Drive, BC",
       imageUrl: "https://picsum.photos/seed/item5/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 6,
@@ -116,6 +147,8 @@ export default function UserDashboardGrid() {
       price: 678,
       location: "678 Spruce Lane, BC",
       imageUrl: "https://picsum.photos/seed/item6/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 7,
@@ -123,6 +156,8 @@ export default function UserDashboardGrid() {
       price: 789,
       location: "789 Willow Crescent, BC",
       imageUrl: "https://picsum.photos/seed/item7/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 8,
@@ -130,6 +165,8 @@ export default function UserDashboardGrid() {
       price: 890,
       location: "890 Elm Street, BC",
       imageUrl: "https://picsum.photos/seed/item8/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 9,
@@ -137,6 +174,8 @@ export default function UserDashboardGrid() {
       price: 901,
       location: "901 Birch Road, BC",
       imageUrl: "https://picsum.photos/seed/item9/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
       id: 10,
@@ -144,6 +183,8 @@ export default function UserDashboardGrid() {
       price: 1012,
       location: "1012 Aspen Way, BC",
       imageUrl: "https://picsum.photos/seed/item10/300/200",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
   ];
 
