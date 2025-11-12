@@ -8,12 +8,13 @@ import * as cognito from "aws-cdk-lib/aws-cognito";
 import { CognitoConstruct } from "../Cognito/cognito";
 import { CRUDGatewayConstruct } from "../ApiGateway/gateway";
 import { DynamoTablesConstruct } from "../DynamoDb/tables";
-
+import { ListingPhotosBucketConstruct } from "../S3/listingPhotos";
 
 interface ListingsFeatureProps {
   tables: DynamoTablesConstruct;
   api: CRUDGatewayConstruct;
   auth: CognitoConstruct;
+  listingPhotos: ListingPhotosBucketConstruct
 }
 
 export class ListingsFeatureConstruct extends Construct {
@@ -58,6 +59,25 @@ export class ListingsFeatureConstruct extends Construct {
 
     // DELETE /user/listings — Delete a listing
     listingsResource.addMethod("DELETE", new apigw.LambdaIntegration(listingCUDLambda), {
+      authorizer: userAuthorizer,
+      authorizationType: apigw.AuthorizationType.COGNITO,
+    });
+
+    const listingPhotoLambda = new lambda.Function(this, "listingPhotoLambda", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: "listing_photo.lambda_handler",
+      code: lambda.Code.fromAsset("lambdas/UserListingCRUD"),
+      environment: {
+        LISTING_PHOTOS_BUCKET: props.listingPhotos.bucket.bucketName,
+      },
+    });
+
+    // Give Lambda permission to write objects
+    props.listingPhotos.bucket.grantPut(listingPhotoLambda);
+
+    // Add API Gateway route
+    const photoResource = listingsResource.addResource("photo");
+    photoResource.addMethod("POST", new apigw.LambdaIntegration(listingPhotoLambda), {
       authorizer: userAuthorizer,
       authorizationType: apigw.AuthorizationType.COGNITO,
     });
