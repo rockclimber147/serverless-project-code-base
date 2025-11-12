@@ -45,8 +45,8 @@ export async function confirmUser(payload) {
 export async function resendConfirmation(payload) {
   return post("/confirmuser/resendconfirmation", payload);
 }
-export async function uploadPhotoBase64(payload, authToken) {
-  return post("/uploadphoto", payload, authToken);
+export async function uploadPhoto(payload, authToken) {
+  return post("/edituser/uploadphoto", payload, authToken);
 }
 export async function editUser(payload, authToken) {
   return post("/edituser", payload, authToken);

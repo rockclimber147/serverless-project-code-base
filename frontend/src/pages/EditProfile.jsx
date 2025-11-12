@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { editUser, uploadPhotoBase64 } from "@/services/authApi"
+import { editUser, uploadPhoto } from "@/services/authApi"
 
 export default function EditProfile() {
   const [form, setForm] = useState({
@@ -30,41 +30,53 @@ export default function EditProfile() {
     setPhotoFile(file);
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
+async function handleSubmit(e) {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // 1️⃣ Upload photo first if selected
-      if (photoFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Data = reader.result.split(",")[1]; // remove prefix
-          try {
-            const res = await uploadPhotoBase64({
-              id: form.id,
-              fileBase64: base64Data,
-              filename: photoFile.name,
-            });
-            form.profileImage = res.s3Url; // save S3 URL
-            await saveProfile();
-          } catch (err) {
-            console.error("Photo upload failed:", err);
-            alert("Photo upload failed.");
-            setLoading(false);
-          }
-        };
-        reader.readAsDataURL(photoFile);
-      } else {
-        // No photo selected, just save profile
-        await saveProfile();
+  try {
+    if (photoFile) {
+      // Get URL from Lambda
+      const presignRes = await uploadPhoto({
+        id: form.id,
+      });
+
+      const { upload_url, public_url } = await presignRes;
+
+      if (!upload_url || !public_url) {
+        throw new Error("Failed to get S3 URL")
       }
-    } catch (err) {
-      console.error(err);
-      alert("Update failed.");
-      setLoading(false);
+
+      // Upload the file directly to S3 using the presigned URL
+      const uploadRes = await fetch(upload_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": photoFile.type || "image/jpeg",
+        },
+        body: photoFile,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload to S3");
+      }
+
+      // Add the S3 link to the set of form data
+      form.profileImage = public_url;
+
+      await saveProfile();
+
+    } else {
+      // No photo selected, just save profile
+      await saveProfile();
     }
+
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    alert("Update failed.");
+  } finally {
+    setLoading(false);
   }
+}
 
   async function saveProfile() {
     try {
