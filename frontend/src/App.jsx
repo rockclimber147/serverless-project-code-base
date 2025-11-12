@@ -9,12 +9,13 @@ import Navbar from "./components/Navbar";
 import UserDashboardGrid from "./pages/user/UserDashboardGrid";
 import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
+import ItemDetails from "./pages/user/ItemDetails";
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="mt-12">
+      <div className="mt-11">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
@@ -23,9 +24,13 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/user-dashboard-grid" element={<UserDashboardGrid />} />
           <Route path="/view-user-profile" element={<Profile />} />
-          <Route path="/view-seller-profile" element={<Profile type="seller"/>} />
+          <Route
+            path="/view-seller-profile"
+            element={<Profile type="seller" />}
+          />
+          <Route path="/item-details" element={<ItemDetails />} />
           <Route path="/favourites" element={<Favourites />} />
-      </Routes>
+        </Routes>
       </div>
     </BrowserRouter>
   );
