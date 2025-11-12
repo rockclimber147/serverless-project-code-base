@@ -2,10 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function ItemCard(props) {
   const { item } = props;
   const [favourite, setFavourite] = useState(false);
+  const navigate = useNavigate();
 
   const handleToggleFavourite = async () => {
     setFavourite(!favourite);
@@ -13,7 +15,12 @@ export default function ItemCard(props) {
   };
 
   return (
-    <div className="w-full m-2">
+    <div
+      className="w-full m-2"
+      onClick={() => {
+        navigate("/item-details", { state: { item } });
+      }}
+    >
       <div className="relative">
         <img
           src={item.imageUrl}
