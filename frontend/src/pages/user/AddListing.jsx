@@ -22,15 +22,14 @@ export default function AddListing() {
   return (
     <div className="flex w-full gap-4 h-screen">
       {/* Image */}
-      <div className="flex-[3] flex justify-center items-center bg-gray-400 w-full">
+      <div className="flex-[3] overflow-hidden bg-gray-200 flex justify-center items-center">
         {image ? (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full overflow-hidden">
             <img
               src={image}
               alt="Preview"
               className="object-cover h-full w-full"
             />
-            <br />
             <button
               onClick={handleClear}
               className="absolute top-2 right-2 bg-red-400 text-white px-3 py-1 rounded-lg"
