@@ -97,7 +97,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 1,
+      id: 11,
       name: "Item1",
       price: 123,
       location: "123 Main Street, BC",
@@ -106,7 +106,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 2,
+      id: 12,
       name: "Item2",
       price: 234,
       location: "234 Oak Avenue, BC",
@@ -115,7 +115,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 3,
+      id: 13,
       name: "Item3",
       price: 345,
       location: "345 Pine Road, BC",
@@ -124,7 +124,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 4,
+      id: 14,
       name: "Item4",
       price: 456,
       location: "456 Maple Street, BC",
@@ -133,7 +133,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 5,
+      id: 15,
       name: "Item5",
       price: 567,
       location: "567 Cedar Drive, BC",
@@ -142,7 +142,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 6,
+      id: 16,
       name: "Item6",
       price: 678,
       location: "678 Spruce Lane, BC",
@@ -151,7 +151,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 7,
+      id: 17,
       name: "Item7",
       price: 789,
       location: "789 Willow Crescent, BC",
@@ -160,7 +160,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 8,
+      id: 18,
       name: "Item8",
       price: 890,
       location: "890 Elm Street, BC",
@@ -169,7 +169,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 9,
+      id: 19,
       name: "Item9",
       price: 901,
       location: "901 Birch Road, BC",
@@ -178,7 +178,7 @@ export default function UserDashboardGrid() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur",
     },
     {
-      id: 10,
+      id: 20,
       name: "Item10",
       price: 1012,
       location: "1012 Aspen Way, BC",
