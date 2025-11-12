@@ -35,6 +35,7 @@ def lambda_handler(event, context):
                 "Bucket": BUCKET_NAME,
                 "Key": filename,
                 "ContentType": "image/jpeg",
+                "ACL": "bucket-owner-full-control"
             },
             ExpiresIn=300,  # 5 minutes
         )
