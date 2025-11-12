@@ -21,10 +21,7 @@ export default function ItemDetails() {
   return (
     <div className="flex w-full gap-4 h-screen">
       <div className="flex-[3] flex justify-center items-center">
-        <img
-          src={item?.imageUrl}
-          className="object-cover h-full object-cover w-full"
-        />
+        <img src={item?.imageUrl} className="object-cover h-full w-full" />
       </div>
 
       {/* Item details */}
