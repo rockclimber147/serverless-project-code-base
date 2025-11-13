@@ -1,9 +1,29 @@
 import ItemCard from "@/components/ItemCard";
 import MapGridToggleButton from "@/components/MapGridToggleButton";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ListingAPIService } from "@/services/listingsApi";
+
 export default function UserDashboardGrid() {
   // TODO: replace
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    async function fetchInitialListings() {
+      try {
+        const data = await ListingAPIService.searchListings();
+        setListings(data);
+      } catch (err) {
+        console.error("Failed to load listings:", err);
+      }
+    }
+  fetchInitialListings();
+  }, []);
+
+  // can remove
+  useEffect(() => {
+    console.log("Listings state updated:", listings);
+  }, [listings]);
 
   const mockItems = [
     {
@@ -196,10 +216,17 @@ export default function UserDashboardGrid() {
   const [inputText, setInputText] = useState("");
   const [searchText, setSearchText] = useState("");
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setSearchText(inputText);
     console.log("Search"); //TODO: add functionality
+
+    try {
+      const results = await ListingAPIService.searchListings(inputText);
+      setListings(results);
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
   };
 
   return (
