@@ -5,6 +5,22 @@ from boto3.dynamodb.types import TypeDeserializer
 dynamodb = boto3.client("dynamodb")
 deserializer = TypeDeserializer()
 
+def get_listing_by_id(table_name: str, listing_id: str):
+    response = dynamodb.get_item(
+        TableName=table_name,
+        Key={"listing_id": {"S": listing_id}}
+    )
+    item = response.get("Item")
+
+    if not item:
+        return {"success": False, "response": {"error": "Listing not found"}}
+
+    deserialized_item = {
+        k: _deserialize_value(v) for k, v in item.items()
+    }
+
+    return {"success": True, "response": deserialized_item}
+
 def search_listing(table_name: str, name: str = None):
     items = _search_table_by_pagination(table_name, name)
     return _sort_by_descending_time(items)
