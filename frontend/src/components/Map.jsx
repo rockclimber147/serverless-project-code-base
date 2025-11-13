@@ -79,8 +79,6 @@ const Map = ({
   useEffect(() => {
     if (!mapRef.current) return;
 
-    console.log(selectedListing?.id)
-
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
