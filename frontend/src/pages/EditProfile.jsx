@@ -40,13 +40,10 @@ async function handleSubmit(e) {
       const presignRes = await uploadPhoto({
         id: form.id,
       });
-
       const { upload_url, public_url } = await presignRes;
-
       if (!upload_url || !public_url) {
         throw new Error("Failed to get S3 URL")
       }
-
       // Upload the file directly to S3 using the presigned URL
       const uploadRes = await fetch(upload_url, {
         method: "PUT",
@@ -55,16 +52,12 @@ async function handleSubmit(e) {
         },
         body: photoFile,
       });
-
       if (!uploadRes.ok) {
         throw new Error("Failed to upload to S3");
       }
-
       // Add the S3 link to the set of form data
       form.profileImage = public_url;
-
       await saveProfile();
-
     } else {
       // No photo selected, just save profile
       await saveProfile();
