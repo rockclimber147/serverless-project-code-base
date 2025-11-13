@@ -39,6 +39,7 @@ const Map = ({
   useEffect(() => {
     if (mapRef.current) return;
 
+    // eslint-disable-next-line no-undef
     mapRef.current = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://maps.geo.${AWS_REGION}.amazonaws.com/v2/styles/${MAP_STYLE}/descriptor?key=${API_KEY}`,
@@ -83,6 +84,7 @@ const Map = ({
     markersRef.current = [];
 
     locations.forEach(({ id, location, popup, onClick }) => {
+      // eslint-disable-next-line no-undef
       const marker = new maplibregl.Marker({
         color: id === selectedListing?.id ? "#DD3333" : "#3FB1CE"
       })
@@ -90,6 +92,7 @@ const Map = ({
         .addTo(mapRef.current);
 
       if (enablePopups && popup) {
+        // eslint-disable-next-line no-undef
         marker.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(popup));
       }
 
@@ -110,7 +113,7 @@ const Map = ({
 Map.propTypes = {
   locations: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.string,
       location: PropTypes.arrayOf(PropTypes.number).isRequired,
       popup: PropTypes.string,
       onClick: PropTypes.func
@@ -118,7 +121,7 @@ Map.propTypes = {
   ),
   selectedListing: PropTypes.oneOfType([
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.string,
       location: PropTypes.arrayOf(PropTypes.number).isRequired,
       popup: PropTypes.string,
       onClick: PropTypes.func,
