@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Map from "../components/Map";
+import LeafletMap from "../components/LeafletMap";
 import MapGridToggleButton from "../components/MapGridToggleButton";
 // import { ListingAPIService } from "@/services/listingsApi";
 
@@ -87,7 +88,7 @@ const MapPage = () => {
 
             {selectedListing && (
                 <div className="
-                    absolute z-50 bg-white shadow-lg p-4 md:pt-20
+                    absolute z-[998] bg-white shadow-lg p-4 md:pt-20
                     w-full max-h-[80vh] overflow-scroll md:w-[25vw] md:max-h-screen md:h-screen
                     bottom-0 md:bottom-auto md:left-0 md:top-0
                     transition-transform duration-300
@@ -116,9 +117,9 @@ const MapPage = () => {
                 <MapGridToggleButton />
             </div>
 
-            <Map
+            <LeafletMap
                 locations={locations}
-                enablePopups={true}
+                enablePopups={false}
                 selectedListing={selectedListing}
                 onMapClick={() => setSelectedListing(null)}
                 centerOnUser={true}
