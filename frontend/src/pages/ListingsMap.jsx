@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Map from "../components/Map";
+import MapGridToggleButton from "../components/MapGridToggleButton";
 
 const SAMPLE_LISTINGS = [
     { id: 1, location: [-123.1207, 49.2827], name: "White crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 100, link: "/" },
@@ -43,14 +44,14 @@ const MapPage = () => {
 
     return (
         <div className="w-screen h-screen relative flex">
-            <div className="absolute z-[999] md:w-[25vw] w-screen">
-                <div className="p-4">
+            <div className="absolute z-[999] md:w-[30vw] w-[60%]">
+                <div className="p-[1.25rem]">
                     <input
                         type="text"
                         placeholder="Search listings..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="px-4 py-2 w-[70vw] md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="px-4 py-2 w-full md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
             </div>
@@ -81,6 +82,10 @@ const MapPage = () => {
                     </button>
                 </div>
             )}
+
+            <div className="absolute top-4 right-10 z-[999]">
+                <MapGridToggleButton />
+            </div>
 
             <Map
                 locations={locations}

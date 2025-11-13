@@ -46,7 +46,7 @@ const Map = ({
       zoom: 13
     });
 
-    mapRef.current.addControl(new maplibregl.NavigationControl());
+    // mapRef.current.addControl(new maplibregl.NavigationControl());
 
     mapRef.current.on("load", () => {
       mapRef.current.setCenter(center);
