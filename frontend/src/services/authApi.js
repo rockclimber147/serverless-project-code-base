@@ -32,6 +32,41 @@ async function post(path, body, authToken) {
   return data;
 }
 
+async function get(path, queryParams = {}, authToken) {
+  const headers = { "Content-Type": "application/json" };
+  if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+
+  // Create query string from queryParams object
+  const queryString = new URLSearchParams(queryParams).toString();
+  
+  // If queryParams exist, append them to the path
+  const url = queryString ? `${API_BASE}${path}?${queryString}` : `${API_BASE}${path}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers
+  });
+
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = text;
+  }
+
+  // Unwrap Lambda proxy response if it exists
+  if (data && data.body) {
+    try {
+      return JSON.parse(data.body);
+    } catch {
+      return data.body;
+    }
+  }
+
+  return data;
+}
+
 // Lambda API functions
 export async function signup(payload) {
   return post("/signup", payload);
@@ -50,6 +85,9 @@ export async function uploadPhoto(payload, authToken) {
 }
 export async function editUser(payload, authToken) {
   return post("/edituser", payload, authToken);
+}
+export async function getUserInfo(queryString, authToken) {
+  return get("/fetchuser", queryString, authToken);
 }
 
 // Decode JWT
