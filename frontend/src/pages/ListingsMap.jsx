@@ -44,7 +44,7 @@ const MapPage = () => {
 
     return (
         <div className="w-screen h-screen relative flex">
-            <div className="absolute z-[999] md:w-[30vw] w-[60%]">
+            <div className="absolute z-[999] md:w-[25vw] w-[60%]">
                 <div className="p-[1.25rem]">
                     <input
                         type="text"
