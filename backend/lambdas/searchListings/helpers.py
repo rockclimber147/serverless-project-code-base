@@ -32,16 +32,25 @@ def _search_table_by_pagination(table_name: str, name: str = None):
     items = []
     last_evaluated_key = None
 
-    # Loop through paginated scan results
     while True:
         scan_kwargs = {"TableName": table_name}
 
-        if name:
-            scan_kwargs["FilterExpression"] = "contains(#n, :val)"
-            scan_kwargs["ExpressionAttributeNames"] = {"#n": "item_name"}
-            scan_kwargs["ExpressionAttributeValues"] = {":val": {"S": name}}
+        # Expression attribute containers
+        expression_names = {"#sold": "is_sold"}
+        expression_values = {":false": {"BOOL": False}}
+        filter_expression = "#sold = :false"  # Only active listings
 
-        # paginate search
+        # Optional name filter
+        if name:
+            expression_names["#n"] = "item_name"
+            expression_values[":val"] = {"S": name}
+            filter_expression += " AND contains(#n, :val)"
+
+        scan_kwargs["FilterExpression"] = filter_expression
+        scan_kwargs["ExpressionAttributeNames"] = expression_names
+        scan_kwargs["ExpressionAttributeValues"] = expression_values
+
+        # Handle pagination
         if last_evaluated_key:
             scan_kwargs["ExclusiveStartKey"] = last_evaluated_key
 
@@ -52,10 +61,9 @@ def _search_table_by_pagination(table_name: str, name: str = None):
             items.append(item)
 
         last_evaluated_key = response.get("LastEvaluatedKey")
-
         if not last_evaluated_key:
             break
-    
+
     return items
 
 def _deserialize_value(value):
