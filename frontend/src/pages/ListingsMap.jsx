@@ -1,15 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Map from "../components/Map";
 import MapGridToggleButton from "../components/MapGridToggleButton";
-
-const SAMPLE_LISTINGS = [
-    { id: 1, location: [-123.1207, 49.2827], name: "White crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 100, link: "/" },
-    { id: 2, location: [-123.1162, 49.2835], name: "Blue crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 200, link: "/" },
-    { id: 3, location: [-123.1139, 49.2819], name: "Yellow crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 600, link: "/" },
-    { id: 4, location: [-123.1149, 49.2796], name: "Green crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 500, link: "/" },
-    { id: 5, location: [-123.1115, 49.2820], name: "Purple crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 300, link: "/" },
-    { id: 6, location: [-123.1200, 49.2850], name: "Black crocs", image: "https://placehold.co/600x400", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", price: 200, link: "/" }
-];
+// import { ListingAPIService } from "@/services/listingsApi";
 
 const buildPopupHTML = ({ name, price, link }) => {
     return `
@@ -21,7 +13,44 @@ const buildPopupHTML = ({ name, price, link }) => {
 
 const MapPage = () => {
     const [search, setSearch] = useState("");
+    const [listings, setListings] = useState([]);
     const [selectedListing, setSelectedListing] = useState(null);
+
+    useEffect(() => {
+        async function fetchInitialListings() {
+            try {
+                // const data = await ListingAPIService.searchListings();
+
+                // TEMP
+                const res = await fetch("https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/search");
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+
+                const normalized = data
+                .filter(
+                    (item) =>
+                    typeof item.latitude === "number" &&
+                    typeof item.longitude === "number" &&
+                    item.latitude !== 0 &&
+                    item.longitude !== 0
+                )
+                .map((item) => ({
+                    id: item.listing_id,
+                    name: item.item_name,
+                    price: item.price,
+                    image: item.image,
+                    description: item.details || "",
+                    link: "#",
+                    location: [item.longitude, item.latitude],
+                }));
+
+                setListings(normalized);
+            } catch (err) {
+                console.error("Failed to load listings:", err);
+            }
+        }
+        fetchInitialListings();
+    }, []);
 
     const toggleSelectedListing = (listing, selectedListing, setSelectedListing) => {
         if (selectedListing && selectedListing.name === listing.name) {
@@ -31,8 +60,8 @@ const MapPage = () => {
         }
     };
 
-    const filteredListings = SAMPLE_LISTINGS.filter(listing =>
-        listing.name.toLowerCase().includes(search.toLowerCase())
+    const filteredListings = listings.filter(listing =>
+        listing.name?.toLowerCase().includes(search.toLowerCase())
     );
 
     const locations = filteredListings.map(listing => ({
@@ -65,7 +94,7 @@ const MapPage = () => {
                 ">
                     <h2 className="font-bold text-lg">{selectedListing.name}</h2>
                     <p className="text-green-600 font-semibold">${selectedListing.price}</p>
-                    <img className="py-2" src={selectedListing.image} alt="Product image" />
+                    {selectedListing.image && <img className="py-2" src={selectedListing.image} alt="Product image" />}
                     <p className="py-2">{selectedListing.description}</p>
                     <a
                         className="text-blue-500 underline py-2"
