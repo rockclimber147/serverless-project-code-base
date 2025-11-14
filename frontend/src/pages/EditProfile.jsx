@@ -53,7 +53,6 @@ async function handleSubmit(e) {
   try {
     if (photoFile) {
       // Get URL from Lambda
-      console.log(form.id)
       const presignRes = await uploadPhoto({
         id: form.id,
       });
