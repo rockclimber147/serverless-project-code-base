@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
+import "leaflet.markercluster";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -16,27 +19,78 @@ L.Icon.Default.mergeOptions({
 
 const MapUpdater = ({ center }) => {
   const map = useMap();
-
   useEffect(() => {
     if (center) map.setView(center, 13);
   }, [center, map]);
+  return null;
+};
 
-  // useEffect(() => {
-  //   if (selectedListing) {
-  //     selectedListing.position = [selectedListing.location[1], selectedListing.location[0]], // [lat, lng]
-  //     map.flyTo(selectedListing.position, 15);
-  //   }
-  // }, [selectedListing, map]);
+const MarkerClusterLayer = ({ locations, selectedListing, enablePopups }) => {
+  const map = useMap();
+  const [clusterGroup] = useState(() => L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 40,
+    iconCreateFunction: (cluster) => {
+      const count = cluster.getChildCount();
+      let size = "small";
+      if (count >= 10 && count < 100) size = "medium";
+      else if (count >= 100) size = "large";
+
+      return L.divIcon({
+        html: `<div><span>${count}</span></div>`,
+        className: `marker-cluster marker-cluster-${size}`,
+        iconSize: L.point(40, 40),
+      });
+    },
+  }));
+
+  useEffect(() => {
+    clusterGroup.clearLayers();
+
+    locations.forEach((loc) => {
+      const icon =
+        selectedListing?.id === loc.id
+          ? new L.Icon({
+              iconUrl:
+                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+              shadowUrl:
+                "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+            })
+          : new L.Icon.Default();
+
+      const marker = L.marker(loc.position, { icon });
+
+      if (enablePopups && loc.popup) marker.bindPopup(loc.popup);
+
+      marker.on("click", (e) => {
+        e.originalEvent.stopPropagation();
+        if (loc.onClick) loc.onClick();
+        if (enablePopups && loc.popup) marker.openPopup();
+      });
+
+      clusterGroup.addLayer(marker);
+    });
+
+    if (!map.hasLayer(clusterGroup)) {
+      map.addLayer(clusterGroup);
+    }
+
+    return () => {
+      clusterGroup.clearLayers(); // cleanup markers
+    };
+  }, [locations, selectedListing, enablePopups, map, clusterGroup]);
 
   return null;
 };
 
 const Map = ({
   locations = [],
-  enablePopups = true,
   selectedListing = null,
   onMapClick = () => {},
   centerOnUser = true,
+  enablePopups = true,
 }) => {
   const DEFAULT_CENTER = [49.2827, -123.1207];
   const [center, setCenter] = useState(DEFAULT_CENTER);
@@ -57,12 +111,8 @@ const Map = ({
   useEffect(() => {
     if (centerOnUser && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCenter([pos.coords.latitude, pos.coords.longitude]);
-        },
-        (err) => {
-          console.warn("Geolocation failed:", err);
-        },
+        (pos) => setCenter([pos.coords.latitude, pos.coords.longitude]),
+        (err) => console.warn("Geolocation failed:", err),
         { enableHighAccuracy: true }
       );
     }
@@ -74,59 +124,26 @@ const Map = ({
       zoom={13}
       style={{ width: "100%", height: "100%" }}
       zoomControl={false}
-      enablePopups={false}
-      whenCreated={(map) => {
-        map.on("click", onMapClick);
-      }}
+      whenCreated={(map) => map.on("click", onMapClick)}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
 
-      <MapUpdater center={center} selectedListing={selectedListing && { ...selectedListing, position: [selectedListing.location[1], selectedListing.location[0]] }} />
+      <MapUpdater center={center} />
 
-      {leafletLocations.map(({ id, position, popup, onClick }) => (
-        <Marker
-          key={id}
-          position={position}
-          icon={
-            selectedListing?.id === id
-              ? new L.Icon({
-                  iconUrl:
-                    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-                  shadowUrl:
-                    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-                  iconSize: [25, 41],
-                  iconAnchor: [12, 41],
-                })
-              : new L.Icon.Default()
-          }
-          eventHandlers={{
-            click: (e) => {
-              e.originalEvent.stopPropagation();
-              if (onClick) onClick();
-            },
-          }}
-        >
-          {enablePopups && popup && <Popup>{popup}</Popup>}
-        </Marker>
-      ))}
+      <MarkerClusterLayer
+        locations={leafletLocations}
+        selectedListing={selectedListing}
+        enablePopups={enablePopups}
+      />
     </MapContainer>
   );
 };
 
 MapUpdater.propTypes = {
-  selectedListing: PropTypes.oneOfType([
-    PropTypes.shape({
-      id: PropTypes.string,
-      location: PropTypes.arrayOf(PropTypes.number).isRequired,
-      popup: PropTypes.string,
-      onClick: PropTypes.func,
-    }),
-    PropTypes.oneOf([null]),
-  ]),
-  center: PropTypes.bool,
+  center: PropTypes.arrayOf(PropTypes.number),
 }
 
 Map.propTypes = {
@@ -138,18 +155,27 @@ Map.propTypes = {
       onClick: PropTypes.func,
     })
   ),
-  selectedListing: PropTypes.oneOfType([
-    PropTypes.shape({
-      id: PropTypes.string,
-      location: PropTypes.arrayOf(PropTypes.number).isRequired,
-      popup: PropTypes.string,
-      onClick: PropTypes.func,
-    }),
-    PropTypes.oneOf([null]),
-  ]),
-  enablePopups: PropTypes.bool,
+  selectedListing: PropTypes.shape({
+    id: PropTypes.string,
+  }),
   onMapClick: PropTypes.func,
   centerOnUser: PropTypes.bool,
+  enablePopups: PropTypes.bool,
+};
+
+MarkerClusterLayer.propTypes = {
+  locations: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      position: PropTypes.arrayOf(PropTypes.number).isRequired,
+      popup: PropTypes.string,
+      onClick: PropTypes.func,
+    })
+  ).isRequired,
+  selectedListing: PropTypes.shape({
+    id: PropTypes.string,
+  }),
+  enablePopups: PropTypes.bool,
 };
 
 export default Map;

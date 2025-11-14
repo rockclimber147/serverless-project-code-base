@@ -13,6 +13,12 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    include: ['leaflet', 'leaflet.markercluster'],
     exclude: ['maplibre-gl']
-  }
+  },
+  build: {
+    commonjsOptions: {
+      include: [/leaflet/, /leaflet\.markercluster/],
+    },
+  },
 });
