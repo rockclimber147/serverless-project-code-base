@@ -21,8 +21,6 @@ const MapPage = () => {
         async function fetchInitialListings() {
             try {
                 // const data = await ListingAPIService.searchListings();
-
-                // TEMP
                 const res = await fetch("https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/search");
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
@@ -41,7 +39,7 @@ const MapPage = () => {
                     price: item.price,
                     image: item.image,
                     description: item.details || "",
-                    link: "#",
+                    link: `/item-details/${item.listing_id}`,
                     location: [item.longitude, item.latitude],
                 }));
 

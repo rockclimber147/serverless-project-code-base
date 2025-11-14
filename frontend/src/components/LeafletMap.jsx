@@ -78,7 +78,7 @@ const MarkerClusterLayer = ({ locations, selectedListing, enablePopups }) => {
     }
 
     return () => {
-      clusterGroup.clearLayers(); // cleanup markers
+      clusterGroup.clearLayers();
     };
   }, [locations, selectedListing, enablePopups, map, clusterGroup]);
 
