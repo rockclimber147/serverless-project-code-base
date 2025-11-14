@@ -18,15 +18,15 @@ export default function EditProfile() {
       const userId = localStorage.getItem("userId");
       if (userId) {
         const fetchedUserInfo = await getUserInfo({id: userId})
-        console.log(fetchedUserInfo)
         if (fetchedUserInfo) {
           const userData = fetchedUserInfo.data
-            setForm({
-              givenName: userData.givenName || "",
-              familyName: userData.familyName || "",
-              prefLocation: userData.prefLocation || "",
-              profileImage: userData.profileImage || "",
-            });
+          setForm(prev => ({
+            ...prev,
+            givenName: userData.givenName || "",
+            familyName: userData.familyName || "",
+            prefLocation: userData.prefLocation || "",
+            profileImage: userData.profileImage || "",
+          }));
         }
       } else {
         throw new Error("No UserID in local storage")
