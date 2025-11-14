@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Map from "../components/Map";
+// import Map from "../components/Map";
 import LeafletMap from "../components/LeafletMap";
 import MapGridToggleButton from "../components/MapGridToggleButton";
-// import { ListingAPIService } from "@/services/listingsApi";
+import { ListingAPIService } from "@/services/listingsApi";
 
 const buildPopupHTML = ({ name, price, link }) => {
     return `
@@ -20,10 +20,10 @@ const MapPage = () => {
     useEffect(() => {
         async function fetchInitialListings() {
             try {
-                // const data = await ListingAPIService.searchListings();
-                const res = await fetch("https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/search");
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
+                const data = await ListingAPIService.searchListings();
+                // const res = await fetch("https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/search");
+                // if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                // const data = await res.json();
 
                 const normalized = data
                 .filter(
