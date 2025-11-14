@@ -12,4 +12,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  optimizeDeps: {
+    include: ['leaflet', 'leaflet.markercluster'],
+    exclude: ['maplibre-gl']
+  },
+  build: {
+    commonjsOptions: {
+      include: [/leaflet/, /leaflet\.markercluster/],
+    },
+  },
 });
