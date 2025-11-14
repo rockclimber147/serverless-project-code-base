@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { editUser, uploadPhotoBase64 } from "@/services/authApi"
+import { editUser, uploadPhoto, getUserInfo } from "@/services/authApi"
 
 export default function EditProfile() {
   const [form, setForm] = useState({
@@ -15,7 +15,23 @@ export default function EditProfile() {
   // Optional: fetch current profile info
   useEffect(() => {
     const fetchProfile = async () => {
-      // Implement getUser API if needed
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        const fetchedUserInfo = await getUserInfo({id: userId})
+        if (fetchedUserInfo) {
+          const userData = fetchedUserInfo.data
+          setForm(prev => ({
+            ...prev,
+            givenName: userData.givenName || "",
+            familyName: userData.familyName || "",
+            prefLocation: userData.prefLocation || "",
+            profileImage: userData.profileImage || "",
+          }));
+        }
+      } else {
+        throw new Error("No UserID in local storage")
+      }
+
     };
     fetchProfile();
   }, []);
@@ -30,41 +46,46 @@ export default function EditProfile() {
     setPhotoFile(file);
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
+async function handleSubmit(e) {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // 1️⃣ Upload photo first if selected
-      if (photoFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Data = reader.result.split(",")[1]; // remove prefix
-          try {
-            const res = await uploadPhotoBase64({
-              id: form.id,
-              fileBase64: base64Data,
-              filename: photoFile.name,
-            });
-            form.profileImage = res.s3Url; // save S3 URL
-            await saveProfile();
-          } catch (err) {
-            console.error("Photo upload failed:", err);
-            alert("Photo upload failed.");
-            setLoading(false);
-          }
-        };
-        reader.readAsDataURL(photoFile);
-      } else {
-        // No photo selected, just save profile
-        await saveProfile();
+  try {
+    if (photoFile) {
+      // Get URL from Lambda
+      const presignRes = await uploadPhoto({
+        id: form.id,
+      });
+      const { upload_url, public_url } = await presignRes;
+      if (!upload_url || !public_url) {
+        throw new Error("Failed to get S3 URL")
       }
-    } catch (err) {
-      console.error(err);
-      alert("Update failed.");
-      setLoading(false);
+      // Upload the file directly to S3 using the presigned URL
+      const uploadRes = await fetch(upload_url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": photoFile.type || "image/jpeg",
+        },
+        body: photoFile,
+      });
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload to S3");
+      }
+      // Add the S3 link to the set of form data
+      form.profileImage = public_url;
+      await saveProfile();
+    } else {
+      // No photo selected, just save profile
+      await saveProfile();
     }
+
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    alert("Update failed.");
+  } finally {
+    setLoading(false);
   }
+}
 
   async function saveProfile() {
     try {
@@ -80,48 +101,85 @@ export default function EditProfile() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-96 space-y-2"
-      >
-        <h1 className="text-2xl font-bold">Edit Profile</h1>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-8 rounded shadow-md w-96 space-y-6"
+    >
 
-        <input
-          placeholder="First Name"
-          value={form.givenName}
-          onChange={(e) => update("givenName", e.target.value)}
-          className="border p-2 w-full"
+      <div className="flex flex-col items-center border-b pb-6 mb-6">
+        <img
+          src={form.profileImage || "/default-avatar.png"}
+          alt="Profile"
+          className="w-24 h-24 rounded-full object-cover mb-4"
         />
+        <h2 className="text-lg font-semibold">{`${form.givenName} ${form.familyName}`}</h2>
+        <p className="text-gray-500">{form.prefLocation || "No location set"}</p>
+      </div>
 
-        <input
-          placeholder="Last Name"
-          value={form.familyName}
-          onChange={(e) => update("familyName", e.target.value)}
-          className="border p-2 w-full"
-        />
+      <h1 className="text-2xl font-bold text-center">Edit Profile Info</h1>
+      <div className="space-y-4">
+        {/* First Name Field */}
+        <div className="flex flex-col">
+          <label htmlFor="givenName" className="text-sm font-semibold text-gray-700">
+            First Name
+          </label>
+          <input
+            id="givenName"
+            placeholder="First Name"
+            value={form.givenName}
+            onChange={(e) => update("givenName", e.target.value)}
+            className="border p-2 w-full mt-1"
+          />
+        </div>
 
-        <input
-          placeholder="Preferred Location"
-          value={form.prefLocation}
-          onChange={(e) => update("prefLocation", e.target.value)}
-          className="border p-2 w-full"
-        />
+        <div className="flex flex-col">
+          <label htmlFor="familyName" className="text-sm font-semibold text-gray-700">
+            Last Name
+          </label>
+          <input
+            id="familyName"
+            placeholder="Last Name"
+            value={form.familyName}
+            onChange={(e) => update("familyName", e.target.value)}
+            className="border p-2 w-full mt-1"
+          />
+        </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handlePhotoChange}
-          className="border p-2 w-full"
-        />
+        <div className="flex flex-col">
+          <label htmlFor="prefLocation" className="text-sm font-semibold text-gray-700">
+            Preferred Meeting Location
+          </label>
+          <input
+            id="prefLocation"
+            placeholder="Preferred Location"
+            value={form.prefLocation}
+            onChange={(e) => update("prefLocation", e.target.value)}
+            className="border p-2 w-full mt-1"
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label htmlFor="profileImage" className="text-sm font-semibold text-gray-700">
+            Profile Image
+          </label>
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="border p-2 w-full mt-1"
+          />
+        </div>
 
         <button
           type="submit"
           className="bg-purple-500 text-white p-2 w-full rounded"
           disabled={loading}
         >
-          {loading ? "Saving..." : "Save Changes"}
+          {loading ? "Updating..." : "Save Profile"}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
+  </div>
   );
 }
