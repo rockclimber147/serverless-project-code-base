@@ -74,25 +74,40 @@ const MapPage = () => {
 
     return (
         <div className="w-screen h-screen relative flex">
-            <div className="absolute z-[999] md:w-[25vw] w-[60%]">
+            <div className="absolute z-[999] md:w-[25vw] pe-8 w-[60%] pointer-events-none">
                 <div className="p-[1.25rem]">
                     <input
                         type="text"
                         placeholder="Search listings..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="px-4 py-2 w-full md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="pointer-events-auto px-4 py-2 w-full md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
             </div>
 
-            {selectedListing && (
-                <div className="
+            <div
+                className={`
                     absolute z-[998] bg-white shadow-lg p-4 md:pt-20
                     w-full max-h-[80vh] overflow-scroll md:w-[25vw] md:max-h-screen md:h-screen
                     bottom-0 md:bottom-auto md:left-0 md:top-0
                     transition-transform duration-300
-                ">
+                    ${selectedListing 
+                    ? "translate-y-0 md:translate-x-0" 
+                    : "translate-y-full md:translate-y-0 md:-translate-x-full"
+                    }
+                `}
+                >
+                <button
+                    className="absolute h-12 text-xl top-4 right-5 text-gray-500 hover:text-gray-800"
+                    onClick={() => setSelectedListing(null)}
+                    aria-label="Close"
+                >
+                    ✕
+                </button>
+
+                {selectedListing && (
+                    <>
                     <h2 className="font-bold text-lg">{selectedListing.name}</h2>
                     <p className="text-green-600 font-semibold">${selectedListing.price}</p>
                     {selectedListing.image && <img className="py-2" src={selectedListing.image} alt="Product image" />}
@@ -105,13 +120,9 @@ const MapPage = () => {
                     >
                         Go to listing
                     </a>
-                    <button
-                        className="mt-4 text-sm text-gray-500"
-                        onClick={() => setSelectedListing(null)}
-                    >
-                    </button>
-                </div>
-            )}
+                    </>
+                )}
+            </div>
 
             <div className="absolute top-4 right-10 z-[999]">
                 <MapGridToggleButton />
