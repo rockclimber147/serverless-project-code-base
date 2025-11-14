@@ -2,12 +2,12 @@ import React from "react";
 import { useState } from "react";
 import SellerCard from "@/components/SellerCard";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 
 export default function ItemDetails() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { item } = location.state || {};
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,10 +21,7 @@ export default function ItemDetails() {
   return (
     <div className="flex w-full gap-4 h-screen">
       <div className="flex-[3] flex justify-center items-center">
-        <img
-          src={item?.imageUrl}
-          className="object-cover h-full object-cover w-full"
-        />
+        <img src={item?.imageUrl} className="object-cover h-full w-full" />
       </div>
 
       {/* Item details */}
@@ -46,8 +43,11 @@ export default function ItemDetails() {
         </div>
 
         <div className="flex w-full gap-2 mb-4">
-          <button className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1 ">
-            <Link to="/chat">Message</Link>
+          <button
+            className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
+            onClick={() => navigate("/chat")}
+          >
+            Message
           </button>
           <button
             className="bg-red-500 rounded-lg px-2 py-1 text-white w-16"
