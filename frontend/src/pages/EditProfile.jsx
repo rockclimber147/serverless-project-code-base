@@ -18,7 +18,6 @@ export default function EditProfile() {
       const userId = localStorage.getItem("userId");
       if (userId) {
         const fetchedUserInfo = await getUserInfo({id: userId})
-        console.log(fetchedUserInfo)
         if (fetchedUserInfo) {
           const userData = fetchedUserInfo.data
           setForm(prev => ({
