@@ -122,12 +122,13 @@ const Map = ({
     <MapContainer
       center={center}
       zoom={13}
+      maxZoom={16}
       style={{ width: "100%", height: "100%" }}
       zoomControl={false}
       whenCreated={(map) => map.on("click", onMapClick)}
     >
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
 
