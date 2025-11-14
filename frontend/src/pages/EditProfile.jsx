@@ -21,12 +21,13 @@ export default function EditProfile() {
         console.log(fetchedUserInfo)
         if (fetchedUserInfo) {
           const userData = fetchedUserInfo.data
-            setForm({
-              givenName: userData.givenName || "",
-              familyName: userData.familyName || "",
-              prefLocation: userData.prefLocation || "",
-              profileImage: userData.profileImage || "",
-            });
+          setForm(prev => ({
+            ...prev,
+            givenName: userData.givenName || "",
+            familyName: userData.familyName || "",
+            prefLocation: userData.prefLocation || "",
+            profileImage: userData.profileImage || "",
+          }));
         }
       } else {
         throw new Error("No UserID in local storage")
@@ -53,6 +54,7 @@ async function handleSubmit(e) {
   try {
     if (photoFile) {
       // Get URL from Lambda
+      console.log(form.id)
       const presignRes = await uploadPhoto({
         id: form.id,
       });
