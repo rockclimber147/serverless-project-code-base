@@ -13,7 +13,7 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
 
     try {
       const response = await fetch(
-        `https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/user/chat/sendMessage`,
+        `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/sendMessage`,
         {
           method: "POST",
           headers: {
@@ -44,7 +44,7 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
 
     try {
       const response = await fetch(
-        `https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/user/chat/getMessages?partnerId=${user.id}`,
+        `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/getMessages?partnerId=${user.id}`,
         {
           headers: {
             Authorization: `Bearer ${idToken}`,

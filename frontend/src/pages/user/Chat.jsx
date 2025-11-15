@@ -54,7 +54,7 @@ function Chat() {
 
       try {
         const response = await fetch(
-          `https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/user/chat/getAllChats`,
+          `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/getAllChats`,
           {
             headers: {
               Authorization: `Bearer ${idToken}`,
