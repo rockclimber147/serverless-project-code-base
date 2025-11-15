@@ -1,9 +1,18 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ListingCRUDAPIService } from "../../services/listingCRUD";
 import { useState } from "react";
-export default function AddListing() {
-  const [image, setImage] = useState(null);
+export default function AddEditListing() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { item } = location.state || {};
+  const [image, setImage] = useState(item?.image || null);
+  const [title, setTitle] = useState(item?.item_name || "");
+  const [price, setPrice] = useState(item?.price || "");
+  const [address, setAddress] = useState(item?.location || "");
+  const [details, setDetails] = useState(item?.details || "");
 
+  const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -27,11 +36,14 @@ export default function AddListing() {
       longitude: -123.1207,
     };
 
-    try {
-      const result = await ListingCRUDAPIService.createListing(listingData);
-      console.log("Listing created", result);
-    } catch (err) {
-      console.log("Failed to create listing", err);
+    if (item) {
+      // edit existing
+      await ListingCRUDAPIService.updateListing(item.id, listingData);
+      console.log("Listing updated");
+    } else {
+      // create new
+      await ListingCRUDAPIService.createListing(listingData);
+      console.log("Listing created");
     }
   };
 
@@ -60,21 +72,27 @@ export default function AddListing() {
 
       {/* Item details */}
       <form className="m-4 flex-[1]" onSubmit={handleSubmit}>
-        <h2 className="text-2xl mb-2"> Add Item Listing</h2>
+        <h2 className="text-2xl mb-2">{pageTitle}</h2>
         {/* Item main info */}
-        <div className="mb-2 flex flex-col gap-3 mb-5">
+        <div className="flex flex-col gap-3 mb-5">
           <input
+            value={title}
             placeholder="Title"
-            className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md"
+            onChange={(e) => setTitle(e.target.value)}
+            className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
           <input
+            value={price}
             placeholder="Price"
             type="number"
-            className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md"
+            onChange={(e) => setPrice(e.target.value)}
+            className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
           <input
+            value={address}
             placeholder="Location"
-            className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md p-2"
+            onChange={(e) => setAddress(e.target.value)}
+            className="rounded-lg focus:border-blue-400 border w-full shadow-md p-2"
           />
         </div>
 
@@ -82,8 +100,10 @@ export default function AddListing() {
         <div className="flex flex-col gap-2">
           <h3 className="text-2xl">Details</h3>
           <textarea
+            value={details}
             rows={6}
             placeholder="Include a description of the item."
+            onChange={(e) => setDetails(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md mb-4"
           ></textarea>
 
@@ -93,7 +113,10 @@ export default function AddListing() {
           >
             Save
           </button>
-          <button className="border-neutral-400 border rounded-lg px-2 py-1 hover:bg-neutral-500 hover:text-white">
+          <button
+            className="border-neutral-400 border rounded-lg px-2 py-1 hover:bg-neutral-500 hover:text-white"
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </button>
         </div>

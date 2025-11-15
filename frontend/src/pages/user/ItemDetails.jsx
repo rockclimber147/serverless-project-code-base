@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import SellerCard from "@/components/SellerCard";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaPen } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 
@@ -21,7 +21,7 @@ export default function ItemDetails() {
   return (
     <div className="flex w-full gap-4 h-screen">
       <div className="flex-[3] flex justify-center items-center">
-        <img src={item?.imageUrl} className="object-cover h-full w-full" />
+        <img src={item?.image} className="object-cover h-full w-full" />
       </div>
 
       {/* Item details */}
@@ -29,7 +29,14 @@ export default function ItemDetails() {
         {/* Item main info */}
         <div className="mb-2">
           <div className="flex justify-between">
-            <h2 className="text-4xl">{item?.name}</h2>
+            <div className="flex items-center">
+              <h2 className="text-4xl mr-2">{item?.item_name}</h2>
+              <FaPen
+                className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                onClick={() => navigate("/add-listing", { state: { item } })}
+              />
+            </div>
+
             <button onClick={() => setFavourite(!favourite)}>
               {favourite ? (
                 <FaHeart className="text-red-500 text-xl transition-colors duration-200" />
@@ -62,7 +69,7 @@ export default function ItemDetails() {
           <div>
             <h3 className="text-2xl">Details</h3>
 
-            <p>{item?.description}</p>
+            <p>{item?.details}</p>
           </div>
 
           <div>
