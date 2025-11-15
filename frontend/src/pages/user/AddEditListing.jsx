@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ListingCRUDAPIService } from "../../services/listingCRUD";
+import { ListingCRUDAPIService } from "@/services/listingUser";
 import { useState } from "react";
 export default function AddEditListing() {
   const navigate = useNavigate();
