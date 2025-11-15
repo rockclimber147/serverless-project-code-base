@@ -26,14 +26,14 @@ export default function UserDashboardGrid() {
       <ItemCard item={item} />
     </div>
   ));
+
   const [inputText, setInputText] = useState("");
-  const [searchText, setSearchText] = useState("");
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    setSearchText(inputText);
     try {
       const results = await ListingAPIService.searchListings(inputText);
+      console.log(results);
       setListings(results);
     } catch (err) {
       console.error("Search failed:", err);
