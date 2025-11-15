@@ -10,7 +10,7 @@ import UserDashboardGrid from "./pages/user/UserDashboardGrid";
 import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
 import ItemDetails from "./pages/user/ItemDetails";
-import AddListing from "./pages/user/AddListing";
+import AddEditListing from "./pages/user/AddListing";
 import ListingsMap from "./pages/ListingsMap";
 
 function App() {
@@ -32,9 +32,9 @@ function App() {
           />
           <Route path="/item-details" element={<ItemDetails />} />
           <Route path="/favourites" element={<Favourites />} />
-          <Route path="/add-listing" element={<AddListing />} />
+          <Route path="/add-listing" element={<AddEditListing />} />
           <Route path="/listings-map" element={<ListingsMap />} />
-      </Routes>
+        </Routes>
       </div>
     </BrowserRouter>
   );
