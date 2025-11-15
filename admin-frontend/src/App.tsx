@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import ReportedListingActivity from "./pages/ReportedListingActivity";
+import ViewListing from "./pages/ViewListing";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -32,6 +33,18 @@ function App() {
                         </>
                     }
                 />
+                <Route
+                    path="/admin/view-listing/:listingId"
+                    element={
+                        <>
+                            <Navbar />
+                            <div className="mt-11">
+                                <ViewListing />
+                            </div>
+                        </>
+                    }
+                />
+
                 <Route path="/" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>

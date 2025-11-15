@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../api/endpoints";
+import { Link } from "react-router-dom";
+
 
 interface Report {
   reason: string;
@@ -107,7 +109,14 @@ export default function ReportedListingActivity() {
                     <td className="p-3 border">{lastReport?.reported_at ?? "—"}</td>
                     <td className="p-3 border">{lastReport?.reported_by ?? "—"}</td>
                     <td className="p-3 border">{lastReport?.reason ?? "—"}</td>
-                    <td className="p-3 border">View</td>
+                    <td className="p-3 border">
+                      <Link
+                        to={`/admin/view-listing/${listing.listing_id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        View
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}

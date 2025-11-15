@@ -3,5 +3,6 @@ export const API_BASE_URL =
 
 export const API_ENDPOINTS = {
   reportedListings: `${API_BASE_URL}/admin/reported-listings`,
-  deletedListings: `${API_BASE_URL}/admin/deleted-listings`,
+  deletedListings: `${API_BASE_URL}/admin/deleted-listings`, //not implemented yet for MVP
+  viewListing: `${API_BASE_URL}/public/listing?id=`
 };
