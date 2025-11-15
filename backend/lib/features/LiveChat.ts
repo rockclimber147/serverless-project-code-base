@@ -55,7 +55,14 @@ export class LiveChatFeatureConstruct extends Construct {
     const chatRoot = props.api.userResource.addResource(API_ENDPOINTS.user.chat.value);
 
     // POST /user/chat/sendMessage
-    chatRoot.addResource(API_ENDPOINTS.user.chat.sendMessage).addMethod(
+    const sendMessageResource = chatRoot.addResource(API_ENDPOINTS.user.chat.sendMessage);
+    sendMessageResource.addCorsPreflight({
+      allowOrigins: ["http://localhost:5173"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["POST", "OPTIONS"],
+    });
+
+    sendMessageResource.addMethod(
       "POST",
       new apigw.LambdaIntegration(sendMessageLambda),
       {
@@ -65,7 +72,14 @@ export class LiveChatFeatureConstruct extends Construct {
     );
 
     // GET /user/chat/getMessages
-    chatRoot.addResource(API_ENDPOINTS.user.chat.getMessages).addMethod(
+    const getMessagesResource = chatRoot.addResource(API_ENDPOINTS.user.chat.getMessages);
+    getMessagesResource.addCorsPreflight({
+      allowOrigins: ["http://localhost:5173"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["GET", "OPTIONS"],
+    });
+
+    getMessagesResource.addMethod(
       "GET",
       new apigw.LambdaIntegration(getMessagesLambda),
       {
@@ -75,7 +89,14 @@ export class LiveChatFeatureConstruct extends Construct {
     );
 
     // GET /user/chat/getAllChats
-    chatRoot.addResource(API_ENDPOINTS.user.chat.getAllChats).addMethod(
+    const getAllChatsResource = chatRoot.addResource(API_ENDPOINTS.user.chat.getAllChats);
+    getAllChatsResource.addCorsPreflight({
+      allowOrigins: ["http://localhost:5173"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["GET", "OPTIONS"],
+    });
+
+    getAllChatsResource.addMethod(
       "GET",
       new apigw.LambdaIntegration(getAllChatsLambda),
       {
