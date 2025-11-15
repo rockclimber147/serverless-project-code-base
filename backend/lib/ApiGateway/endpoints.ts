@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
       value: "chat",
       sendMessage: "sendMessage",
       getMessages: "getMessages",
+      getAllChats: "getAllChats",
     },
   },
   admin: {

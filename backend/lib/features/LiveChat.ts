@@ -42,6 +42,16 @@ export class LiveChatFeatureConstruct extends Construct {
     });
     chatTable.grantReadData(getMessagesLambda);
 
+    const getAllChatsLambda = new lambda.Function(this, "getAllChatsLambda", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: "getAllChats.lambda_handler",
+      code: lambda.Code.fromAsset("lambdas/liveChat"),
+      environment: {
+        CHAT_TABLE: chatTable.tableName,
+      },
+    });
+    chatTable.grantReadData(getAllChatsLambda);
+
     const chatRoot = props.api.userResource.addResource(API_ENDPOINTS.user.chat.value);
 
     // POST /user/chat/sendMessage
@@ -58,6 +68,16 @@ export class LiveChatFeatureConstruct extends Construct {
     chatRoot.addResource(API_ENDPOINTS.user.chat.getMessages).addMethod(
       "GET",
       new apigw.LambdaIntegration(getMessagesLambda),
+      {
+        authorizer: userAuthorizer,
+        authorizationType: apigw.AuthorizationType.COGNITO,
+      }
+    );
+
+    // GET /user/chat/getAllChats
+    chatRoot.addResource(API_ENDPOINTS.user.chat.getAllChats).addMethod(
+      "GET",
+      new apigw.LambdaIntegration(getAllChatsLambda),
       {
         authorizer: userAuthorizer,
         authorizationType: apigw.AuthorizationType.COGNITO,

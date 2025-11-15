@@ -1,14 +1,27 @@
 import json
 import boto3
-import uuid
 import os
 from datetime import datetime
 
 dynamodb = boto3.resource("dynamodb")
-chat_table = dynamodb.Table(os.environ['CHAT_TABLE'])
+chat_table = dynamodb.Table(os.environ["CHAT_TABLE"])
+
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "http://localhost:5173",  # replace "*" with your frontend URL in production
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+}
 
 def lambda_handler(event, context):
     try:
+        # Handle preflight OPTIONS request
+        if event["httpMethod"] == "OPTIONS":
+            return {
+                "statusCode": 200,
+                "headers": CORS_HEADERS,
+                "body": ""
+            }
+
         body = json.loads(event.get("body", "{}"))
         user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
         partner_id = body.get("partnerId")
@@ -17,28 +30,33 @@ def lambda_handler(event, context):
         if not partner_id or not message:
             return {
                 "statusCode": 400,
+                "headers": CORS_HEADERS,
                 "body": json.dumps({"error": "partnerId and message are required"})
             }
 
-        msg_id = str(uuid.uuid4())
+        # Compute chatId for the user pair (order independent)
+        chat_id = "#".join(sorted([user_id, partner_id]))
 
+        # Put item into DynamoDB
         item = {
-            "id": msg_id,
-            "userId": user_id,
-            "partnerId": partner_id,
-            "message": message,
-            "timestamp": datetime.utcnow().isoformat()
+            "chatId": chat_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "senderId": user_id,
+            "receiverId": partner_id,
+            "message": message
         }
 
         chat_table.put_item(Item=item)
 
         return {
             "statusCode": 200,
-            "body": json.dumps({"ok": True, "messageId": msg_id}),
+            "headers": CORS_HEADERS,
+            "body": json.dumps({"ok": True}),
         }
 
     except Exception as e:
         return {
             "statusCode": 500,
+            "headers": CORS_HEADERS,
             "body": json.dumps({"error": str(e)}),
         }
