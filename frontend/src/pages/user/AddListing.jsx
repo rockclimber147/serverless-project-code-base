@@ -1,4 +1,5 @@
 import React from "react";
+import { ListingCRUDAPIService } from "../../services/listingCRUD";
 import { useState } from "react";
 export default function AddListing() {
   const [image, setImage] = useState(null);
@@ -14,9 +15,24 @@ export default function AddListing() {
     setImage(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Send all the form data
+
+    const listingData = {
+      item_name: "POST test",
+      price: 450,
+      is_sold: false,
+      location: "Vancouver, BC",
+      latitude: 49.2827,
+      longitude: -123.1207,
+    };
+
+    try {
+      const result = await ListingCRUDAPIService.createListing(listingData);
+      console.log("Listing created", result);
+    } catch (err) {
+      console.log("Failed to create listing", err);
+    }
   };
 
   return (

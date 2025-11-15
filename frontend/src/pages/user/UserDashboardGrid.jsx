@@ -17,13 +17,8 @@ export default function UserDashboardGrid() {
         console.error("Failed to load listings:", err);
       }
     }
-  fetchInitialListings();
+    fetchInitialListings();
   }, []);
-
-  // can remove
-  useEffect(() => {
-    console.log("Listings state updated:", listings);
-  }, [listings]);
 
   const mockItems = [
     {
@@ -208,7 +203,7 @@ export default function UserDashboardGrid() {
     },
   ];
 
-  const mockItemList = mockItems.map((item) => (
+  const itemList = listings.map((item) => (
     <div key={item.id}>
       <ItemCard item={item} />
     </div>
@@ -219,8 +214,6 @@ export default function UserDashboardGrid() {
   const handleSearch = async (e) => {
     e.preventDefault();
     setSearchText(inputText);
-    console.log("Search"); //TODO: add functionality
-
     try {
       const results = await ListingAPIService.searchListings(inputText);
       setListings(results);
@@ -252,7 +245,7 @@ export default function UserDashboardGrid() {
       </div>
       <h2 className="text-2xl m-4">Most Recent Listings</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {mockItemList}
+        {itemList}
       </div>
     </div>
   );
