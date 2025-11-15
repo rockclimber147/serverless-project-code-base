@@ -5,12 +5,14 @@ export class ListingCRUDAPIService {
 
   static async createListing(listingData: Listing) {
     const token = localStorage.getItem("idToken");
-
+    if (!token) {
+      throw new Error("No auth token found in localStorage");
+    }
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(listingData),
     });
