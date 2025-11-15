@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatSideBar from "../../components/ChatSideBar";
 import ChatThread from "../../components/ChatThread";
+import { useLocation } from "react-router-dom";
 
 function Chat() {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -10,6 +11,10 @@ function Chat() {
   const [idToken, setIdToken] = useState(null);
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const partnerIdFromNav = location.state?.partnerId;
+  const partnerNameFromNav = location.state?.partnerName;
+  const partnerAvatarFromNav = location.state?.avatar;
 
   useEffect(() => {
     const storedId = localStorage.getItem("userId");
@@ -23,6 +28,24 @@ function Chat() {
     setCurrentUserId(storedId);
     setIdToken(storedToken);
   }, [navigate]);
+
+  useEffect(() => {
+    if (partnerIdFromNav && !users.find((u) => u.id === partnerIdFromNav)) {
+      setUsers((prev) => [
+        ...prev,
+        {
+          id: partnerIdFromNav,
+          name: partnerNameFromNav || "User",
+          avatar: partnerAvatarFromNav || "",
+        },
+      ]);
+      setSelectedUser({
+        id: partnerIdFromNav,
+        name: partnerNameFromNav || "User",
+        avatar: partnerAvatarFromNav || "",
+      });
+    }
+  }, [partnerIdFromNav]);
 
   // Fetch all chat partners for the current user
   useEffect(() => {

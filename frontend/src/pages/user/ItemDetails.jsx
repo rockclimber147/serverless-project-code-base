@@ -13,7 +13,9 @@ export default function ItemDetails() {
   const [modalOpen, setModalOpen] = useState(false);
   // TODO: replace
   const user = {
+    id: "seller-id",
     name: "Name",
+    photo: "https://picsum.photos/seed/200/200/200"
   };
 
   const [favourite, setFavourite] = useState(false);
@@ -45,7 +47,9 @@ export default function ItemDetails() {
         <div className="flex w-full gap-2 mb-4">
           <button
             className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
-            onClick={() => navigate("/chat")}
+            onClick={() => navigate("/chat", {
+              state: { partnerId: user.id, partnerName: user.name, avatar: user.photo },
+            })}
           >
             Message
           </button>
