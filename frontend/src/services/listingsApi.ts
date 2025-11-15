@@ -2,7 +2,7 @@ import { Listing } from "@/models/listing";
 
 export class ListingAPIService {
   private static readonly API_BASE =
-    "https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/";
+    "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/public/";
   private static readonly SEARCH_API = this.API_BASE + `search`;
   private static readonly GET_LISTING_BY_ID_API = this.API_BASE + `listing`;
 
