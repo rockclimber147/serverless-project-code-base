@@ -13,8 +13,3 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 * `npx cdk diff`    compare deployed stack with current state
 * `npx cdk synth`   emits the synthesized CloudFormation template
 * `aws sso login --profile <your-profile-name>`     login to aws when sso expires
-
-
-```
-[ { "M" : { "reason" : { "S" : "fake" }, "reported_at" : { "N" : "20251111" }, "reported_by" : { "S" : "user-1234-abcd" } } }, { "M" : { "reason" : { "S" : "scam!!" }, "reported_at" : { "N" : "20251114" }, "reported_by" : { "S" : "user-1234-abcd" } } } ]
-```
