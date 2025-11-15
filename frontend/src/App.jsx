@@ -10,7 +10,7 @@ import UserDashboardGrid from "./pages/user/UserDashboardGrid";
 import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
 import ItemDetails from "./pages/user/ItemDetails";
-import AddEditListing from "./pages/user/AddListing";
+import AddEditListing from "./pages/user/AddEditListing";
 import ListingsMap from "./pages/ListingsMap";
 
 function App() {
