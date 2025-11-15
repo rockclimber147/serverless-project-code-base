@@ -7,7 +7,7 @@ dynamodb = boto3.resource("dynamodb")
 chat_table = dynamodb.Table(os.environ["CHAT_TABLE"])
 
 CORS_HEADERS = {
-    "Access-Control-Allow-Origin": "http://localhost:5173",  # replace "*" with your frontend URL in production
+    "Access-Control-Allow-Origin": "*",  # replace "*" with your frontend URL in production
     "Access-Control-Allow-Headers": "Content-Type,Authorization",
     "Access-Control-Allow-Methods": "POST,OPTIONS"
 }

@@ -57,7 +57,7 @@ export class LiveChatFeatureConstruct extends Construct {
     // POST /user/chat/sendMessage
     const sendMessageResource = chatRoot.addResource(API_ENDPOINTS.user.chat.sendMessage);
     sendMessageResource.addCorsPreflight({
-      allowOrigins: ["http://localhost:5173"],
+      allowOrigins: ["*"],
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "OPTIONS"],
     });
@@ -74,7 +74,7 @@ export class LiveChatFeatureConstruct extends Construct {
     // GET /user/chat/getMessages
     const getMessagesResource = chatRoot.addResource(API_ENDPOINTS.user.chat.getMessages);
     getMessagesResource.addCorsPreflight({
-      allowOrigins: ["http://localhost:5173"],
+      allowOrigins: ["*"],
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["GET", "OPTIONS"],
     });
@@ -91,7 +91,7 @@ export class LiveChatFeatureConstruct extends Construct {
     // GET /user/chat/getAllChats
     const getAllChatsResource = chatRoot.addResource(API_ENDPOINTS.user.chat.getAllChats);
     getAllChatsResource.addCorsPreflight({
-      allowOrigins: ["http://localhost:5173"],
+      allowOrigins: ["*"],
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["GET", "OPTIONS"],
     });
