@@ -6,6 +6,7 @@ import { DynamoTablesConstruct } from "../DynamoDb/tables";
 import { ListingsFeatureConstruct } from "../features/UserListingCRUD";
 import { ListingPhotosBucketConstruct } from "../S3/listingPhotos";
 import { SearchListingsFeatureConstruct } from "../features/SearchListing";
+import { LiveChatFeatureConstruct } from "../features/LiveChat";
 
 export class ProductionStack extends cdk.Stack {
   public readonly cognitoConstruct: CognitoConstruct;
@@ -54,5 +55,11 @@ export class ProductionStack extends cdk.Stack {
         tables: this.dynamoTable,
       }
     );
+
+    const liveChatFeature = new LiveChatFeatureConstruct(this, "LiveChatFeature", {
+      api: this.gatewayConstruct,
+      tables: this.dynamoTable,
+      auth: this.cognitoConstruct,
+    });
   }
 }

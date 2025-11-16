@@ -100,3 +100,31 @@ export function parseJwt(token) {
     return null;
   }
 }
+
+const CRUD_API = "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod";
+export async function fetchApiGet(endpoint, idToken) {
+  const response = await fetch(
+    `${CRUD_API}${endpoint}`,
+    {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    }
+  );
+  return response;
+}
+
+export async function fetchApiPost(endpoint, body, idToken) {
+  const response = await fetch(
+    `${CRUD_API}${endpoint}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify(body),
+    }
+  );
+  return response;
+}
