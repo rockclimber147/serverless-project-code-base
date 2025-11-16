@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -9,12 +9,6 @@ interface PrivateRouteProps {
 export default function PrivateRoute({ children }: PrivateRouteProps) {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const isLoading = useAuthStore((state) => state.isLoading);
-    const initializeAuth = useAuthStore((state) => state.initializeAuth);
-
-    // Initialize auth state from localStorage on mount
-    useEffect(() => {
-        initializeAuth();
-    }, [initializeAuth]);
 
     // Show loading state while checking authentication
     if (isLoading) {

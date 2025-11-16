@@ -97,10 +97,28 @@ interface AuthState {
     initializeAuth: () => void;
 }
 
+// Initialize auth state synchronously on store creation
+const getInitialAuthState = () => {
+    const storedToken = localStorage.getItem("idToken");
+    const storedUserId = localStorage.getItem("userId");
+
+    if (storedToken && storedUserId) {
+        return {
+            idToken: storedToken,
+            userId: storedUserId,
+            isAuthenticated: true,
+        };
+    }
+
+    return {
+        idToken: null,
+        userId: null,
+        isAuthenticated: false,
+    };
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
-    idToken: null,
-    userId: null,
-    isAuthenticated: false,
+    ...getInitialAuthState(),
     isLoading: false,
     error: null,
 
@@ -113,6 +131,12 @@ export const useAuthStore = create<AuthState>((set) => ({
                 idToken: storedToken,
                 userId: storedUserId,
                 isAuthenticated: true,
+            });
+        } else {
+            set({
+                idToken: null,
+                userId: null,
+                isAuthenticated: false,
             });
         }
     },

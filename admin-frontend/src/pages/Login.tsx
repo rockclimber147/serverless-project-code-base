@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -6,13 +6,7 @@ export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [validationError, setValidationError] = useState("");
-    const { login, isAuthenticated, isLoading, error, initializeAuth } =
-        useAuthStore();
-
-    // Initialize auth state from localStorage on mount
-    useEffect(() => {
-        initializeAuth();
-    }, [initializeAuth]);
+    const { login, isAuthenticated, isLoading, error } = useAuthStore();
 
     // Redirect to dashboard if already authenticated
     if (isAuthenticated && !isLoading) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -6,8 +6,16 @@ import ReportedListingActivity from "./pages/ReportedListingActivity";
 import ViewListing from "./pages/ViewListing";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
+import { useAuthStore } from "./stores/authStore";
 
 function App() {
+    const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+    // Initialize auth state before routes render
+    useEffect(() => {
+        initializeAuth();
+    }, [initializeAuth]);
+
     return (
         <BrowserRouter>
             <Routes>
