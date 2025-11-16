@@ -34,12 +34,6 @@ export default function Home() {
       ) : (
         <div className="flex gap-4">
           <button
-            className="bg-gray-800 text-white p-2 rounded hover:bg-gray-900"
-            onClick={() => navigate("/user-dashboard-grid")}
-          >
-            View Dashboard
-          </button>
-          <button
             className="bg-purple-500 text-white p-2 rounded hover:bg-purple-600"
             onClick={() => navigate("/view-user-profile")}
           >
