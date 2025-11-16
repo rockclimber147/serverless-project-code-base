@@ -31,13 +31,7 @@ export default function ViewListing() {
         if (!res.ok) throw new Error("Failed to load reports");
 
         const data = await res.json();
-
-        // Find the specific listing
-        const match = data.find(
-          (item: Listing) => item.listing_id === listingId
-        );
-
-        setListing(match);
+        setListing(data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -54,7 +48,7 @@ export default function ViewListing() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Link to="/admin/reported-listings" className="text-blue-600 underline">
+      <Link to="/reported-listings" className="text-blue-600 underline">
         ← Back to Reported Listings
       </Link>
 

@@ -34,7 +34,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/admin/view-listing/:listingId"
+                    path="/view-listing/:listingId"
                     element={
                         <>
                             <Navbar />

@@ -111,7 +111,7 @@ export default function ReportedListingActivity() {
                     <td className="p-3 border">{lastReport?.reason ?? "—"}</td>
                     <td className="p-3 border">
                       <Link
-                        to={`/admin/view-listing/${listing.listing_id}`}
+                        to={`/view-listing/${listing.listing_id}`}
                         className="text-blue-600 hover:underline"
                       >
                         View
