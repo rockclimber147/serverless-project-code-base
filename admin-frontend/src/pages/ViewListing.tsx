@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { API_ENDPOINTS } from "../api/endpoints";
+import { formatDate } from "../utils/dateUtils";
 
 interface Report {
   reason: string;
@@ -76,7 +77,7 @@ export default function ViewListing() {
           {listing.reports.map((r, index) => (
             <tr key={index} className="border-b">
               <td className="p-3 border">{index + 1}</td>
-              <td className="p-3 border">{r.reported_at}</td>
+              <td className="p-3 border">{formatDate(r.reported_at)}</td>
               <td className="p-3 border">{r.reason}</td>
               <td className="p-3 border">{r.reported_by}</td>
             </tr>

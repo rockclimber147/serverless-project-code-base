@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/dateUtils";
 
 interface Report {
     reason: string;
@@ -30,7 +31,9 @@ export default function ListingRow({
             <td className="p-3 border">{listing.item_name}</td>
             <td className="p-3 border">{listing.user_id}</td>
             <td className="p-3 border">{reportCount}</td>
-            <td className="p-3 border">{lastReport?.reported_at ?? "—"}</td>
+            <td className="p-3 border">
+                {formatDate(lastReport?.reported_at)}
+            </td>
             <td className="p-3 border">{lastReport?.reported_by ?? "—"}</td>
             <td className="p-3 border">{lastReport?.reason ?? "—"}</td>
             <td className="p-3 border">
