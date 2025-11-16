@@ -73,16 +73,70 @@ export default function ReportedListingActivity() {
     <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
       <h1 className="text-3xl font-bold mb-6">Reported Listing Activity</h1>
 
-      {loading && <p>Loading reported listings...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      {!loading && !error && listings.length === 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <p className="text-gray-500">No reported listings to display.</p>
+      {loading && (
+        <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+          <div className="flex flex-col items-center justify-center py-8 mb-6">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <p className="text-gray-600">Loading reported listings...</p>
+          </div>
+          {/* Skeleton loader matching table structure */}
+          <table className="min-w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-3 text-left border">Item</th>
+                <th className="p-3 text-left border">Seller</th>
+                <th className="p-3 text-left border">Total Reports</th>
+                <th className="p-3 text-left border">Reported At</th>
+                <th className="p-3 text-left border">Reported By</th>
+                <th className="p-3 text-left border">Reason</th>
+                <th className="p-3 text-left border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i} className="border-b animate-pulse">
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-12 mx-auto"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-28"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-40"></div>
+                  </td>
+                  <td className="p-3 border">
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {!loading && listings.length > 0 && (
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <p className="font-semibold">Error loading listings</p>
+          <p className="text-sm mt-1">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && listings.length === 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <p className="text-gray-500 text-center py-8">No reported listings to display.</p>
+        </div>
+      )}
+
+      {!loading && !error && listings.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
           <table className="min-w-full border-collapse">
             <thead>
