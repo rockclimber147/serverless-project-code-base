@@ -31,6 +31,9 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         "longitude": {"N": str(data.get("longitude", 0.0))},
         "image": {"S": data.get("image", "")},
         "created_at": {"N": str(int(time.time()))},
+        "is_removed": {"BOOL": bool(data.get("is_removed", False))},
+        "reports": {"L": []},
+        
     }
 
     dynamodb.put_item(TableName=table_name, Item=item)
