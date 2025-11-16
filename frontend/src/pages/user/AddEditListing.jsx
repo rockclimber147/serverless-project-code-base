@@ -1,49 +1,76 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ListingCRUDAPIService } from "@/services/listingUser";
+import { ListingCRUDAPIService } from "@/services/listingsUser";
 import { useState } from "react";
+import DeleteModal from "@/components/DeleteModal";
+
 export default function AddEditListing() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [deleteModal, setOpenDeleteModal] = useState(false);
   const { item } = location.state || {};
   const [image, setImage] = useState(item?.image || null);
+  const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
   const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
   const [details, setDetails] = useState(item?.details || "");
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(URL.createObjectURL(file));
+      setImageFile(file);
     }
   };
 
-  const handleClear = () => {
-    setImage(null);
-  };
+  function getUpdatedFields(original, current) {
+    const updated = {};
+    Object.keys(current).forEach((key) => {
+      // Only include fields that are different
+      if (current[key] !== original[key]) {
+        updated[key] = current[key];
+      }
+    });
+    return updated;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const listingData = {
-      item_name: "POST test",
-      price: 450,
-      is_sold: false,
-      location: "Vancouver, BC",
-      latitude: 49.2827,
-      longitude: -123.1207,
+    const currentData = {
+      item_name: title,
+      price: price,
+      details: details,
+      location: address,
+      image: image,
     };
+    let listingId;
+    console.log("current Data", currentData);
+    try {
+      if (item) {
+        const updatedData = getUpdatedFields(item, currentData);
+        await ListingCRUDAPIService.updateListing(item.id, updatedData);
+        listingId = item.id;
+      } else {
+        const createdListing =
+          await ListingCRUDAPIService.createListing(currentData);
+        listingId = createdListing.id;
+      }
+      if (imageFile instanceof File) {
+        const { upload_url, public_url } =
+          await ListingCRUDAPIService.getUploadLink(listingId);
+        await ListingCRUDAPIService.uploadToS3(upload_url, imageFile);
 
-    if (item) {
-      // edit existing
-      await ListingCRUDAPIService.updateListing(item.id, listingData);
-      console.log("Listing updated");
-    } else {
-      // create new
-      await ListingCRUDAPIService.createListing(listingData);
-      console.log("Listing created");
+        // Patch the listing with the public_url
+        await ListingCRUDAPIService.updateListing(listingId, {
+          image: public_url,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to save listing:", err);
     }
   };
 
@@ -59,7 +86,9 @@ export default function AddEditListing() {
               className="object-cover h-full w-full"
             />
             <button
-              onClick={handleClear}
+              onClick={() => {
+                setImage(null);
+              }}
               className="absolute top-2 right-2 bg-red-400 text-white px-3 py-1 rounded-lg"
             >
               Clear
@@ -114,13 +143,31 @@ export default function AddEditListing() {
             Save
           </button>
           <button
+            type="button"
             className="border-neutral-400 border rounded-lg px-2 py-1 hover:bg-neutral-500 hover:text-white"
             onClick={() => navigate(-1)}
           >
             Cancel
           </button>
+
+          <button
+            type="button"
+            className="bg-red-500 text-white border rounded-lg px-2 py-1
+            hover:text-white"
+            onClick={() => setOpenDeleteModal(true)}
+          >
+            {" "}
+            Delete
+          </button>
         </div>
       </form>
+      {deleteModal && (
+        <DeleteModal
+          listingId={item.id}
+          open={deleteModal}
+          setOpen={setOpenDeleteModal}
+        />
+      )}
     </div>
   );
 }
