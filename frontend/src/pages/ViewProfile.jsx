@@ -1,11 +1,21 @@
-import React from "react";
+import React, {useEffect} from "react";
 import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
+      
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
 
+    if (!storedId || !storedToken) {
+      navigate("/");
+      return;
+    }
+  }, [navigate]);
+  
   // TODO: replace
   const profile = {
     photo:

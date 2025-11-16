@@ -21,7 +21,7 @@ const MapPage = () => {
         async function fetchInitialListings() {
             try {
                 const data = await ListingAPIService.searchListings();
-                // const res = await fetch("https://i94mrsytqk.execute-api.us-west-2.amazonaws.com/prod/public/search");
+                // const res = await fetch("https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/public/search");
                 // if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 // const data = await res.json();
 
@@ -71,7 +71,7 @@ const MapPage = () => {
     }));
 
     return (
-        <div className="w-screen h-screen relative flex">
+        <div className="w-screen h-[calc(100vh-2.75rem)] relative flex overflow-hidden">
             <div className="absolute z-[999] md:w-[25vw] pe-8 w-[60%] pointer-events-none">
                 <div className="p-[1.25rem]">
                     <input
