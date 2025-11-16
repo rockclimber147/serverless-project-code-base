@@ -30,7 +30,7 @@ export class ListingCRUDAPIService {
     return data;
   }
 
-  static async updateListing(updatedListingFields: Listing) {
+  static async updateListing(listingId: number, updatedListingFields: any) {
     const token = this.checkAuth();
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "PATCH",
@@ -38,7 +38,10 @@ export class ListingCRUDAPIService {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(updatedListingFields),
+      body: JSON.stringify({
+        listing_id: listingId,
+        ...updatedListingFields,
+      }),
     });
 
     if (!res.ok) {
@@ -52,19 +55,45 @@ export class ListingCRUDAPIService {
   static async deleteListing(listingId: number) {
     const token = this.checkAuth();
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
-      method: "PATCH",
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(listingId),
+      body: JSON.stringify({ listing_id: listingId }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to delete listing: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  }
+
+  static async uploadImage(listingId: number) {
+    const token = this.checkAuth();
+    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ listing_id: listingId }),
     });
 
     if (!res.ok) {
       throw new Error(`Failed to update listing: ${res.status}`);
     }
 
-    const data = await res.json();
-    return data;
+    return res.json(); // returns { upload_url, public_url }
+  }
+
+  static async uploadToS3(uploadUrl: string, file: File) {
+    const res = await fetch(uploadUrl, {
+      method: "PUT",
+      body: file,
+    });
+    if (!res.ok) throw new Error("Failed to upload image to S3");
   }
 }
