@@ -35,9 +35,9 @@ export default function Home() {
         <div className="flex gap-4">
           <button
             className="bg-purple-500 text-white p-2 rounded hover:bg-purple-600"
-            onClick={() => navigate("/edit-profile")}
+            onClick={() => navigate("/view-user-profile")}
           >
-            Edit Profile
+            View Profile
           </button>
           <button
             className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
