@@ -5,6 +5,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ReportedListingActivity from "./pages/ReportedListingActivity";
 import ViewListing from "./pages/ViewListing";
 import Navbar from "./components/Navbar";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
     return (
@@ -14,34 +15,34 @@ function App() {
                 <Route
                     path="/dashboard"
                     element={
-                        <>
+                        <PrivateRoute>
                             <Navbar />
                             <div className="mt-11">
                                 <AdminDashboard />
                             </div>
-                        </>
+                        </PrivateRoute>
                     }
                 />
                 <Route
                     path="/reported-listings"
                     element={
-                        <>
+                        <PrivateRoute>
                             <Navbar />
                             <div className="mt-11">
                                 <ReportedListingActivity />
                             </div>
-                        </>
+                        </PrivateRoute>
                     }
                 />
                 <Route
                     path="/view-listing/:listingId"
                     element={
-                        <>
+                        <PrivateRoute>
                             <Navbar />
                             <div className="mt-11">
                                 <ViewListing />
                             </div>
-                        </>
+                        </PrivateRoute>
                     }
                 />
 

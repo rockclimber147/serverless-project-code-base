@@ -44,16 +44,6 @@ export default function AdminDashboard() {
                     View Reported Listing Activity
                 </button>
             </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
-                <div className="text-gray-500">
-                    <p>No recent activity to display.</p>
-                    <p className="text-sm mt-2">
-                        Backend integration will be added later.
-                    </p>
-                </div>
-            </div>
         </div>
     );
 }
