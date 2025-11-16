@@ -25,8 +25,10 @@ useEffect(() => {
   const fetchProfile = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("No UserID in local storage");
+      const storedToken = localStorage.getItem("idToken");
+      if (!userId || !storedToken) {
+        navigate("/");
+        return;
       }
       const fetchedUserInfo = await getUserInfo({ id: userId });
       if (fetchedUserInfo) {
