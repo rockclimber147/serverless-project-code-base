@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { fetchApiGet, fetchApiPost } from "@/services/authApi"
 
 function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
   const [input, setInput] = useState("");
@@ -12,20 +13,8 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
     if (!input.trim() || !idToken) return;
 
     try {
-      const response = await fetch(
-        `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/sendMessage`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            partnerId: user.id,
-            message: input,
-          }),
-        }
-      );
+      const body = { partnerId: user.id, message: input };
+      const response = await fetchApiPost("/user/chat/sendMessage", body, idToken);
 
       const data = await response.json();
       if (data.ok) {
@@ -43,15 +32,8 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
     if (!idToken || !user) return;
 
     try {
-      const response = await fetch(
-        `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/getMessages?partnerId=${user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-
+      const endpoint = `/user/chat/getMessages?partnerId=${user.id}`;
+      const response = await fetchApiGet(endpoint, idToken);
       const data = await response.json();
       setMessages(Array.isArray(data) ? data : []);
       scrollToBottom();

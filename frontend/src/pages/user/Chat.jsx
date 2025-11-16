@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ChatSideBar from "../../components/ChatSideBar";
 import ChatThread from "../../components/ChatThread";
 import { useLocation } from "react-router-dom";
+import { fetchApiGet } from "@/services/authApi"
 
 function Chat() {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -53,15 +54,7 @@ function Chat() {
       if (!idToken || !currentUserId) return;
 
       try {
-        const response = await fetch(
-          `https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/chat/getAllChats`,
-          {
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
-
+        const response = await fetchApiGet("/user/chat/getAllChats", idToken);
         const data = await response.json();
 
         // Dynamo might return an array of partner IDs or objects
