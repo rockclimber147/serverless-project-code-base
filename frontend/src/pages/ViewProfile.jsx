@@ -16,8 +16,8 @@ export default function Profile({ type = "user" }) {
   const [profile, setProfileData] = useState({
   photo: "",
   name: "",
-  rating: 4,
-  reviews: 12,
+  rating: 0,
+  reviews: 0,
   address: "",
 });
 
@@ -142,7 +142,7 @@ useEffect(() => {
               )}
             </div>
 
-            {type === "seller" && (
+            {type === "user" && (
               <div className="flex items-center space-x-2 mt-1">
                 <span>{renderStars(profile.rating)}</span>
                 <span className="text-gray-500">
