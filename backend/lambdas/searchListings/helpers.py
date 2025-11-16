@@ -67,8 +67,17 @@ def _search_table_by_pagination(table_name: str, name: str = None):
     return items
 
 def _deserialize_value(value):
-    """Deserialize DynamoDB attribute to JSON-safe Python type."""
     val = deserializer.deserialize(value)
+    return _convert_nested(val)
+
+def _convert_nested(val):
     if isinstance(val, decimal.Decimal):
         return float(val) if val % 1 else int(val)
+
+    if isinstance(val, list):
+        return [_convert_nested(v) for v in val]
+
+    if isinstance(val, dict):
+        return {k: _convert_nested(v) for k, v in val.items()}
+
     return val
