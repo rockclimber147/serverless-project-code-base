@@ -27,4 +27,12 @@ export class CRUDGatewayConstruct extends Construct {
     this.userResource = this.api.root.addResource(API_ENDPOINTS.user.value);
     this.adminResource = this.api.root.addResource(API_ENDPOINTS.admin.value);
   }
+
+  public addUserSubResource(...pathSegments: string[]): apigw.Resource {
+    let parent = this.userResource;
+    for (const segment of pathSegments) {
+      parent = parent.addResource(segment);
+    }
+    return parent;
+  }
 }

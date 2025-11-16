@@ -10,7 +10,13 @@ export const API_ENDPOINTS = {
     value: "public"
   },
   user: {
-    value: "user"
+    value: "user",
+    chat: {
+      value: "chat",
+      sendMessage: "sendMessage",
+      getMessages: "getMessages",
+      getAllChats: "getAllChats",
+    },
   },
   admin: {
     value: "admin"

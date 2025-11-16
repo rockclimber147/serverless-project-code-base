@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect} from "react";
 import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -6,42 +6,25 @@ import { getUserInfo } from "@/services/authApi";
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
+      
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
 
-  function signOut() {
-    localStorage.removeItem("idToken");
-    localStorage.removeItem("userId");
-    navigate("/"); // redirect to login/home
-  }
-
-  const [profile, setProfileData] = useState({
-  photo: "",
-  name: "",
-  rating: 0,
-  reviews: 0,
-  address: "",
-});
-
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("No UserID in local storage");
-      }
-      const fetchedUserInfo = await getUserInfo({ id: userId });
-      if (fetchedUserInfo) {
-        const user = fetchedUserInfo.data;
-        setProfileData(prev => ({
-          ...prev,
-          photo: user.profileImage || "",
-          name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
-          address: user.prefLocation ?? "",
-        }));
-      }
-    } catch (err) {
-      console.error(err);
-      navigate("/signin");
+    if (!storedId || !storedToken) {
+      navigate("/");
+      return;
     }
+  }, [navigate]);
+  
+  // TODO: replace
+  const profile = {
+    photo:
+      "https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=3307",
+    name: "John Doe",
+    rating: 4,
+    reviews: 12,
+    address: "555 Seymour Street, Vancouver, BC",
   };
 
   fetchProfile();

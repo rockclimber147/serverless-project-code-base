@@ -5,6 +5,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 export class DynamoTablesConstruct extends Construct {
   public readonly userTable: dynamodb.ITable;
   public readonly listingsTable: dynamodb.Table;
+  public readonly chatTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, usersTableArn: string) {
     super(scope, id);
@@ -22,6 +23,14 @@ export class DynamoTablesConstruct extends Construct {
       indexName: "owner-id-index",
       partitionKey: { name: "owner_id", type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
+    });
+
+    const chatTableName = `LiveChat-${cdk.Stack.of(this).account}-${cdk.Stack.of(this).region}`;
+    this.chatTable = new dynamodb.Table(this, "ChatTable", {
+      tableName: chatTableName,
+      partitionKey: { name: "chatId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "timestamp", type: dynamodb.AttributeType.STRING },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }
 }
