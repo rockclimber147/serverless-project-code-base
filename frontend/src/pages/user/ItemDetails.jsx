@@ -1,24 +1,44 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SellerCard from "@/components/SellerCard";
 import { FaHeart, FaRegHeart, FaPen } from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
+import { ListingAPIService } from "@/services/listingsApi";
 
 export default function ItemDetails() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { listingId } = useParams();
 
-  const { item } = location.state || {};
   const [modalOpen, setModalOpen] = useState(false);
   // TODO: replace
   const user = {
     id: "seller-id",
     name: "Name",
-    photo: "https://picsum.photos/seed/200/200/200"
+    photo: "https://picsum.photos/seed/200/200/200",
   };
 
   const [favourite, setFavourite] = useState(false);
+
+  // Initialize state from location.state if available
+  const [item, setItem] = useState(location.state?.item || null);
+
+  useEffect(() => {
+    // If item is not passed via state, fetch it from the backend
+    if (!item && listingId) {
+      const fetchItem = async () => {
+        try {
+          const fetchedItem = await ListingAPIService.getListingById(listingId);
+          setItem(fetchedItem); // update the state
+        } catch (err) {
+          console.error("Failed to fetch item:", err);
+        }
+      };
+
+      fetchItem();
+    }
+  }, [item, listingId]);
 
   return (
     <div className="flex w-full gap-4 h-screen">
@@ -54,9 +74,15 @@ export default function ItemDetails() {
         <div className="flex w-full gap-2 mb-4">
           <button
             className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
-            onClick={() => navigate("/chat", {
-              state: { partnerId: user.id, partnerName: user.name, avatar: user.photo },
-            })}
+            onClick={() =>
+              navigate("/chat", {
+                state: {
+                  partnerId: user.id,
+                  partnerName: user.name,
+                  avatar: user.photo,
+                },
+              })
+            }
           >
             Message
           </button>
