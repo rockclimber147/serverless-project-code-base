@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ChatSideBar from "../../components/ChatSideBar";
 import ChatThread from "../../components/ChatThread";
 import { useLocation } from "react-router-dom";
-import { fetchApiGet } from "@/services/authApi"
+import { fetchApiGet, getUserInfo } from "@/services/authApi"
 
 function Chat() {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -16,6 +16,7 @@ function Chat() {
   const partnerIdFromNav = location.state?.partnerId;
   const partnerNameFromNav = location.state?.partnerName;
   const partnerAvatarFromNav = location.state?.avatar;
+  const defaultAvatar = "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
 
   useEffect(() => {
     const storedId = localStorage.getItem("userId");
@@ -37,13 +38,13 @@ function Chat() {
         {
           id: partnerIdFromNav,
           name: partnerNameFromNav || "User",
-          avatar: partnerAvatarFromNav || "",
+          avatar: partnerAvatarFromNav || defaultAvatar,
         },
       ]);
       setSelectedUser({
         id: partnerIdFromNav,
         name: partnerNameFromNav || "User",
-        avatar: partnerAvatarFromNav || "",
+        avatar: partnerAvatarFromNav || defaultAvatar,
       });
     }
   }, [partnerIdFromNav]);
@@ -55,22 +56,35 @@ function Chat() {
 
       try {
         const response = await fetchApiGet("/user/chat/getAllChats", idToken);
+        if (response.status === 401) {
+            localStorage.removeItem("idToken");
+            localStorage.removeItem("userId");
+            navigate("/");
+            return;
+        }
+
         const data = await response.json();
-
-        // Dynamo might return an array of partner IDs or objects
-        // For now, create random names and avatars
-        // TODO: read from user table
+  
         const partnerUsers = Array.isArray(data)
-          ? data.map((partnerId, idx) => ({
+          ? await Promise.all(
+            data.map(async (partnerId) => {
+            const res = await getUserInfo({id: partnerId}, idToken);
+            const user = res.data;
+            return ({
               id: partnerId,
-              name: `User ${idx + 1}`,
-              avatar: `https://i.pravatar.cc/150?img=${Math.floor(
-                Math.random() * 70
-              ) + 1}`,
-            }))
-          : [];
+              name: user?.givenName || "User",
+              avatar: user?.profileImage || defaultAvatar,
+            })
+          })) : [];
 
-        setUsers(partnerUsers);
+        setUsers((prev) => {
+          const existingIds = new Set(prev.map((u) => u.id));
+          const merged = [
+            ...prev,
+            ...partnerUsers.filter((u) => !existingIds.has(u.id)),
+          ];
+          return merged;
+        });
 
         // Set the first user as selected by default
         if (partnerUsers.length > 0 && !selectedUser) {

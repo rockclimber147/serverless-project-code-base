@@ -19,7 +19,7 @@ export default function ItemCard(props) {
     <div
       className="w-full m-2"
       onClick={() => {
-        navigate(`/item-details/${item.listing_id}`);
+        navigate(`/item-details/${item.listing_id}`, { state: { item } });
       }}
     >
       <div className="relative">
