@@ -10,7 +10,7 @@ import UserDashboardGrid from "./pages/user/UserDashboardGrid";
 import Favourites from "./pages/user/Favourites";
 import Profile from "./pages/ViewProfile";
 import ItemDetails from "./pages/user/ItemDetails";
-import AddListing from "./pages/user/AddListing";
+import AddEditListing from "./pages/user/AddEditListing";
 import ListingsMap from "./pages/ListingsMap";
 import Chat from "./pages/user/Chat";
 
@@ -31,12 +31,12 @@ function App() {
             path="/view-seller-profile"
             element={<Profile type="seller" />}
           />
-          <Route path="/item-details" element={<ItemDetails />} />
+          <Route path="/item-details/:listingId" element={<ItemDetails />} />
           <Route path="/favourites" element={<Favourites />} />
-          <Route path="/add-listing" element={<AddListing />} />
+          <Route path="/add-listing" element={<AddEditListing />} />
           <Route path="/listings-map" element={<ListingsMap />} />
           <Route path="/chat" element={<Chat />} />
-      </Routes>
+        </Routes>
       </div>
     </BrowserRouter>
   );

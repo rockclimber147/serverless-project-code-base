@@ -9,7 +9,8 @@ export default function ItemCard(props) {
   const [favourite, setFavourite] = useState(false);
   const navigate = useNavigate();
 
-  const handleToggleFavourite = async () => {
+  const handleToggleFavourite = async (e) => {
+    e.stopPropagation();
     setFavourite(!favourite);
     // TODO: Add backend logic
   };
@@ -18,12 +19,12 @@ export default function ItemCard(props) {
     <div
       className="w-full m-2"
       onClick={() => {
-        navigate("/item-details", { state: { item } });
+        navigate(`/item-details/${item.listing_id}`);
       }}
     >
       <div className="relative">
         <img
-          src={item.imageUrl}
+          src={item.image}
           className="rounded-lg mb-2 object-cover w-full "
         />
         <button
@@ -39,7 +40,7 @@ export default function ItemCard(props) {
       </div>
 
       <div className="flex justify-between items-center mb-1 w-full">
-        <h5 className="text-lg">{item.name}</h5>
+        <h5 className="text-lg">{item.item_name}</h5>
         <b>${item.price}</b>
       </div>
       <p className="text-neutral-400 text-sm">{item.location}</p>
@@ -49,8 +50,9 @@ export default function ItemCard(props) {
 
 ItemCard.propTypes = {
   item: PropTypes.shape({
-    imageUrl: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
+    listing_id: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    item_name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     location: PropTypes.string,
   }).isRequired,

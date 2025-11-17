@@ -1,12 +1,22 @@
 import React from "react";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 
 export default function MapGridToggleButton() {
-  const [viewMode, setViewMode] = useState("grid");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const viewMode = location.pathname.includes("map") ? "map" : "grid";
+
   const handleChangeView = (event, newView) => {
-    setViewMode(newView);
+    if (!newView) return;
+
+    if (newView === "grid" && !location.pathname.includes("grid")) {
+      navigate("/user-dashboard-grid");
+    } else if (newView === "map" && !location.pathname.includes("map")) {
+      navigate("/listings-map");
+    }
   };
+
   return (
     <ToggleButtonGroup
       color="primary"

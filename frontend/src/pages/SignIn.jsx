@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signin, parseJwt } from "@/services/authApi"
+import { signin, parseJwt } from "@/services/authApi";
 import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
@@ -24,7 +24,7 @@ export default function SignIn() {
         localStorage.setItem("idToken", res.idToken);
         const claims = parseJwt(res.idToken);
         localStorage.setItem("userId", claims.sub);
-        navigate("/"); // redirect to home page
+        navigate("/user-dashboard-grid"); // redirect to dashboard
       } else if (res.error) {
         setErrorMsg(res.error);
       } else {

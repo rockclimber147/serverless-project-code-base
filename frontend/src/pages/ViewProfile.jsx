@@ -53,45 +53,57 @@ useEffect(() => {
   const listings = [
     {
       id: 1,
-      name: "Item1",
+      item_name: "Item1",
       price: 123,
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       location: "123 Main Street, BC",
-      imageUrl: "https://picsum.photos/seed/item1/300/200",
+      image: "https://picsum.photos/seed/item1/300/200",
     },
     {
       id: 2,
-      name: "Item2",
+      item_name: "Item2",
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       price: 234,
       location: "234 Oak Avenue, BC",
-      imageUrl: "https://picsum.photos/seed/item2/300/200",
+      image: "https://picsum.photos/seed/item2/300/200",
     },
     {
       id: 3,
-      name: "Item3",
+      item_name: "Item3",
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       price: 345,
       location: "345 Pine Road, BC",
-      imageUrl: "https://picsum.photos/seed/item3/300/200",
+      image: "https://picsum.photos/seed/item3/300/200",
     },
     {
       id: 4,
-      name: "Item4",
+      item_name: "Item4",
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       price: 456,
       location: "456 Maple Street, BC",
-      imageUrl: "https://picsum.photos/seed/item4/300/200",
+      image: "https://picsum.photos/seed/item4/300/200",
     },
     {
       id: 5,
-      name: "Item5",
+      item_name: "Item5",
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       price: 567,
       location: "567 Cedar Drive, BC",
-      imageUrl: "https://picsum.photos/seed/item5/300/200",
+      image: "https://picsum.photos/seed/item5/300/200",
     },
     {
       id: 6,
-      name: "Item6",
+      item_name: "Item6",
+      details:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
       price: 678,
       location: "678 Spruce Lane, BC",
-      imageUrl: "https://picsum.photos/seed/item6/300/200",
+      image: "https://picsum.photos/seed/item6/300/200",
     },
   ];
 
