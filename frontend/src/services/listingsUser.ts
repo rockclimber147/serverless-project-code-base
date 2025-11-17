@@ -53,6 +53,7 @@ export class ListingCRUDAPIService {
   }
 
   static async deleteListing(listingId: number) {
+    console.log(listingId);
     const token = this.checkAuth();
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "DELETE",
@@ -60,7 +61,7 @@ export class ListingCRUDAPIService {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ listing_id: listingId }),
+      body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
     if (!res.ok) {
@@ -71,7 +72,7 @@ export class ListingCRUDAPIService {
     return data;
   }
 
-  static async uploadImage(listingId: number) {
+  static async getUploadLink(listingId: number) {
     const token = this.checkAuth();
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "POST",
