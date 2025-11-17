@@ -8,6 +8,7 @@ import { ListingAPIService } from "@/services/listingsApi"
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
   const [myListings, setMyListings] = useState([]);
+  const defaultProfileImage = "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=1024x1024&w=is&k=20&c=ZVVVbYUtoZgPqbVSDxoltjnrW3G_4DLKYk6QZ0uu5_w=";
 
   function signOut() {
     localStorage.removeItem("idToken");
@@ -16,7 +17,7 @@ export default function Profile({ type = "user" }) {
   }
 
   const [profile, setProfileData] = useState({
-    photo: "https://www.istockphoto.com/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-gm1451587807-488238421",
+    photo: defaultProfileImage,
     name: "",
     rating: 0,
     reviews: 0,
@@ -38,7 +39,7 @@ export default function Profile({ type = "user" }) {
           const user = fetchedUserInfo.data;
           setProfileData(prev => ({
             ...prev,
-            photo: user.profileImage || "",
+            photo: user.profileImage || defaultProfileImage,
             name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
             address: user.prefLocation ?? "",
           }));
@@ -48,6 +49,7 @@ export default function Profile({ type = "user" }) {
         navigate("/signin");
       }
     };
+    fetchProfile();
   }, [navigate]);
 
   useEffect(() => {
