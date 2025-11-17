@@ -17,6 +17,14 @@ CORS_HEADERS = {
 
 
 def lambda_handler(event, context):
+    method = event.get("httpMethod")
+    if method == "OPTIONS":
+        return {
+            "statusCode": 200,
+            "headers": CORS_HEADERS,
+            "body": ""
+        }
+    
     body = json.loads(event.get("body") or "{}")
     listing_id = body.get("listing_id")
 
