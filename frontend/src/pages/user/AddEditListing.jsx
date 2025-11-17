@@ -107,7 +107,11 @@ export default function AddEditListing() {
           console.error("Failed to update listing:", err);
         }
       }
-      navigate("/user-dashboard-grid");
+      if (!item) {
+        navigate("/view-user-profile");
+      } else {
+        navigate(`/item-details/${listingId}`);
+      }
     } catch (err) {
       console.error("Failed to save listing:", err);
     }
