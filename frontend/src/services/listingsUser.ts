@@ -30,8 +30,9 @@ export class ListingCRUDAPIService {
     return data;
   }
 
-  static async updateListing(listingId: number, updatedListingFields: any) {
+  static async updateListing(listingId: string, updatedListingFields: any) {
     const token = this.checkAuth();
+
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "PATCH",
       headers: {
@@ -39,7 +40,7 @@ export class ListingCRUDAPIService {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        listing_id: listingId,
+        listing_id: String(listingId),
         ...updatedListingFields,
       }),
     });
@@ -72,19 +73,19 @@ export class ListingCRUDAPIService {
     return data;
   }
 
-  static async getUploadLink(listingId: number) {
+  static async getUploadLink(listingId: string) {
     const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API_BASE + "/photo", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ listing_id: listingId }),
+      body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to update listing: ${res.status}`);
+      throw new Error(`Failed to get upload link: ${res.status}`);
     }
 
     return res.json(); // returns { upload_url, public_url }
