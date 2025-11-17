@@ -11,18 +11,18 @@ dynamodb = boto3.client("dynamodb", region_name=REGION)
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token",
-    "Access-Control-Allow-Methods": "OPTIONS,POST",
+    "Access-Control-Allow-Methods": "OPTIONS,POST,PATCH,DELETE",
 }
 
 
 def lambda_handler(event, context):
+    method = event.get("httpMethod")
     claims = event.get("requestContext", {}).get("authorizer", {}).get("claims", {})
     user_id = claims.get("sub")
 
     if not user_id:
         return cors_response(401, {"error": "Missing user identity"})
 
-    method = event.get("httpMethod")
     body = json.loads(event.get("body") or "{}")
 
     if method == "POST":

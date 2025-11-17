@@ -76,7 +76,7 @@ const MapPage = () => {
   }));
 
   return (
-    <div className="w-screen h-screen relative flex">
+    <div className="w-screen h-[calc(100vh-2.75rem)] relative flex overflow-hidden">
       <div className="absolute z-[999] md:w-[25vw] pe-8 w-[60%] pointer-events-none">
         <div className="p-[1.25rem]">
           <input

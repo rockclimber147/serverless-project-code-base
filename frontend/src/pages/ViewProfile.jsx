@@ -1,21 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { getUserInfo } from "@/services/authApi";
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
 
-  // TODO: replace
-  const profile = {
-    photo:
-      "https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=3307",
-    name: "John Doe",
-    rating: 4,
-    reviews: 12,
-    address: "555 Seymour Street, Vancouver, BC",
+  function signOut() {
+    localStorage.removeItem("idToken");
+    localStorage.removeItem("userId");
+    navigate("/"); // redirect to login/home
+  }
+
+  const [profile, setProfileData] = useState({
+  photo: "",
+  name: "",
+  rating: 0,
+  reviews: 0,
+  address: "",
+});
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const storedToken = localStorage.getItem("idToken");
+      if (!userId || !storedToken) {
+        navigate("/");
+        return;
+      }
+      const fetchedUserInfo = await getUserInfo({ id: userId });
+      if (fetchedUserInfo) {
+        const user = fetchedUserInfo.data;
+        setProfileData(prev => ({
+          ...prev,
+          photo: user.profileImage || "",
+          name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
+          address: user.prefLocation ?? "",
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+      navigate("/signin");
+    }
   };
 
+  fetchProfile();
+}, [navigate]);
+
+// TODO: Replace with live user listings
   const listings = [
     {
       id: 1,
@@ -73,6 +107,7 @@ export default function Profile({ type = "user" }) {
     },
   ];
 
+  // TODO: Replace with live user reviews/ratings
   const reviews = [
     {
       id: 1,
@@ -89,6 +124,7 @@ export default function Profile({ type = "user" }) {
   ];
 
   const renderStars = (count) => {
+    console.log("render called")
     return [...Array(5)].map((_, index) => (
       <FaStar
         key={index}
@@ -100,32 +136,46 @@ export default function Profile({ type = "user" }) {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Profile Info */}
-      <div className="flex items-start space-x-4 mt-6 mb-16">
-        <img
-          src={profile.photo}
-          alt="Profile"
-          className="w-32 h-32 rounded-full object-cover"
-        />
-        <div className="flex flex-col px-3">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-3xl font-bold py-1">{profile.name}</h1>
-            {type === "user" && (
-              <FaPen
-                className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                onClick={() => navigate("/edit-profile")}
-              />
-            )}
-          </div>
+      <div className="flex items-start justify-between mt-6 mb-16">
+        {/* LEFT SIDE: profile image + info */}
+        <div className="flex items-start space-x-4">
+          <img
+            src={profile.photo}
+            alt="Profile"
+            className="w-32 h-32 rounded-full object-cover"
+          />
 
-          {type === "seller" && (
-            <div className="flex items-center space-x-2 mt-1">
-              <span>{renderStars(profile.rating)}</span>
-              <span className="text-gray-500">({profile.reviews} reviews)</span>
+          <div className="flex flex-col px-3">
+            <div className="flex items-center space-x-2">
+              <h1 className="text-3xl font-bold py-1">{profile.name}</h1>
+              {type === "user" && (
+                <FaPen
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                  onClick={() => navigate("/edit-profile")}
+                />
+              )}
             </div>
-          )}
 
-          <p className="text-gray-600 mt-1">{profile.address}</p>
+            {type === "user" && (
+              <div className="flex items-center space-x-2 mt-1">
+                <span>{renderStars(profile.rating)}</span>
+                <span className="text-gray-500">
+                  ({profile.reviews} reviews)
+                </span>
+              </div>
+            )}
+
+            <p className="text-gray-600 mt-1">{profile.address}</p>
+          </div>
         </div>
+
+        {/* RIGHT SIDE: sign out button */}
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          onClick={signOut}
+        >
+          Sign out
+        </button>
       </div>
 
       {/* Listing Section */}

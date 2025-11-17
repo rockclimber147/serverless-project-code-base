@@ -41,6 +41,11 @@ export class ListingsFeatureConstruct extends Construct {
     this.addMethodWithAuthorizer(listingsResource, "POST", listingCUDLambda, userAuthorizer);
     this.addMethodWithAuthorizer(listingsResource, "PATCH", listingCUDLambda, userAuthorizer);
     this.addMethodWithAuthorizer(listingsResource, "DELETE", listingCUDLambda, userAuthorizer);
+    listingsResource.addCorsPreflight({
+      allowOrigins: ["*"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["OPTIONS", "POST", "PATCH", "DELETE"],
+    });
 
     const listingPhotoLambda = new lambda.Function(this, "listingPhotoLambda", {
       runtime: lambda.Runtime.PYTHON_3_11,
@@ -55,6 +60,11 @@ export class ListingsFeatureConstruct extends Construct {
 
     const photoResource = listingsResource.addResource("photo");
     this.addMethodWithAuthorizer(photoResource, "POST", listingPhotoLambda, userAuthorizer);
+    photoResource.addCorsPreflight({
+      allowOrigins: ["*"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["OPTIONS", "POST"],
+    });
   }
 
   private addMethodWithAuthorizer(

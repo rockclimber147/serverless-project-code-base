@@ -12,6 +12,7 @@ import Profile from "./pages/ViewProfile";
 import ItemDetails from "./pages/user/ItemDetails";
 import AddEditListing from "./pages/user/AddEditListing";
 import ListingsMap from "./pages/ListingsMap";
+import Chat from "./pages/user/Chat";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/favourites" element={<Favourites />} />
           <Route path="/add-listing" element={<AddEditListing />} />
           <Route path="/listings-map" element={<ListingsMap />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </div>
     </BrowserRouter>

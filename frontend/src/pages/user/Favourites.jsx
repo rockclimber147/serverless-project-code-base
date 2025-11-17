@@ -1,7 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ItemCard from "../../components/ItemCard";
 
 export default function Favourites() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
+
+    if (!storedId || !storedToken) {
+      navigate("/");
+      return;
+    }
+  }, [navigate]);
+
   // TODO: replace
   const listings = [
     {
