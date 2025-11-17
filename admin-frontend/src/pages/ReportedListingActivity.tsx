@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsTable from "../components/ListingsTable";
+import { Link } from "react-router-dom";
 
 interface Report {
     reason: string;
@@ -68,7 +69,10 @@ export default function ReportedListingActivity() {
 
     return (
         <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
-            <h1 className="text-3xl font-bold mb-6">
+            <Link to="/dashboard" className="text-blue-600 underline">
+            ← Back to Reported Listings
+            </Link>
+            <h1 className="text-3xl font-bold mb-6 mt-4">
                 Reported Listing Activity
             </h1>
 
