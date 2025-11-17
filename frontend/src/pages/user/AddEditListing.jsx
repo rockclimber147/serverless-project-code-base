@@ -44,7 +44,10 @@ export default function AddEditListing() {
       item_name: title,
       price: price,
       details: details,
+      is_sold: false,
       location: address,
+      latitude: 49.2827, // hardcoded
+      longitude: -123.1207, //hardcoded
       image: image,
     };
     let listingId;
@@ -52,12 +55,13 @@ export default function AddEditListing() {
     try {
       if (item) {
         const updatedData = getUpdatedFields(item, currentData);
-        await ListingCRUDAPIService.updateListing(item.id, updatedData);
-        listingId = item.id;
+        await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
+        listingId = item.listing_id;
       } else {
         const createdListing =
           await ListingCRUDAPIService.createListing(currentData);
-        listingId = createdListing.id;
+        console.log(createdListing);
+        listingId = createdListing.listing_id;
       }
       if (imageFile instanceof File) {
         const { upload_url, public_url } =
@@ -163,7 +167,7 @@ export default function AddEditListing() {
       </form>
       {deleteModal && (
         <DeleteModal
-          listingId={item.id}
+          listingId={item.listing_id}
           open={deleteModal}
           setOpen={setOpenDeleteModal}
         />
