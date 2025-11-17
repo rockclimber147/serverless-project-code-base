@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ListingCRUDAPIService } from "@/services/listingsUser";
 import { useState } from "react";
 import DeleteModal from "@/components/DeleteModal";
+import { MappingAPI } from "@/services/mapping";
 
 export default function AddEditListing() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const [deleteModal, setOpenDeleteModal] = useState(false);
-  const { item } = location.state || {};
+  const navigate = useNavigate();
 
+  const { item } = location.state || {};
+  const [deleteModal, setOpenDeleteModal] = useState(false);
   const [image, setImage] = useState(item?.image || null);
   const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
@@ -41,18 +42,27 @@ export default function AddEditListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let coordinates;
+    let listingId;
+    // Fetch coordinates
+    try {
+      coordinates = await MappingAPI.getCoordinates({ address: address });
+      // TODO: Default to user address once backend GET user info is added
+      console.log(coordinates);
+    } catch (err) {
+      console.error("Failed to get upload link:", err);
+      return;
+    }
+
     const currentData = {
       item_name: title,
       price: price,
       details: details,
-      is_sold: false,
       location: address,
-      latitude: 49.2827, // hardcoded
-      longitude: -123.1207, //hardcoded
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
       image: image,
     };
-
-    let listingId;
 
     try {
       if (item) {
@@ -97,6 +107,7 @@ export default function AddEditListing() {
           console.error("Failed to update listing:", err);
         }
       }
+      navigate("/user-dashboard-grid");
     } catch (err) {
       console.error("Failed to save listing:", err);
     }
@@ -177,16 +188,17 @@ export default function AddEditListing() {
           >
             Cancel
           </button>
-
-          <button
-            type="button"
-            className="bg-red-500 text-white border rounded-lg px-2 py-1
+          {item && (
+            <button
+              type="button"
+              className="bg-red-500 text-white border rounded-lg px-2 py-1
             hover:text-white"
-            onClick={() => setOpenDeleteModal(true)}
-          >
-            {" "}
-            Delete
-          </button>
+              onClick={() => setOpenDeleteModal(true)}
+            >
+              {" "}
+              Delete
+            </button>
+          )}
         </div>
       </form>
       {deleteModal && (
