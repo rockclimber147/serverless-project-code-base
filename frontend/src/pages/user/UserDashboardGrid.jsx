@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { ListingAPIService } from "@/services/listingsApi";
 
 export default function UserDashboardGrid() {
-  // TODO: replace
   const [listings, setListings] = useState([]);
 
   useEffect(() => {
@@ -21,16 +20,16 @@ export default function UserDashboardGrid() {
     fetchInitialListings();
   }, []);
 
-  const itemList = listings.map((item, index) => (
-    <div key={index}>
-      <ItemCard item={item} />
-    </div>
-  ));
+  useEffect(() => {
+    console.log("Listings state updated:", listings);
+  }, [listings]);
 
   const [inputText, setInputText] = useState("");
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setSearchText(inputText);
+
     try {
       const results = await ListingAPIService.searchListings(inputText);
       console.log(results);
@@ -63,7 +62,11 @@ export default function UserDashboardGrid() {
       </div>
       <h2 className="text-2xl m-4">Most Recent Listings</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {itemList}
+        {listings && listings.map((item) => (
+          <div key={item.id}>
+            <ItemCard item={item} />
+          </div>
+        ))}
       </div>
     </div>
   );

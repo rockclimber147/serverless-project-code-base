@@ -25,6 +25,7 @@ export default function ItemCard(props) {
       <div className="relative">
         <img
           src={item.image}
+          src={item.image}
           className="rounded-lg mb-2 object-cover w-full "
         />
         <button
