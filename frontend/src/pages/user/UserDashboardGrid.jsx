@@ -21,8 +21,8 @@ export default function UserDashboardGrid() {
     fetchInitialListings();
   }, []);
 
-  const itemList = listings.map((item) => (
-    <div key={item.id}>
+  const itemList = listings.map((item, index) => (
+    <div key={index}>
       <ItemCard item={item} />
     </div>
   ));
