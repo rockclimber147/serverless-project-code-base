@@ -9,7 +9,8 @@ export default function ItemCard(props) {
   const [favourite, setFavourite] = useState(false);
   const navigate = useNavigate();
 
-  const handleToggleFavourite = async () => {
+  const handleToggleFavourite = async (e) => {
+    e.stopPropagation();
     setFavourite(!favourite);
     // TODO: Add backend logic
   };
