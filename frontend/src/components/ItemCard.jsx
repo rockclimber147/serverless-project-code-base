@@ -18,7 +18,7 @@ export default function ItemCard(props) {
     <div
       className="w-full m-2"
       onClick={() => {
-        navigate("/item-details", { state: { item } });
+        navigate(`/item-details/${item.listing_id}`);
       }}
     >
       <div className="relative">
@@ -49,6 +49,7 @@ export default function ItemCard(props) {
 
 ItemCard.propTypes = {
   item: PropTypes.shape({
+    listing_id: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
     item_name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
