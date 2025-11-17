@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { API_ENDPOINTS } from "../api/endpoints";
 import { formatDate } from "../utils/dateUtils";
+import Button from "../components/Button";
+import DeleteModal from "../components/DeleteModal";
 
 interface Report {
   reason: string;
@@ -14,6 +16,7 @@ interface Listing {
   user_id: string;
   item_name: string;
   reports: Report[];
+  is_removed: boolean;
 }
 
 export default function ViewListing() {
@@ -21,6 +24,9 @@ export default function ViewListing() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [buttonColor, setButtonColor] = useState("red");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -43,6 +49,12 @@ export default function ViewListing() {
     load();
   }, [listingId]);
 
+  useEffect(() => {
+  if (listing && listing.is_removed) {
+    setButtonColor("green");
+    }
+  }, [listing]);
+
   if (loading) return <p>Loading listing details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
   if (!listing) return <p>No listing found.</p>;
@@ -59,6 +71,8 @@ export default function ViewListing() {
         <p><strong>Item:</strong> {listing.item_name}</p>
         <p><strong>Seller User ID:</strong> {listing.user_id}</p>
         <p><strong>Total Reports:</strong> {listing.reports.length}</p>
+        <Button color="neutral" to="">View Listing</Button>
+        <Button className="mx-1" color={buttonColor as any} onClick={() => setDeleteModalOpen(true)}>{listing.is_removed ? "Reactivate" : "Delete Listing"}</Button>
       </div>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Reports</h2>
@@ -84,6 +98,39 @@ export default function ViewListing() {
           ))}
         </tbody>
       </table>
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Enter the reason for deleting"
+      >
+        <textarea
+          className="w-full border rounded-lg p-2 h-28 resize-none focus:ring-primary focus:border-primary"
+          placeholder="Type your reason..."
+          value={deleteReason}
+          onChange={(e) => setDeleteReason(e.target.value)}
+        />
+
+        <div className="flex justify-end mt-4 gap-2">
+          <Button
+            color="neutral"
+            variant="outline"
+            onClick={() => setDeleteModalOpen(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="red"
+            onClick={() => {
+              console.log("Deleting listing with reason:", deleteReason);
+              // TODO: Call delete lambda here
+              setDeleteModalOpen(false);
+            }}
+          >
+            Delete Listing
+          </Button>
+        </div>
+      </DeleteModal>
     </div>
   );
 }
