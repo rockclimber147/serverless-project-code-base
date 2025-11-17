@@ -44,6 +44,7 @@ export default function AddEditListing() {
 
     let coordinates;
     let listingId;
+
     // Fetch coordinates
     if (address) {
       try {
@@ -55,6 +56,7 @@ export default function AddEditListing() {
         return;
       }
     }
+
     const currentData = {
       item_name: title,
       price: price,
@@ -65,56 +67,63 @@ export default function AddEditListing() {
       image: image,
     };
 
-    try {
-      if (item) {
-        const updatedData = getUpdatedFields(item, currentData);
-        await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
-        listingId = item.listing_id;
-      } else {
+    if (!item) {
+      // Create Listing
+      try {
         const createdListing =
           await ListingCRUDAPIService.createListing(currentData);
         listingId = createdListing.listing_id;
+      } catch (err) {
+        console.error("Failed to create listing:", err);
       }
-      if (imageFile instanceof File) {
-        let uploadUrl;
-        let publicUrl;
+    } else {
+      // Update Listing
+      try {
+        const updatedData = getUpdatedFields(item, currentData);
+        await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
+        listingId = item.listing_id;
+      } catch (err) {
+        console.error("Failed to update listing:", err);
+      }
+    }
 
-        console.log("listingid", listingId);
-        // Step 1: Get upload link
-        try {
-          const res = await ListingCRUDAPIService.getUploadLink(listingId);
-          uploadUrl = res.upload_url;
-          publicUrl = res.public_url;
-          console.log("Upload URL:", uploadUrl);
-        } catch (err) {
-          console.error("Failed to get upload link:", err);
-          return;
-        }
-        // Step 2: Upload to S3
-        try {
-          await ListingCRUDAPIService.uploadToS3(uploadUrl, imageFile);
-          console.log("Upload successful");
-        } catch (err) {
-          console.error("Failed to upload file:", err);
-          return; // stop if upload fails
-        }
-        // Step 3: Patch listing with public URL
-        try {
-          await ListingCRUDAPIService.updateListing(listingId, {
-            image: publicUrl,
-          });
-          console.log("Listing updated with image");
-        } catch (err) {
-          console.error("Failed to update listing:", err);
-        }
+    if (imageFile instanceof File) {
+      let uploadUrl;
+      let publicUrl;
+
+      console.log("listingid", listingId);
+      // Step 1: Get upload link
+      try {
+        const res = await ListingCRUDAPIService.getUploadLink(listingId);
+        uploadUrl = res.upload_url;
+        publicUrl = res.public_url;
+        console.log("Upload URL:", uploadUrl);
+      } catch (err) {
+        console.error("Failed to get upload link:", err);
+        return;
       }
-      if (!item) {
-        navigate("/view-user-profile");
-      } else {
-        navigate(`/item-details/${listingId}`);
+      // Step 2: Upload to S3
+      try {
+        await ListingCRUDAPIService.uploadToS3(uploadUrl, imageFile);
+        console.log("Upload successful");
+      } catch (err) {
+        console.error("Failed to upload file:", err);
+        return; // stop if upload fails
       }
-    } catch (err) {
-      console.error("Failed to save listing:", err);
+      // Step 3: Patch listing with public URL
+      try {
+        await ListingCRUDAPIService.updateListing(listingId, {
+          image: publicUrl,
+        });
+        console.log("Listing updated with image");
+      } catch (err) {
+        console.error("Failed to update listing:", err);
+      }
+    }
+    if (!item) {
+      navigate("/view-user-profile");
+    } else {
+      navigate(`/item-details/${listingId}`);
     }
   };
 
