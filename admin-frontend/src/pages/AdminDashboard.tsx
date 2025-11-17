@@ -53,7 +53,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <DataContainer textColour="text-blue-600" title="Total Listing" data={activeListingsCount} subtitle="Active Listings"/>
                 <DataContainer textColour="text-green-600" title="Total Users" data={0} subtitle="Registered Users"/>
-                <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Number of Reported Listings"/>
+                <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Reported Listings"/>
             </div>
 
             <div className="mb-8">
