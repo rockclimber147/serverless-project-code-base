@@ -3,9 +3,11 @@ import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo } from "@/services/authApi";
+import { ListingAPIService } from "@/services/listingsApi"
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
+  const [myListings, setMyListings] = useState([]);
 
   function signOut() {
     localStorage.removeItem("idToken");
@@ -14,86 +16,54 @@ export default function Profile({ type = "user" }) {
   }
 
   const [profile, setProfileData] = useState({
-  photo: "",
-  name: "",
-  rating: 0,
-  reviews: 0,
-  address: "",
-});
+    photo: "https://www.istockphoto.com/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-gm1451587807-488238421",
+    name: "",
+    rating: 0,
+    reviews: 0,
+    address: "",
+  });
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      const storedToken = localStorage.getItem("idToken");
-      if (!userId || !storedToken) {
-        navigate("/");
-        return;
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
+
+    const fetchProfile = async () => {
+      try {
+        if (!userId || !storedToken) {
+          navigate("/");
+          return;
+        }
+        const fetchedUserInfo = await getUserInfo({ id: userId });
+        if (fetchedUserInfo) {
+          const user = fetchedUserInfo.data;
+          setProfileData(prev => ({
+            ...prev,
+            photo: user.profileImage || "",
+            name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
+            address: user.prefLocation ?? "",
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+        navigate("/signin");
       }
-      const fetchedUserInfo = await getUserInfo({ id: userId });
-      if (fetchedUserInfo) {
-        const user = fetchedUserInfo.data;
-        setProfileData(prev => ({
-          ...prev,
-          photo: user.profileImage || "",
-          name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
-          address: user.prefLocation ?? "",
-        }));
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
+    
+    async function fetchInitialListings() {
+      try {
+        const data = await ListingAPIService.getMyListings(userId);
+        setMyListings(data);
+      } catch (err) {
+        console.error("Failed to load My Listings:", err);
       }
-    } catch (err) {
-      console.error(err);
-      navigate("/signin");
     }
-  };
-
-  fetchProfile();
-}, [navigate]);
-
-// TODO: Replace with live user listings
-  const listings = [
-    {
-      id: 1,
-      name: "Item1",
-      price: 123,
-      location: "123 Main Street, BC",
-      imageUrl: "https://picsum.photos/seed/item1/300/200",
-    },
-    {
-      id: 2,
-      name: "Item2",
-      price: 234,
-      location: "234 Oak Avenue, BC",
-      imageUrl: "https://picsum.photos/seed/item2/300/200",
-    },
-    {
-      id: 3,
-      name: "Item3",
-      price: 345,
-      location: "345 Pine Road, BC",
-      imageUrl: "https://picsum.photos/seed/item3/300/200",
-    },
-    {
-      id: 4,
-      name: "Item4",
-      price: 456,
-      location: "456 Maple Street, BC",
-      imageUrl: "https://picsum.photos/seed/item4/300/200",
-    },
-    {
-      id: 5,
-      name: "Item5",
-      price: 567,
-      location: "567 Cedar Drive, BC",
-      imageUrl: "https://picsum.photos/seed/item5/300/200",
-    },
-    {
-      id: 6,
-      name: "Item6",
-      price: 678,
-      location: "678 Spruce Lane, BC",
-      imageUrl: "https://picsum.photos/seed/item6/300/200",
-    },
-  ];
+  fetchInitialListings();
+  }, []);
 
   // TODO: Replace with live user reviews/ratings
   const reviews = [
@@ -185,7 +155,7 @@ useEffect(() => {
 
         {/* Grid Wrapper */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {listings.map((item) => (
+          {myListings && myListings.map((item) => (
             <ItemCard key={item.id} item={item} />
           ))}
         </div>
