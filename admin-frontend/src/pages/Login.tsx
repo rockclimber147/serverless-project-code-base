@@ -1,62 +1,69 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [validationError, setValidationError] = useState("");
+    const { login, isAuthenticated, isLoading, error } = useAuthStore();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrorMsg("");
-
-    if (!username || !password) {
-      setErrorMsg("Please enter both username and password.");
-      return;
+    // Redirect to dashboard if already authenticated
+    if (isAuthenticated && !isLoading) {
+        // TODO: Add admin check here before navigating
+        return <Navigate to="/dashboard" replace />;
     }
 
-    // Placeholder for login - just navigate to dashboard for now
-    // In the future, this will call the backend API
-    navigate("/dashboard");
-  }
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setValidationError("");
 
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-96 flex flex-col gap-4"
-      >
-        <h1 className="text-2xl font-bold mb-4">Admin Sign In</h1>
+        if (!username || !password) {
+            setValidationError("Please enter both username and password.");
+            return;
+        }
 
-        {errorMsg && (
-          <div className="text-red-600 bg-red-100 p-2 rounded">{errorMsg}</div>
-        )}
+        await login(username, password);
+    }
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded"
-        />
+    return (
+        <div className="flex items-center justify-center h-screen bg-gray-100">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white p-8 rounded shadow-md w-96 flex flex-col gap-4"
+            >
+                <h1 className="text-2xl font-bold mb-4">Admin Sign In</h1>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 rounded"
-        />
+                {(error || validationError) && (
+                    <div className="text-red-600 bg-red-100 p-2 rounded">
+                        {error || validationError}
+                    </div>
+                )}
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-        >
-          Sign In
-        </button>
-      </form>
-    </div>
-  );
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="border p-2 rounded"
+                />
+
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="border p-2 rounded"
+                />
+
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isLoading ? "Signing In..." : "Sign In"}
+                </button>
+            </form>
+        </div>
+    );
 }
-
