@@ -45,22 +45,23 @@ export default function AddEditListing() {
     let coordinates;
     let listingId;
     // Fetch coordinates
-    try {
-      coordinates = await MappingAPI.getCoordinates({ address: address });
-      // TODO: Default to user address once backend GET user info is added
-      console.log(coordinates);
-    } catch (err) {
-      console.error("Failed to get upload link:", err);
-      return;
+    if (address) {
+      try {
+        coordinates = await MappingAPI.getCoordinates({ address: address });
+        // TODO: Default to user address once backend GET user info is added
+        console.log(coordinates);
+      } catch (err) {
+        console.error("Failed to get upload link:", err);
+        return;
+      }
     }
-
     const currentData = {
       item_name: title,
       price: price,
       details: details,
       location: address,
-      latitude: coordinates.latitude,
-      longitude: coordinates.longitude,
+      latitude: coordinates?.latitude,
+      longitude: coordinates?.longitude,
       image: image,
     };
 
