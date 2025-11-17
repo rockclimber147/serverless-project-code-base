@@ -1,16 +1,19 @@
 import React from "react";
 import Modal from "@mui/material/Modal";
+import { useNavigate } from "react-router-dom";
 import { ListingCRUDAPIService } from "@/services/listingsUser";
 import PropTypes from "prop-types";
 
 export default function DeleteModal(props) {
   const { listingId, open, setOpen } = props;
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setOpen(false);
     try {
       await ListingCRUDAPIService.deleteListing(listingId);
+      navigate("/view-user-profile");
     } catch (err) {
       console.error("Failed to delete listing:", err);
     }
@@ -52,7 +55,7 @@ export default function DeleteModal(props) {
 }
 
 DeleteModal.propTypes = {
-  listingId: PropTypes.number.isRequired,
+  listingId: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
 };
