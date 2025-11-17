@@ -24,7 +24,8 @@ export default function ViewListing() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [buttonColor, setButtonColor] = useState("red");
+  const deleteButtonColor = listing?.is_removed ? "green" : "red";
+  const deleteButtonText = listing?.is_removed ? "Reactivate Listing" : "Delete Listing";
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
 
@@ -49,15 +50,34 @@ export default function ViewListing() {
     load();
   }, [listingId]);
 
-  useEffect(() => {
-  if (listing && listing.is_removed) {
-    setButtonColor("green");
-    }
-  }, [listing]);
-
   if (loading) return <p>Loading listing details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
   if (!listing) return <p>No listing found.</p>;
+
+  async function handleDelete() {
+    if (!listing) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.deleteListing, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          listing_id: listing.listing_id,
+          reason: deleteReason,
+        })
+      });
+
+      const data = await res.json();
+      console.log("Delete response:", data);
+
+      setDeleteModalOpen(false);
+      setListing(prev =>
+        prev ? { ...prev, is_removed: !prev.is_removed } : prev
+      );
+
+    } catch (err) {
+      console.error("Error deleting:", err);
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -72,7 +92,9 @@ export default function ViewListing() {
         <p><strong>Seller User ID:</strong> {listing.user_id}</p>
         <p><strong>Total Reports:</strong> {listing.reports.length}</p>
         <Button color="neutral" to="">View Listing</Button>
-        <Button className="mx-1" color={buttonColor as any} onClick={() => setDeleteModalOpen(true)}>{listing.is_removed ? "Reactivate" : "Delete Listing"}</Button>
+        <Button color={deleteButtonColor} onClick={() => setDeleteModalOpen(true)} className="mx-1">
+          {deleteButtonText}
+        </Button>
       </div>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Reports</h2>
@@ -98,10 +120,12 @@ export default function ViewListing() {
           ))}
         </tbody>
       </table>
+
+    {!listing.is_removed ? (
       <DeleteModal
         open={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        title="Enter the reason for deleting"
+        title="Enter the reason for deleting (*)"
       >
         <textarea
           className="w-full border rounded-lg p-2 h-28 resize-none focus:ring-primary focus:border-primary"
@@ -119,18 +143,36 @@ export default function ViewListing() {
             Cancel
           </Button>
 
-          <Button
-            color="red"
-            onClick={() => {
-              console.log("Deleting listing with reason:", deleteReason);
-              // TODO: Call delete lambda here
-              setDeleteModalOpen(false);
-            }}
-          >
+          <Button color="red" onClick={handleDelete}>
             Delete Listing
           </Button>
         </div>
       </DeleteModal>
+    ) : (
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Reactivate Listing"
+      >
+        <p className="text-gray-700 mb-4">
+          Are you sure you want to reactivate this listing?
+        </p>
+
+        <div className="flex justify-end mt-4 gap-2">
+          <Button
+            color="neutral"
+            variant="outline"
+            onClick={() => setDeleteModalOpen(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button color="green" onClick={handleDelete}>
+            Reactivate Listing
+          </Button>
+        </div>
+      </DeleteModal>
+    )}
     </div>
   );
 }
