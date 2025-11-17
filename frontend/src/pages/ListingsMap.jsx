@@ -8,7 +8,7 @@ const buildPopupHTML = ({ name, price, link }) => {
   return `
         <strong>${name}</strong><br/>
         $${price}<br/>
-        <a class="text-blue-500 underline" href="${link}" target="_blank">Go to listing</a>
+        <a class="text-blue-500 underline" href="${link}">Go to listing</a>
     `;
 };
 
@@ -127,7 +127,6 @@ const MapPage = () => {
             <a
               className="text-blue-500 underline py-2"
               href={selectedListing.link}
-              target="_blank"
               rel="noreferrer"
             >
               Go to listing
