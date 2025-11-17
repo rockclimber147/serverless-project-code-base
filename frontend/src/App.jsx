@@ -31,7 +31,7 @@ function App() {
             path="/view-seller-profile"
             element={<Profile type="seller" />}
           />
-          <Route path="/item-details" element={<ItemDetails />} />
+          <Route path="/item-details/:listingId" element={<ItemDetails />} />
           <Route path="/favourites" element={<Favourites />} />
           <Route path="/add-listing" element={<AddEditListing />} />
           <Route path="/listings-map" element={<ListingsMap />} />
