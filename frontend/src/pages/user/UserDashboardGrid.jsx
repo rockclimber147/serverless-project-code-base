@@ -11,7 +11,7 @@ export default function UserDashboardGrid() {
   useEffect(() => {
     async function fetchInitialListings() {
       try {
-        await FavouritesAPIService.get_all_favourites();
+        await FavouritesAPIService.getAllFavourites();
         const data = await ListingAPIService.searchListings();
         console.log(data);
         setListings(data);

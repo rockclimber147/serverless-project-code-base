@@ -15,9 +15,9 @@ export default function ItemCard(props) {
     e.stopPropagation();
 
     if (favourite) {
-      await FavouritesAPIService.delete_favourite(item.listing_id);
+      await FavouritesAPIService.deleteFavourite(item.listing_id);
     } else {
-      await FavouritesAPIService.add_favourite(item.listing_id);
+      await FavouritesAPIService.addFavourite(item.listing_id);
     }
 
     setFavourite(!favourite);

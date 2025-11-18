@@ -3,7 +3,7 @@ import { BaseServiceWithAuth } from "./baseAuthApi";
 export class FavouritesAPIService extends BaseServiceWithAuth {
     private static API = this.API_BASE + "user/favourites";
 
-    static async get_all_favourites() {
+    static async getAllFavourites() {
         // get all user favourites
         const hasAuthHeader = true;
         const errorMessage = "Error getting user favourites";
@@ -18,7 +18,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async add_favourite(listing_id: string) {
+    static async addFavourite(listing_id: string) {
         const hasAuthHeader = true;
         const body = JSON.stringify({ listing_id: String(listing_id) })
         const errorMessage = "Error adding favourite listing";
@@ -29,7 +29,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async delete_favourite(listing_id: string) {
+    static async deleteFavourite(listing_id: string) {
         const hasAuthHeader = true;
         const body = JSON.stringify({ listing_id: String(listing_id) })
         const errorMessage = "Error deleting favourite listing";
@@ -44,7 +44,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static get_favourite() {
+    static getFavourite() {
 
     }
 }
