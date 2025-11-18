@@ -65,7 +65,6 @@ export default function AddEditListing() {
       location: address,
       latitude: coordinates?.latitude,
       longitude: coordinates?.longitude,
-      image: image,
     };
 
     if (!item) {
