@@ -14,9 +14,25 @@ interface Listing {
     reports: Report[];
 }
 
+interface User {
+    id: string;
+    role: string;
+    givenName: string;
+    familyName: string;
+    email: string;
+    prefLocation: string;
+}
+
+interface UserBody {
+    statusCode: number;
+    body: User[];
+
+}
+
 export default function AdminDashboard() {
     const navigate = useNavigate();
     const [listings, setListings] = useState<Listing[] | null>(null);
+    const [users, setUsers] = useState<UserBody | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -26,15 +42,29 @@ export default function AdminDashboard() {
 
     const reportedListingCount = listings?.filter((l: Listing) => l.reports).length ?? 0;
 
+    // This excludes admin role
+    const userCount = useMemo(() => {
+        return users?.body.filter((u: User) => u.role === "user").length ?? 0;
+    }, [users]);
+
     useEffect(() => {
         async function load() {
             try {
-                const resListings = await fetch(API_ENDPOINTS.viewAllListings);
+                const [resListings, resUsers] = await Promise.all([
+                    fetch(API_ENDPOINTS.viewAllListings),
+                    fetch(API_ENDPOINTS.viewUsers),
+                ]);
 
                 if (!resListings.ok) throw new Error("Failed to load listings");
+                if (!resUsers.ok) throw new Error("Failed to load users");
 
-                const resListingsData = await resListings.json();
+                const [resListingsData, resUsersData] = await Promise.all([
+                    resListings.json(),
+                    resUsers.json(),
+                ]);
+
                 setListings(resListingsData);
+                setUsers(resUsersData);
             } catch (err: any){
                 setError(err.message);
             } finally {
@@ -53,7 +83,7 @@ export default function AdminDashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <DataContainer textColour="text-blue-600" title="Total Listing" data={activeListingsCount} subtitle="Active Listings"/>
-                <DataContainer textColour="text-green-600" title="Total Users" data={0} subtitle="Registered Users"/>
+                <DataContainer textColour="text-green-600" title="Total Users" data={userCount} subtitle="Registered Users"/>
                 <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Reported Listings"/>
                 <ListingsBarChart listings={listings ?? []} />
             </div>
