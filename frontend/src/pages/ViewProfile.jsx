@@ -56,8 +56,6 @@ export default function Profile({ type = "user" }) {
     async function fetchInitialListings() {
       try {
         const data = await ListingCRUDAPIService.getMyListings();
-        console.log("here")
-        console.log(data)
         setMyListings(data);
       } catch (err) {
         console.error("Failed to load My Listings:", err);

@@ -10,8 +10,6 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         try {
             const res = await this.fetchAPI(this.API, "GET", hasAuthHeader, errorMessage);
             if (res.success == true) {
-                console.log("Successfully favourited listing");
-                console.log(res);
                 const favourites = res.favourites.map(fav => fav.listing_id);
                 sessionStorage.setItem("favourites", JSON.stringify(favourites))
             } 
@@ -26,9 +24,6 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         const errorMessage = "Error adding favourite listing";
         try {
             const res = await this.fetchAPI(this.API, "POST", hasAuthHeader, errorMessage, body);
-            if (res.success == true) {
-                console.log("Successfully favourited listing");
-            } 
         } catch (e) {
             console.log(e);
         }
