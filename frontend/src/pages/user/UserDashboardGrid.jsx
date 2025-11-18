@@ -6,6 +6,7 @@ import { ListingAPIService } from "@/services/listingsApi";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
+  const [searchText, setSearchText] = useState([]);
 
   useEffect(() => {
     async function fetchInitialListings() {

@@ -27,7 +27,7 @@ export class ListingAPIService {
 
   //TODO: update and link my listings
   static async getMyListings(userId: string) {
-    const url = `${this.SEARCH_API}?name=${encodeURIComponent(userId)}`
+    const url = `${this.SEARCH_API}?user_id=${encodeURIComponent(userId)}`
     const res = await fetch(url);
     if (!res.ok) {
       console.log(res);
@@ -38,7 +38,7 @@ export class ListingAPIService {
     const listings: Listing[] = rawListings.map((item: Listing) =>
       this.castToListingObject(item)
     );
-    
+    console.log(listings);
     return listings;
   }
 
@@ -60,8 +60,8 @@ export class ListingAPIService {
   }
 
   //TODO: update and link to favorites
-  static async getFavoriteListings() {
-    const url = this.SEARCH_API;
+  static async getFavoriteListings(userId: string) {
+    const url = `${this.SEARCH_API}?user_favorites=${encodeURIComponent(userId)}`
     const res = await fetch(url);
     if (!res.ok) {
       console.log(res);
