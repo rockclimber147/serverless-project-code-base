@@ -1,7 +1,6 @@
 import DataContainer from "@/components/DataContainer";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsBarChart from "@/components/ListingsBarChart";
 import { useListings } from "@/hooks/useListing";
 import { useUsers } from "@/hooks/useUsers";
