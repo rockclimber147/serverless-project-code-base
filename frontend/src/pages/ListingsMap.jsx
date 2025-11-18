@@ -140,8 +140,10 @@ const MapPage = () => {
         )}
       </div>
 
-      <div className="absolute top-4 right-10 z-[999]">
-        <MapGridToggleButton />
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 container flex justify-end pointer-events-none z-[9999]">
+          <div className="pointer-events-auto">
+            <MapGridToggleButton />
+          </div>
       </div>
 
       <LeafletMap
