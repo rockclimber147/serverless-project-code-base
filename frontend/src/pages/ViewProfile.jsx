@@ -40,9 +40,11 @@ export default function Profile({ type = "user" }) {
         }
         if (type === "seller") {
           if (passedUser) {
+            const name = `${passedUser.givenName ?? ""} ${passedUser.familyName ?? ""}`.trim()
+              ? passedUser.givenName : passedUser.name;
             setProfileData({
-              photo: passedUser.profileImage || defaultProfileImage,
-              name: `${passedUser.givenName ?? ""} ${passedUser.familyName ?? ""}`.trim(),
+              photo: passedUser?.profileImage || passedUser?.avatar || defaultProfileImage,
+              name: name,
               rating: passedUser.rating ?? 0,
               reviews: passedUser.reviews ?? 0,
               address: passedUser.prefLocation ?? "",

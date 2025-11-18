@@ -72,7 +72,7 @@ function Chat() {
             const user = res.data;
             return ({
               id: partnerId,
-              name: user?.givenName || "User",
+              name: `${user?.givenName} ${user?.familyName}` || "User",
               avatar: user?.profileImage || defaultAvatar,
             })
           })) : [];
