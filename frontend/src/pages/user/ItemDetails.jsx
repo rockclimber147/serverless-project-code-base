@@ -28,7 +28,6 @@ export default function ItemDetails() {
       const authToken = localStorage.getItem("idToken");
       const res = await getUserInfo({ id: item.user_id }, authToken);
       const user = res.data;
-      console.log("User", user);
       setUser(user);
     }
     getUser();
