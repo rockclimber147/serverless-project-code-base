@@ -17,10 +17,11 @@ export default function ItemDetails() {
   const [modalOpen, setModalOpen] = useState(false);
   const [favourite, setFavourite] = useState(false);
   const [user, setUser] = useState(null);
+  const currentUserId = localStorage.getItem("userId");
+  const isOwnListing = currentUserId && item && currentUserId === item.user_id;
 
   const defaultAvatar =
     "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
-
   useEffect(() => {
     if (!item) return;
     async function getUser() {
@@ -92,26 +93,30 @@ export default function ItemDetails() {
         </div>
 
         <div className="flex w-full gap-2 mb-4">
-          <button
-            className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
-            onClick={() =>
-              navigate("/chat", {
-                state: {
-                  partnerId: user.id,
-                  partnerName: `${user.givenName} ${user.familyName}`,
-                  avatar: user.profileImage || defaultAvatar,
-                },
-              })
-            }
-          >
-            Message
-          </button>
-          <button
-            className="bg-red-500 rounded-lg px-2 py-1 text-white w-16"
-            onClick={() => setModalOpen(true)}
-          >
-            Report
-          </button>
+          {!isOwnListing && (
+            <button
+              className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
+              onClick={() =>
+                navigate("/chat", {
+                  state: {
+                    partnerId: user.id,
+                    partnerName: `${user.givenName} ${user.familyName}`,
+                    avatar: user.profileImage || defaultAvatar,
+                  },
+                })
+              }
+            >
+              Message
+            </button>
+          )}
+          {!isOwnListing && (
+            <button
+              className="bg-red-500 rounded-lg px-2 py-1 text-white w-16"
+              onClick={() => setModalOpen(true)}
+            >
+              Report
+            </button>
+          )}
         </div>
 
         {/* Description */}
@@ -129,7 +134,13 @@ export default function ItemDetails() {
         </div>
       </div>
 
-      {modalOpen && <ReportPopUp open={modalOpen} setOpen={setModalOpen} />}
+      {modalOpen && (
+        <ReportPopUp
+          open={modalOpen}
+          setOpen={setModalOpen}
+          listingId={item.listing_id}
+        />
+      )}
     </div>
   );
 }
