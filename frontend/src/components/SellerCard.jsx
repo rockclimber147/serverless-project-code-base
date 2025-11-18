@@ -16,7 +16,7 @@ export default function SellerCard(prop) {
       </div>
       <div className="flex items-center">
         <FaUserCircle className="mr-2 text-4xl" />
-        <p>{user.name}</p>
+        <p>{user.givenName} {user.familyName}</p>
       </div>
     </div>
   );

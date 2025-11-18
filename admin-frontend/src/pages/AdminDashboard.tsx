@@ -1,39 +1,59 @@
-import React from "react";
+import DataContainer from "@/components/DataContainer";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../api/endpoints";
+
+interface Listing {
+  listing_id: string;
+  user_id: string;
+  item_name: string;
+  is_sold: boolean;
+  is_removed: boolean;
+  reports: Report[];
+}
+
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
+    const [listings, setListings] = useState<Listing[] | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const activeListingsCount = useMemo(() => {
+    return (listings || []).reduce((count: number, listing: Listing) => count + (!listing.is_removed && !listing.is_sold ? 1 : 0), 0);
+    }, [listings]);
+
+    const reportedListingCount = listings?.filter((l: Listing) => l.reports).length ?? 0;
+
+    useEffect(() => {
+        async function load() {
+            try {
+                const resListings = await fetch(API_ENDPOINTS.viewAllListings);
+
+                if (!resListings.ok) throw new Error("Failed to load listings");
+
+                const resListingsData = await resListings.json();
+                setListings(resListingsData);
+            } catch (err: any){
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        load();
+    }, [])
+
+    if (loading) return <p>Loading data</p>;
+    if (error) return <p className="text-red-500">{error}</p>;
 
     return (
         <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
             <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-2">
-                        Total Listings
-                    </h2>
-                    <p className="text-3xl font-bold text-blue-600">0</p>
-                    <p className="text-gray-500 text-sm mt-2">
-                        Active listings
-                    </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-2">Total Users</h2>
-                    <p className="text-3xl font-bold text-green-600">0</p>
-                    <p className="text-gray-500 text-sm mt-2">
-                        Registered users
-                    </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-2">Reports</h2>
-                    <p className="text-3xl font-bold text-red-600">0</p>
-                    <p className="text-gray-500 text-sm mt-2">
-                        Pending reports
-                    </p>
-                </div>
+                <DataContainer textColour="text-blue-600" title="Total Listing" data={activeListingsCount} subtitle="Active Listings"/>
+                <DataContainer textColour="text-green-600" title="Total Users" data={0} subtitle="Registered Users"/>
+                <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Reported Listings"/>
             </div>
 
             <div className="mb-8">
@@ -43,16 +63,6 @@ export default function AdminDashboard() {
                 >
                     View Reported Listing Activity
                 </button>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
-                <div className="text-gray-500">
-                    <p>No recent activity to display.</p>
-                    <p className="text-sm mt-2">
-                        Backend integration will be added later.
-                    </p>
-                </div>
             </div>
         </div>
     );
