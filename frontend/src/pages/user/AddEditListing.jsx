@@ -11,10 +11,11 @@ export default function AddEditListing() {
 
   const { item } = location.state || {};
   const [deleteModal, setOpenDeleteModal] = useState(false);
+
   const [image, setImage] = useState(item?.image || null);
   const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
-  const [price, setPrice] = useState(item?.price || "");
+  const [price, setPrice] = useState(item?.price || 0);
   const [address, setAddress] = useState(item?.location || "");
   const [details, setDetails] = useState(item?.details || "");
 
@@ -72,6 +73,7 @@ export default function AddEditListing() {
       try {
         const createdListing =
           await ListingCRUDAPIService.createListing(currentData);
+        console.log(createdListing);
         listingId = createdListing.listing_id;
       } catch (err) {
         console.error("Failed to create listing:", err);
