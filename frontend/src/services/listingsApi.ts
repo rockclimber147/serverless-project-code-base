@@ -1,5 +1,6 @@
 import { Listing } from "@/models/listing";
 import { Review } from "@/models/review";
+import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export class ListingAPIService {
   private static readonly API_BASE =
@@ -67,6 +68,7 @@ export class ListingAPIService {
 
   //TODO: update and link to favorites
   static async getFavoriteListings() {
+    const favouriteIds = await FavouritesAPIService.getAllFavourites();
     const url = this.SEARCH_API;
     const res = await fetch(url);
     if (!res.ok) {
@@ -75,11 +77,11 @@ export class ListingAPIService {
     }
 
     const rawListings = await res.json();
-    const listings: Listing[] = rawListings.map((item: Listing) =>
-      this.castToListingObject(item)
-    );
+    const favoriteListings = rawListings
+      .filter((item: any) => favouriteIds.includes(String(item.listing_id)))
+      .map((item: Listing) => this.castToListingObject(item, true));
 
-    return listings;
+    return favoriteListings;
   }
 
   static async getListingById(id: string) {
