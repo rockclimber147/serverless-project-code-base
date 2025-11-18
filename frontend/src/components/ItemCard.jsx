@@ -9,7 +9,8 @@ export default function ItemCard(props) {
   const [favourite, setFavourite] = useState(false);
   const navigate = useNavigate();
 
-  const handleToggleFavourite = async () => {
+  const handleToggleFavourite = async (e) => {
+    e.stopPropagation();
     setFavourite(!favourite);
     // TODO: Add backend logic
   };
@@ -18,14 +19,21 @@ export default function ItemCard(props) {
     <div
       className="w-full m-2"
       onClick={() => {
-        navigate("/item-details", { state: { item } });
+        navigate(`/item-details/${item.listing_id}`, { state: { item } });
       }}
     >
       <div className="relative">
-        <img
-          src={item.image}
-          className="rounded-lg mb-2 object-cover w-full "
-        />
+        {item.image ? (
+          <img
+            src={item.image}
+            className="rounded-lg mb-2 object-cover w-full h-48"
+          />
+        ) : (
+          <div className="rounded-lg mb-2 object-cover w-full h-48 justify-center flex items-center bg-neutral-400">
+            No image
+          </div>
+        )}
+
         <button
           className="absolute top-2 right-2 z-10"
           onClick={handleToggleFavourite}
@@ -42,13 +50,17 @@ export default function ItemCard(props) {
         <h5 className="text-lg">{item.item_name}</h5>
         <b>${item.price}</b>
       </div>
-      <p className="text-neutral-400 text-sm">{item.location}</p>
+
+      <p className="text-neutral-400 text-sm">
+        {item?.location || "No location available"}
+      </p>
     </div>
   );
 }
 
 ItemCard.propTypes = {
   item: PropTypes.shape({
+    listing_id: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
     item_name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
