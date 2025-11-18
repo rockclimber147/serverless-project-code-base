@@ -36,7 +36,7 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <DataContainer textColour="text-blue-600" title="Total Active Listing" data={activeListingsCount} subtitle="Active Listings"/>
+                <DataContainer textColour="text-blue-600" title="Total Active Listings" data={activeListingsCount} subtitle="Active Listings"/>
                 <DataContainer textColour="text-green-600" title="Total Users" data={userCount} subtitle="Registered Users"/>
                 <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Reported Listings"/>
                 <ListingsBarChart listings={listings ?? []} />
