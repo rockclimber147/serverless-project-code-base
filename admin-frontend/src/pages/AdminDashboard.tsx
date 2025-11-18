@@ -2,16 +2,17 @@ import DataContainer from "@/components/DataContainer";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../api/endpoints";
+import ListingsBarChart from "@/components/ListingsBarChart";
 
 interface Listing {
-  listing_id: string;
-  user_id: string;
-  item_name: string;
-  is_sold: boolean;
-  is_removed: boolean;
-  reports: Report[];
+    listing_id: string;
+    user_id: string;
+    item_name: string;
+    created_at: number;
+    is_sold: boolean;
+    is_removed: boolean;
+    reports: Report[];
 }
-
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
@@ -54,6 +55,7 @@ export default function AdminDashboard() {
                 <DataContainer textColour="text-blue-600" title="Total Listing" data={activeListingsCount} subtitle="Active Listings"/>
                 <DataContainer textColour="text-green-600" title="Total Users" data={0} subtitle="Registered Users"/>
                 <DataContainer textColour="text-red-600" title="Reported Listings" data={reportedListingCount} subtitle="Reported Listings"/>
+                <ListingsBarChart listings={listings ?? []} />
             </div>
 
             <div className="mb-8">
