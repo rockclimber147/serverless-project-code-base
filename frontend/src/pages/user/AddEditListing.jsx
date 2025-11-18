@@ -43,6 +43,32 @@ export default function AddEditListing() {
     }
   };
 
+  const fetchCoordinates = async () => {
+    if (address) {
+      try {
+        const coordinates = await MappingAPI.getCoordinates({
+          address: address,
+        });
+        return coordinates;
+      } catch (err) {
+        console.error("Failed to get upload link:", err);
+        return;
+      }
+    }
+  };
+
+  const createListing = async (listingFormCreateData) => {
+    try {
+      const createdListing = await ListingCRUDAPIService.createListing(
+        listingFormCreateData
+      );
+      console.log(createdListing);
+      return createdListing.listing_id;
+    } catch (err) {
+      console.error("Failed to create listing:", err);
+    }
+  };
+
   function getUpdatedFields(original, current) {
     const updated = {};
     Object.keys(current).forEach((key) => {
@@ -54,24 +80,29 @@ export default function AddEditListing() {
     return updated;
   }
 
+  const updateListing = async (listingFormCreateData) => {
+    try {
+      const updatedData = getUpdatedFields(item, listingFormCreateData);
+
+      if (Object.keys(updatedData).length > 0) {
+        await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
+      }
+
+      const listingId = item.listing_id;
+      return listingId;
+    } catch (err) {
+      console.error("Failed to update listing:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    let coordinates;
     let listingId;
 
     // Fetch coordinates
-    if (address) {
-      try {
-        coordinates = await MappingAPI.getCoordinates({ address: address });
-        // TODO: Default to user address once backend GET user info is added
-        console.log(coordinates);
-      } catch (err) {
-        console.error("Failed to get upload link:", err);
-        return;
-      }
-    }
+    const coordinates = await fetchCoordinates();
 
     const listingFormCreateData = {
       item_name: title,
@@ -83,32 +114,9 @@ export default function AddEditListing() {
     };
 
     if (!item) {
-      // Create Listing
-      try {
-        const createdListing = await ListingCRUDAPIService.createListing(
-          listingFormCreateData
-        );
-        console.log(createdListing);
-        listingId = createdListing.listing_id;
-      } catch (err) {
-        console.error("Failed to create listing:", err);
-      }
+      listingId = await createListing(listingFormCreateData);
     } else {
-      // Update Listing
-      try {
-        const updatedData = getUpdatedFields(item, listingFormCreateData);
-
-        if (Object.keys(updatedData).length > 0) {
-          await ListingCRUDAPIService.updateListing(
-            item.listing_id,
-            updatedData
-          );
-        }
-
-        listingId = item.listing_id;
-      } catch (err) {
-        console.error("Failed to update listing:", err);
-      }
+      listingId = await updateListing(listingFormCreateData);
     }
 
     if (imageFile instanceof File) {
@@ -143,7 +151,12 @@ export default function AddEditListing() {
       } catch (err) {
         console.error("Failed to update listing:", err);
       }
+    } else if (!image && (imageFile || item?.image)) {
+      await ListingCRUDAPIService.updateListing(listingId, {
+        image: "",
+      });
     }
+
     if (!item) {
       navigate("/view-user-profile");
     } else {
@@ -190,6 +203,7 @@ export default function AddEditListing() {
             <button
               onClick={() => {
                 setImage(null);
+                setImageFile(null);
               }}
               className="absolute top-2 right-2 bg-red-400 text-white px-3 py-1 rounded-lg"
             >
