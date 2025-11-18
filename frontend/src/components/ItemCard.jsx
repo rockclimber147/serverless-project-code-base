@@ -23,11 +23,17 @@ export default function ItemCard(props) {
       }}
     >
       <div className="relative">
-        <img
-          src={item.image}
-          src={item.image}
-          className="rounded-lg mb-2 object-cover w-full "
-        />
+        {item.image ? (
+          <img
+            src={item.image}
+            className="rounded-lg mb-2 object-cover w-full h-48"
+          />
+        ) : (
+          <div className="rounded-lg mb-2 object-cover w-full h-48 justify-center flex items-center bg-neutral-400">
+            No image
+          </div>
+        )}
+
         <button
           className="absolute top-2 right-2 z-10"
           onClick={handleToggleFavourite}
@@ -44,7 +50,10 @@ export default function ItemCard(props) {
         <h5 className="text-lg">{item.item_name}</h5>
         <b>${item.price}</b>
       </div>
-      <p className="text-neutral-400 text-sm">{item.location}</p>
+
+      <p className="text-neutral-400 text-sm">
+        {item?.location || "No location available"}
+      </p>
     </div>
   );
 }

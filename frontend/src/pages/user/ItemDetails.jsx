@@ -5,7 +5,7 @@ import { FaHeart, FaRegHeart, FaPen } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 import { ListingAPIService } from "@/services/listingsApi";
-import { getUserInfo } from "@/services/authApi"
+import { getUserInfo } from "@/services/authApi";
 
 export default function ItemDetails() {
   const location = useLocation();
@@ -17,16 +17,18 @@ export default function ItemDetails() {
   const [modalOpen, setModalOpen] = useState(false);
   const [favourite, setFavourite] = useState(false);
   const [user, setUser] = useState(null);
+  const currentUserId = localStorage.getItem("userId");
+  const isOwnListing = currentUserId && item && currentUserId === item.user_id;
 
-  const defaultAvatar = "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
-  
+  const defaultAvatar =
+    "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
   useEffect(() => {
-    if (!item) return; 
+    if (!item) return;
     async function getUser() {
       const authToken = localStorage.getItem("idToken");
-      const res = await getUserInfo({id: item.user_id}, authToken);
+      const res = await getUserInfo({ id: item.user_id }, authToken);
       const user = res.data;
-      setUser(user)
+      setUser(user);
     }
     getUser();
   }, [item]);
@@ -49,9 +51,18 @@ export default function ItemDetails() {
   if (!item) return <p>Loading item...</p>;
 
   return (
-    <div className="flex w-full gap-4 h-screen">
+    <div className="flex w-full gap-4 min-h-[calc(100vh-2.75rem)]">
       <div className="flex-[3] flex justify-center items-center">
-        <img src={item?.image} className="object-cover h-full w-full" />
+        {item.image ? (
+          <img
+            src={item?.image}
+            className="object-cover max-h-[calc(100vh-2.75rem)] w-full"
+          />
+        ) : (
+          <div className="object-cover h-full w-full flex justify-center items-center bg-neutral-400">
+            No image
+          </div>
+        )}
       </div>
 
       {/* Item details */}
@@ -76,26 +87,36 @@ export default function ItemDetails() {
             </button>
           </div>
           <p className="text-2xl">${item?.price}</p>
-          <p className="text-md">{item?.location}</p>
+          <p className="text-md">
+            {item?.location || "No location available."}
+          </p>
         </div>
 
         <div className="flex w-full gap-2 mb-4">
-          <button
-            className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
-            onClick={() =>
-              navigate("/chat", {
-                state: { partnerId: user.id, partnerName: `${user.givenName} ${user.familyName}`, avatar: user.profileImage || defaultAvatar },
-              })
-            }
-          >
-            Message
-          </button>
-          <button
-            className="bg-red-500 rounded-lg px-2 py-1 text-white w-16"
-            onClick={() => setModalOpen(true)}
-          >
-            Report
-          </button>
+          {!isOwnListing && (
+            <button
+              className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
+              onClick={() =>
+                navigate("/chat", {
+                  state: {
+                    partnerId: user.id,
+                    partnerName: `${user.givenName} ${user.familyName}`,
+                    avatar: user.profileImage || defaultAvatar,
+                  },
+                })
+              }
+            >
+              Message
+            </button>
+          )}
+          {!isOwnListing && (
+            <button
+              className="bg-red-500 rounded-lg px-2 py-1 text-white w-16"
+              onClick={() => setModalOpen(true)}
+            >
+              Report
+            </button>
+          )}
         </div>
 
         {/* Description */}
@@ -103,7 +124,7 @@ export default function ItemDetails() {
           <div>
             <h3 className="text-2xl">Details</h3>
 
-            <p>{item?.details}</p>
+            <p>{item?.details || "No description available."}</p>
           </div>
 
           <div>
@@ -113,7 +134,13 @@ export default function ItemDetails() {
         </div>
       </div>
 
-      {modalOpen && <ReportPopUp open={modalOpen} setOpen={setModalOpen} />}
+      {modalOpen && (
+        <ReportPopUp
+          open={modalOpen}
+          setOpen={setModalOpen}
+          listingId={item.listing_id}
+        />
+      )}
     </div>
   );
 }

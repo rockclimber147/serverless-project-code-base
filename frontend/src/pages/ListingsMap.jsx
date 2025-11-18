@@ -3,16 +3,19 @@ import React, { useState, useEffect } from "react";
 import LeafletMap from "../components/LeafletMap";
 import MapGridToggleButton from "../components/MapGridToggleButton";
 import { ListingAPIService } from "@/services/listingsApi";
+import { useNavigate } from "react-router-dom";
 
 const buildPopupHTML = ({ name, price, link }) => {
   return `
         <strong>${name}</strong><br/>
         $${price}<br/>
-        <a class="text-blue-500 underline" href="${link}" target="_blank">Go to listing</a>
+        <a class="text-blue-500 underline" href="${link}">Go to listing</a>
     `;
 };
 
 const MapPage = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [listings, setListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState(null);
@@ -81,10 +84,10 @@ const MapPage = () => {
         <div className="p-[1.25rem]">
           <input
             type="text"
-            placeholder="Search listings..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pointer-events-auto px-4 py-2 w-full md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="pointer-events-auto px-4 py-2 w-full md:w-full rounded-lg shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
       </div>
@@ -124,20 +127,23 @@ const MapPage = () => {
               />
             )}
             <p className="py-2">{selectedListing.description}</p>
-            <a
-              className="text-blue-500 underline py-2"
-              href={selectedListing.link}
-              target="_blank"
+            <button
+              className="bg-gray-800 text-white text-sm mt-4 px-3 py-2 rounded hover:bg-gray-600 w-full"
+              onClick={() => {
+                navigate(`/item-details/${selectedListing.id}`, { });
+              }}
               rel="noreferrer"
             >
-              Go to listing
-            </a>
+              View Listing
+            </button>
           </>
         )}
       </div>
 
-      <div className="absolute top-4 right-10 z-[999]">
-        <MapGridToggleButton />
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 container flex justify-end pointer-events-none z-[9999]">
+          <div className="pointer-events-auto">
+            <MapGridToggleButton />
+          </div>
       </div>
 
       <LeafletMap
