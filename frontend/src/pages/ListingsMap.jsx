@@ -127,15 +127,15 @@ const MapPage = () => {
               />
             )}
             <p className="py-2">{selectedListing.description}</p>
-            <a
-              className="text-blue-500 underline py-2 cursor-pointer"
+            <button
+              className="bg-gray-800 text-white text-sm mt-4 px-3 py-2 rounded hover:bg-gray-600 w-full"
               onClick={() => {
                 navigate(`/item-details/${selectedListing.id}`, { });
               }}
               rel="noreferrer"
             >
-              Go to listing
-            </a>
+              View Listing
+            </button>
           </>
         )}
       </div>
