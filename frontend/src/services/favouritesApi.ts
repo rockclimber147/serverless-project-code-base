@@ -12,6 +12,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
             if (res.success == true) {
                 const favourites = res.favourites.map(fav => fav.listing_id);
                 sessionStorage.setItem("favourites", JSON.stringify(favourites))
+                return favourites;
             } 
         } catch (e) {
             console.log(e);
