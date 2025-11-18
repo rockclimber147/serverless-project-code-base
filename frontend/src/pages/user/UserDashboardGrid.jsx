@@ -3,6 +3,7 @@ import MapGridToggleButton from "@/components/MapGridToggleButton";
 import React from "react";
 import { useState, useEffect } from "react";
 import { ListingAPIService } from "@/services/listingsApi";
+import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
@@ -11,6 +12,7 @@ export default function UserDashboardGrid() {
   useEffect(() => {
     async function fetchInitialListings() {
       try {
+        await FavouritesAPIService.getAllFavourites();
         const data = await ListingAPIService.searchListings();
         console.log(data);
         setListings(data);

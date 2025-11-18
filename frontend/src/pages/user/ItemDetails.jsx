@@ -15,6 +15,8 @@ export default function ItemDetails() {
   // Initialize state from location.state if available
   const [item, setItem] = useState(location.state?.item || null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  //TODO: add logic to populate favourite state on load
   const [favourite, setFavourite] = useState(false);
   const [user, setUser] = useState(null);
   const currentUserId = localStorage.getItem("userId");

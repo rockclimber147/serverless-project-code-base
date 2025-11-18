@@ -25,6 +25,34 @@ def search_listing(table_name: str, name: str = None):
     items = _search_table_by_pagination(table_name, name)
     return _sort_by_descending_time(items)
 
+def get_all_user_listings(table_name: str, user_id: str):
+    items = []
+    last_key = None
+
+    while True:
+        scan_kwargs = {
+            "TableName": table_name,
+            "FilterExpression": "user_id = :u",
+            "ExpressionAttributeValues": {
+                ":u": {"S": user_id}
+            }
+        }
+
+        if last_key:
+            scan_kwargs["ExclusiveStartKey"] = last_key
+
+        response = dynamodb.scan(**scan_kwargs)
+
+        for raw_item in response.get("Items", []):
+            item = {k: _deserialize_value(v) for k, v in raw_item.items()}
+            items.append(item)
+
+        last_key = response.get("LastEvaluatedKey")
+        if not last_key:
+            break
+
+    return _sort_by_descending_time(items)
+
 def _sort_by_descending_time(listings: any):
     return sorted(listings, key=lambda x: int(x["created_at"]), reverse=True)
 

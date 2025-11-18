@@ -2,18 +2,25 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import * as apigw from "aws-cdk-lib/aws-apigateway";
 
 import { DynamoTablesConstruct } from "../DynamoDb/tables";
 import { CRUDGatewayConstruct } from "../ApiGateway/gateway";
+import { CognitoConstruct } from "../Cognito/cognito";
 
 interface SearchListingsProps {
   api: CRUDGatewayConstruct;
   tables: DynamoTablesConstruct;
+  auth: CognitoConstruct;
 }
 
 export class SearchListingsFeatureConstruct extends Construct {
   constructor(scope: Construct, id: string, props: SearchListingsProps) {
     super(scope, id);
+
+    const userAuthorizer = new apigw.CognitoUserPoolsAuthorizer(this, "UserPoolAuthorizer", {
+      cognitoUserPools: [props.auth.userPool],
+    });
 
     // Lambda for searching listings
     const searchLambda = new lambda.Function(this, "SearchListingsLambda", {
@@ -30,6 +37,25 @@ export class SearchListingsFeatureConstruct extends Construct {
     const search = props.api.publicResource.addResource("search");
     search.addMethod("GET", new apigateway.LambdaIntegration(searchLambda), {
       authorizationType: apigateway.AuthorizationType.NONE,
+    });
+
+    // Lambda for getting all of user's listings
+    const userListingsLambda = new lambda.Function(this, "userListingsLambda", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: "get_user_listings.lambda_handler",
+      code: lambda.Code.fromAsset("lambdas/searchListings"),
+      environment: {
+        LISTINGS_TABLE: props.tables.listingsTable.tableName,
+      },
+    });
+    
+    props.tables.listingsTable.grantReadData(userListingsLambda);
+    const userListings = props.api.userResource.addResource("allListings");
+    this.addMethodWithAuthorizer(userListings, "GET", userListingsLambda, userAuthorizer);
+    userListings.addCorsPreflight({
+      allowOrigins: ["*"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      allowMethods: ["OPTIONS", "GET"],
     });
 
     // Lambda for getting listing by id
@@ -56,5 +82,18 @@ export class SearchListingsFeatureConstruct extends Construct {
         authorizationType: apigateway.AuthorizationType.NONE,
       }
     );
+
+
   }
+    private addMethodWithAuthorizer(
+      resource: apigw.IResource,
+      method: string,
+      lambdaFn: lambda.IFunction,
+      authorizer: apigw.IAuthorizer
+    ) {
+      resource.addMethod(method, new apigw.LambdaIntegration(lambdaFn), {
+        authorizer,
+        authorizationType: apigw.AuthorizationType.COGNITO,
+      });
+    }
 }

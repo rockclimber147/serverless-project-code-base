@@ -6,6 +6,7 @@ export class DynamoTablesConstruct extends Construct {
   public readonly userTable: dynamodb.ITable;
   public readonly listingsTable: dynamodb.Table;
   public readonly chatTable: dynamodb.Table;
+  public readonly favouritesTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, usersTableArn: string) {
     super(scope, id);
@@ -30,6 +31,14 @@ export class DynamoTablesConstruct extends Construct {
       tableName: chatTableName,
       partitionKey: { name: "chatId", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "timestamp", type: dynamodb.AttributeType.STRING },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const favouritesTableName = `Favourites-${cdk.Stack.of(this).account}-${cdk.Stack.of(this).region}`;
+    this.favouritesTable = new dynamodb.Table(this, "FavouritesTable", {
+      tableName: favouritesTableName,
+      partitionKey: { name: "user_id", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "listing_id", type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }
