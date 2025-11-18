@@ -1,24 +1,12 @@
 import { Listing } from "../models/listing";
-export class ListingCRUDAPIService {
-  private static readonly API_BASE =
-    "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/listings";
-
-  private static checkAuth() {
-    const token = localStorage.getItem("idToken");
-    if (!token) {
-      throw new Error("No auth token found in localStorage");
-    }
-    return token;
-  }
+import { BaseServiceWithAuth } from "./baseAuthApi";
+export class ListingCRUDAPIService extends BaseServiceWithAuth {
+  private static readonly API = this.API_BASE + "user/listings";
 
   static async createListing(listingData: Listing) {
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify(listingData),
     });
 
@@ -31,14 +19,9 @@ export class ListingCRUDAPIService {
   }
 
   static async updateListing(listingId: string, updatedListingFields: any) {
-    const token = this.checkAuth();
-
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({
         listing_id: String(listingId),
         ...updatedListingFields,
@@ -54,14 +37,9 @@ export class ListingCRUDAPIService {
   }
 
   static async deleteListing(listingId: number) {
-    console.log(listingId);
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
@@ -74,13 +52,9 @@ export class ListingCRUDAPIService {
   }
 
   static async getUploadLink(listingId: string) {
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE + "/photo", {
+    const res = await fetch(ListingCRUDAPIService.API + "/photo", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
