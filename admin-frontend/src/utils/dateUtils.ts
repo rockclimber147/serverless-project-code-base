@@ -117,3 +117,20 @@ export function formatDateTime(dateNumber: number | undefined | null): string {
     return dateStr;
 }
 
+/**
+ * Parses a timestamp into a Date object.
+ * @param value - Timestamp as number (seconds or milliseconds)
+ * @returns Parsed Date object or null if parsing fails
+ */
+export function parseTimestamp(value: number | string | undefined | null): Date | null {
+    if (value == null) return null;
+
+    const n = Number(value);
+    if (!Number.isFinite(n) || Number.isNaN(n)) return null;
+
+    // Heuristic: < 1e12 => seconds, else milliseconds
+    const ms = n < 1e12 ? n * 1000 : n;
+    const d = new Date(ms);
+    return isNaN(d.getTime()) ? null : d;
+}
+
