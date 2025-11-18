@@ -50,7 +50,7 @@ export default function ItemDetails() {
   if (!item) return <p>Loading item...</p>;
 
   return (
-    <div className="flex w-full gap-4 flex-1">
+    <div className="flex w-full gap-4 h-screen">
       <div className="flex-[3] flex justify-center items-center">
         {item.image ? (
           <img src={item?.image} className="object-cover h-full w-full" />
