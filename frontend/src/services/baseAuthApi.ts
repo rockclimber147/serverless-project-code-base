@@ -16,4 +16,18 @@ export class BaseServiceWithAuth {
         }
         return token;
     }
+
+    static async fetchAPI(url: string, method: string, hasAuthHeader: boolean, errorMessage: string, body?: string) {
+        const res = await fetch(url, {
+            method: method,
+            headers: hasAuthHeader ? this.getAuthHeader() : undefined,
+            body: body ? body : undefined
+        });
+
+        if (!res.ok) {
+            throw new Error(`${errorMessage}`);
+        }
+
+        return await res.json();
+    }
 }

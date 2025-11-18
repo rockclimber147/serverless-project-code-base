@@ -3,16 +3,24 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export default function ItemCard(props) {
   const { item } = props;
-  const [favourite, setFavourite] = useState(false);
+  // TODO add logic to determine favourite state on load
+  const [favourite, setFavourite] = useState(!!item.is_favourite);
   const navigate = useNavigate();
 
   const handleToggleFavourite = async (e) => {
     e.stopPropagation();
+
+    if (favourite) {
+      await FavouritesAPIService.delete_favourite(item.listing_id);
+    } else {
+      await FavouritesAPIService.add_favourite(item.listing_id);
+    }
+
     setFavourite(!favourite);
-    // TODO: Add backend logic
   };
 
   return (
@@ -65,5 +73,6 @@ ItemCard.propTypes = {
     item_name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     location: PropTypes.string,
+    is_favourite: PropTypes.bool
   }).isRequired,
 };

@@ -27,7 +27,8 @@ def lambda_handler(event, context):
         listing_id = query_params.get("listing_id")
 
         if not listing_id: 
-            return error_response_missing_listing()
+            items = get_all_favourites(FAVOURITES_TABLE, user_id)
+            return cors_response(200, items)
         
         result = get_favourite(FAVOURITES_TABLE, user_id, listing_id)
     elif method == "POST" or method == "DELETE":

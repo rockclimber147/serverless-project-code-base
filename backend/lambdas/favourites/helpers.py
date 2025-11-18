@@ -1,9 +1,18 @@
 import time
 import boto3
+from boto3.dynamodb.types import TypeDeserializer
 
 dynamodb = boto3.client("dynamodb")
+deserializer = TypeDeserializer()
 
 def create_favourite(table_name: str, user_id: str, listing_id: str) -> dict:
+    favourite = _get_favourite_by_user_and_listing(table_name, user_id, listing_id)
+    if favourite["success"]:
+        return {
+            "success": False,
+            "error": "Favourite already exists"
+        }
+    
     item = {
         "listing_id": {"S": listing_id},
         "user_id": {"S": user_id},
@@ -55,7 +64,18 @@ def get_all_favourites(table_name: str, user_id: str):
             ":u": {"S": user_id}
         }
     )
-    return resp.get("Items", [])
+
+    items = resp.get("Items", [])
+
+    deserialized_items = [
+        {k: _deserialize_value(v) for k, v in item.items()}
+        for item in items
+    ]
+
+    return {
+        "success": True,
+        "favourites": deserialized_items
+    }
 
 def _get_favourite_by_user_and_listing(table_name: str, user_id: str, listing_id: str):
     favourite = dynamodb.get_item(TableName=table_name, Key={"user_id": {"S": user_id}, "listing_id": {"S": listing_id}})
@@ -77,7 +97,14 @@ def _get_favourite_by_user_and_listing(table_name: str, user_id: str, listing_id
             "user_id": user_id,
         }
     
+    deserialized_items = {
+        k: _deserialize_value(v) for k, v in item.items()
+    }
+    
     return {
         "success": True,
-        "item": item
+        "item": deserialized_items
     }
+
+def _deserialize_value(value):
+    return deserializer.deserialize(value)
