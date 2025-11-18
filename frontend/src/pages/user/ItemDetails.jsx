@@ -53,7 +53,10 @@ export default function ItemDetails() {
     <div className="flex w-full gap-4 min-h-[calc(100vh-2.75rem)]">
       <div className="flex-[3] flex justify-center items-center">
         {item.image ? (
-          <img src={item?.image} className="object-cover h-full w-full" />
+          <img
+            src={item?.image}
+            className="object-cover max-h-[calc(100vh-2.75rem)] w-full"
+          />
         ) : (
           <div className="object-cover h-full w-full flex justify-center items-center bg-neutral-400">
             No image
