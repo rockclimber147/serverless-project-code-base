@@ -50,7 +50,10 @@ export default function ItemCard(props) {
         <h5 className="text-lg">{item.item_name}</h5>
         <b>${item.price}</b>
       </div>
-      <p className="text-neutral-400 text-sm">{item?.location}</p>
+
+      <p className="text-neutral-400 text-sm">
+        {item?.location || "No location available"}
+      </p>
     </div>
   );
 }
