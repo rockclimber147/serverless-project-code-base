@@ -97,7 +97,14 @@ export default function AddEditListing() {
       // Update Listing
       try {
         const updatedData = getUpdatedFields(item, listingFormCreateData);
-        await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
+
+        if (Object.keys(updatedData).length > 0) {
+          await ListingCRUDAPIService.updateListing(
+            item.listing_id,
+            updatedData
+          );
+        }
+
         listingId = item.listing_id;
       } catch (err) {
         console.error("Failed to update listing:", err);
