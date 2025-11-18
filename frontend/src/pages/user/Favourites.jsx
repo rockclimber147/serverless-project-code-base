@@ -9,11 +9,9 @@ export default function Favourites() {
   const [listings, setListings] = useState([]);
   
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-
     async function fetchInitialListings() {
       try {
-        const data = await ListingAPIService.getFavoriteListings(userId);
+        const data = await ListingAPIService.getFavoriteListings();
         setListings(data);
       } catch (err) {
         console.error("Failed to load listings:", err);
