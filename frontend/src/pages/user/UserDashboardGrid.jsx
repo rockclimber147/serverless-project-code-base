@@ -7,6 +7,7 @@ import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
+  const [searchText, setSearchText] = useState([]);
 
   useEffect(() => {
     async function fetchInitialListings() {

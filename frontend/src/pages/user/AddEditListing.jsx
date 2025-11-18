@@ -145,7 +145,7 @@ export default function AddEditListing() {
   };
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchDefaultLocation = async () => {
       try {
         const userId = localStorage.getItem("userId");
         const storedToken = localStorage.getItem("idToken");
@@ -164,8 +164,9 @@ export default function AddEditListing() {
         navigate("/signin");
       }
     };
-
-    fetchProfile();
+    if (!item) {
+      fetchDefaultLocation();
+    }
   }, [navigate]);
 
   return (

@@ -4,10 +4,14 @@ import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo } from "@/services/authApi";
 import { ListingCRUDAPIService } from "@/services/listingsUser";
+import { ListingAPIService } from "@/services/listingsApi"
+import { useLocation } from "react-router-dom";
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
   const [myListings, setMyListings] = useState([]);
+  const location = useLocation();
+
   const defaultProfileImage = "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=1024x1024&w=is&k=20&c=ZVVVbYUtoZgPqbVSDxoltjnrW3G_4DLKYk6QZ0uu5_w=";
 
   function signOut() {
@@ -23,6 +27,7 @@ export default function Profile({ type = "user" }) {
     reviews: 0,
     address: "",
   });
+  const passedUser = location.state?.user || null;
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -33,6 +38,20 @@ export default function Profile({ type = "user" }) {
         if (!userId || !storedToken) {
           navigate("/");
           return;
+        }
+        if (type === "seller") {
+          if (passedUser) {
+            const name = `${passedUser.givenName ?? ""} ${passedUser.familyName ?? ""}`.trim()
+              ? passedUser.givenName : passedUser.name;
+            setProfileData({
+              photo: passedUser?.profileImage || passedUser?.avatar || defaultProfileImage,
+              name: name,
+              rating: passedUser.rating ?? 0,
+              reviews: passedUser.reviews ?? 0,
+              address: passedUser.prefLocation ?? "",
+            });
+          }
+          return; // STOP — do not run the logged-in user logic
         }
         const fetchedUserInfo = await getUserInfo({ id: userId });
         if (fetchedUserInfo) {
@@ -50,7 +69,7 @@ export default function Profile({ type = "user" }) {
       }
     };
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, passedUser]);
 
   useEffect(() => {
     async function fetchInitialListings() {
