@@ -1,9 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ListingCRUDAPIService } from "@/services/listingsUser";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteModal from "@/components/DeleteModal";
 import { MappingAPI } from "@/services/mapping";
+import { getUserInfo } from "@/services/authApi";
 
 export default function AddEditListing() {
   const location = useLocation();
@@ -15,7 +16,7 @@ export default function AddEditListing() {
   const [image, setImage] = useState(item?.image || null);
   const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
-  const [price, setPrice] = useState(item?.price || null);
+  const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
   const [details, setDetails] = useState(item?.details || "");
 
@@ -74,7 +75,7 @@ export default function AddEditListing() {
 
     const listingFormCreateData = {
       item_name: title,
-      price: price,
+      price: Number(price),
       details: details,
       location: address,
       latitude: coordinates?.latitude,
@@ -142,6 +143,30 @@ export default function AddEditListing() {
       navigate(`/item-details/${listingId}`);
     }
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        const storedToken = localStorage.getItem("idToken");
+        if (!userId || !storedToken) {
+          navigate("/");
+          return;
+        }
+        const fetchedUserInfo = await getUserInfo({ id: userId });
+        if (fetchedUserInfo?.data) {
+          const user = fetchedUserInfo.data;
+          const location = user.prefLocation || "";
+          setAddress(location);
+        }
+      } catch (err) {
+        console.error(err);
+        navigate("/signin");
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   return (
     <div className="flex w-full gap-4 h-screen">
