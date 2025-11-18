@@ -12,6 +12,7 @@ export class ListingCRUDAPIService {
   }
 
   static async createListing(listingData: Listing) {
+    console.log("listing data", listingData);
     const token = this.checkAuth();
     const res = await fetch(ListingCRUDAPIService.API_BASE, {
       method: "POST",

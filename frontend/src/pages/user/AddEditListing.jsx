@@ -1,9 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ListingCRUDAPIService } from "@/services/listingsUser";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DeleteModal from "@/components/DeleteModal";
 import { MappingAPI } from "@/services/mapping";
+import { getUserInfo } from "@/services/authApi";
 
 export default function AddEditListing() {
   const location = useLocation();
@@ -11,6 +12,7 @@ export default function AddEditListing() {
 
   const { item } = location.state || {};
   const [deleteModal, setOpenDeleteModal] = useState(false);
+
   const [image, setImage] = useState(item?.image || null);
   const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
@@ -19,6 +21,19 @@ export default function AddEditListing() {
   const [details, setDetails] = useState(item?.details || "");
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
+
+  const [errors, setErrors] = useState({ title: "", price: "" });
+
+  const validateForm = () => {
+    const newErrors = { title: "", price: "" };
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!price || isNaN(price) || Number(price) <= 0)
+      newErrors.price = "Price must be a positive number";
+    setErrors(newErrors);
+
+    // Return true if no errors
+    return !newErrors.title && !newErrors.price;
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -41,77 +56,117 @@ export default function AddEditListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
     let coordinates;
     let listingId;
+
     // Fetch coordinates
-    try {
-      coordinates = await MappingAPI.getCoordinates({ address: address });
-      // TODO: Default to user address once backend GET user info is added
-      console.log(coordinates);
-    } catch (err) {
-      console.error("Failed to get upload link:", err);
-      return;
+    if (address) {
+      try {
+        coordinates = await MappingAPI.getCoordinates({ address: address });
+        // TODO: Default to user address once backend GET user info is added
+        console.log(coordinates);
+      } catch (err) {
+        console.error("Failed to get upload link:", err);
+        return;
+      }
     }
 
-    const currentData = {
+    const listingFormCreateData = {
       item_name: title,
-      price: price,
+      price: Number(price),
       details: details,
       location: address,
-      latitude: coordinates.latitude,
-      longitude: coordinates.longitude,
-      image: image,
+      latitude: coordinates?.latitude,
+      longitude: coordinates?.longitude,
     };
 
-    try {
-      if (item) {
-        const updatedData = getUpdatedFields(item, currentData);
+    if (!item) {
+      // Create Listing
+      try {
+        const createdListing = await ListingCRUDAPIService.createListing(
+          listingFormCreateData
+        );
+        console.log(createdListing);
+        listingId = createdListing.listing_id;
+      } catch (err) {
+        console.error("Failed to create listing:", err);
+      }
+    } else {
+      // Update Listing
+      try {
+        const updatedData = getUpdatedFields(item, listingFormCreateData);
         await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
         listingId = item.listing_id;
-      } else {
-        const createdListing =
-          await ListingCRUDAPIService.createListing(currentData);
-        listingId = createdListing.listing_id;
+      } catch (err) {
+        console.error("Failed to update listing:", err);
       }
-      if (imageFile instanceof File) {
-        let uploadUrl;
-        let publicUrl;
+    }
 
-        console.log("listingid", listingId);
-        // Step 1: Get upload link
-        try {
-          const res = await ListingCRUDAPIService.getUploadLink(listingId);
-          uploadUrl = res.upload_url;
-          publicUrl = res.public_url;
-          console.log("Upload URL:", uploadUrl);
-        } catch (err) {
-          console.error("Failed to get upload link:", err);
-          return;
-        }
-        // Step 2: Upload to S3
-        try {
-          await ListingCRUDAPIService.uploadToS3(uploadUrl, imageFile);
-          console.log("Upload successful");
-        } catch (err) {
-          console.error("Failed to upload file:", err);
-          return; // stop if upload fails
-        }
-        // Step 3: Patch listing with public URL
-        try {
-          await ListingCRUDAPIService.updateListing(listingId, {
-            image: publicUrl,
-          });
-          console.log("Listing updated with image");
-        } catch (err) {
-          console.error("Failed to update listing:", err);
-        }
+    if (imageFile instanceof File) {
+      let uploadUrl;
+      let publicUrl;
+
+      console.log("listingid", listingId);
+      // Step 1: Get upload link
+      try {
+        const res = await ListingCRUDAPIService.getUploadLink(listingId);
+        uploadUrl = res.upload_url;
+        publicUrl = res.public_url;
+        console.log("Upload URL:", uploadUrl);
+      } catch (err) {
+        console.error("Failed to get upload link:", err);
+        return;
       }
-      navigate("/user-dashboard-grid");
-    } catch (err) {
-      console.error("Failed to save listing:", err);
+      // Step 2: Upload to S3
+      try {
+        await ListingCRUDAPIService.uploadToS3(uploadUrl, imageFile);
+        console.log("Upload successful");
+      } catch (err) {
+        console.error("Failed to upload file:", err);
+        return; // stop if upload fails
+      }
+      // Step 3: Patch listing with public URL
+      try {
+        await ListingCRUDAPIService.updateListing(listingId, {
+          image: publicUrl,
+        });
+        console.log("Listing updated with image");
+      } catch (err) {
+        console.error("Failed to update listing:", err);
+      }
+    }
+    if (!item) {
+      navigate("/view-user-profile");
+    } else {
+      navigate(`/item-details/${listingId}`);
     }
   };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        const storedToken = localStorage.getItem("idToken");
+        if (!userId || !storedToken) {
+          navigate("/");
+          return;
+        }
+        const fetchedUserInfo = await getUserInfo({ id: userId });
+        if (fetchedUserInfo?.data) {
+          const user = fetchedUserInfo.data;
+          const location = user.prefLocation || "";
+          setAddress(location);
+        }
+      } catch (err) {
+        console.error(err);
+        navigate("/signin");
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   return (
     <div className="flex w-full gap-4 h-screen">
@@ -145,17 +200,25 @@ export default function AddEditListing() {
         <div className="flex flex-col gap-3 mb-5">
           <input
             value={title}
-            placeholder="Title"
+            placeholder="Title (Required)"
+            required
             onChange={(e) => setTitle(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
+          {errors.title && (
+            <p className="text-red-500 text-sm">{errors.title}</p>
+          )}
           <input
             value={price}
-            placeholder="Price"
+            placeholder="Price (Required)"
             type="number"
+            required
             onChange={(e) => setPrice(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
+          {errors.price && (
+            <p className="text-red-500 text-sm">{errors.price}</p>
+          )}
           <input
             value={address}
             placeholder="Location"
@@ -176,8 +239,9 @@ export default function AddEditListing() {
           ></textarea>
 
           <button
-            className="bg-blue-400 text-white rounded-lg px-2 py-1 hover:bg-blue-500"
+            className="bg-blue-400 text-white rounded-lg px-2 py-1 disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
             type="submit"
+            disabled={!title || !price}
           >
             Save
           </button>
