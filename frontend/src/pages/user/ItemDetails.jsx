@@ -50,7 +50,7 @@ export default function ItemDetails() {
   if (!item) return <p>Loading item...</p>;
 
   return (
-    <div className="flex w-full gap-4 h-screen">
+    <div className="flex w-full gap-4 flex-1">
       <div className="flex-[3] flex justify-center items-center">
         {item.image ? (
           <img src={item?.image} className="object-cover h-full w-full" />
@@ -83,7 +83,9 @@ export default function ItemDetails() {
             </button>
           </div>
           <p className="text-2xl">${item?.price}</p>
-          <p className="text-md">{item?.location}</p>
+          <p className="text-md">
+            {item?.location || "No location available."}
+          </p>
         </div>
 
         <div className="flex w-full gap-2 mb-4">
@@ -114,7 +116,7 @@ export default function ItemDetails() {
           <div>
             <h3 className="text-2xl">Details</h3>
 
-            <p>{item?.details}</p>
+            <p>{item?.details || "No description available."}</p>
           </div>
 
           <div>
