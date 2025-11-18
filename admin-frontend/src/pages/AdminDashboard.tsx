@@ -14,7 +14,14 @@ export default function AdminDashboard() {
     return (listings || []).reduce((count: number, listings) => count + (!listings.is_removed && !listings.is_sold ? 1 : 0), 0);
     }, [listings]);
 
-    const reportedListingCount = listings?.filter((l) => l.reports).length ?? 0;
+    const reportedListingCount = useMemo(() => {
+    return (listings ?? []).reduce((count, l) => {
+        if (Array.isArray(l.reports) && l.reports.length > 0 && !l.is_removed && !l.is_sold) {
+        return count + 1;
+        }
+        return count;
+    }, 0);
+    }, [listings]);
 
     // This excludes admin role
     const userCount = useMemo(() => {
