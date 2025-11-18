@@ -84,10 +84,10 @@ const MapPage = () => {
         <div className="p-[1.25rem]">
           <input
             type="text"
-            placeholder="Search listings..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pointer-events-auto px-4 py-2 w-full md:w-full rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="pointer-events-auto px-4 py-2 w-full md:w-full rounded-lg shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
       </div>
