@@ -28,6 +28,7 @@ export default function ItemDetails() {
       const authToken = localStorage.getItem("idToken");
       const res = await getUserInfo({ id: item.user_id }, authToken);
       const user = res.data;
+      console.log("User", user);
       setUser(user);
     }
     getUser();
@@ -72,10 +73,12 @@ export default function ItemDetails() {
           <div className="flex justify-between">
             <div className="flex items-center">
               <h2 className="text-4xl mr-2">{item?.item_name}</h2>
-              <FaPen
-                className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                onClick={() => navigate("/add-listing", { state: { item } })}
-              />
+              {isOwnListing && (
+                <FaPen
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                  onClick={() => navigate("/add-listing", { state: { item } })}
+                />
+              )}
             </div>
 
             <button onClick={() => setFavourite(!favourite)}>
