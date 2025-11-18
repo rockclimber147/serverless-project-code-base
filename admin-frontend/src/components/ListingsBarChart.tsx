@@ -65,7 +65,7 @@ export default function ListingsBarChart({ listings, months=3 }: ListingsBarChar
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-2">Listings (Past 3 Months)</h2>
+      <h2 className="text-xl font-semibold mb-2">Total Listings (Past 3 Months)</h2>
       <Bar data={data} />
     </div>
   );
