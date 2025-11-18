@@ -38,6 +38,9 @@ export default function AddEditListing() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (image) {
+        URL.revokeObjectURL(image);
+      }
       setImage(URL.createObjectURL(file));
       setImageFile(file);
     }
@@ -151,10 +154,12 @@ export default function AddEditListing() {
       } catch (err) {
         console.error("Failed to update listing:", err);
       }
-    } else if (!image && (imageFile || item?.image)) {
-      await ListingCRUDAPIService.updateListing(listingId, {
-        image: "",
-      });
+    } else if (!image) {
+      try {
+        await ListingCRUDAPIService.updateListing(listingId, { image: "" });
+      } catch (err) {
+        console.error("Failed to clear image:", err);
+      }
     }
 
     if (!item) {
