@@ -17,7 +17,7 @@ export class BaseServiceWithAuth {
         return token;
     }
 
-    static async fetchAPI(url: string, method: string, hasAuthHeader: boolean, errorMessage: string, body?: string) {
+    static async fetchAPI(url: string, method: "GET" | "POST" | "PATCH" | "DELETE", hasAuthHeader: boolean, errorMessage: string, body?: string) {
         const res = await fetch(url, {
             method: method,
             headers: hasAuthHeader ? this.getAuthHeader() : undefined,
