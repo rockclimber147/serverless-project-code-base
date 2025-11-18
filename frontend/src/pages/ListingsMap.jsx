@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import LeafletMap from "../components/LeafletMap";
 import MapGridToggleButton from "../components/MapGridToggleButton";
 import { ListingAPIService } from "@/services/listingsApi";
+import { useNavigate } from "react-router-dom";
 
 const buildPopupHTML = ({ name, price, link }) => {
   return `
@@ -13,6 +14,8 @@ const buildPopupHTML = ({ name, price, link }) => {
 };
 
 const MapPage = () => {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [listings, setListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState(null);
@@ -125,8 +128,10 @@ const MapPage = () => {
             )}
             <p className="py-2">{selectedListing.description}</p>
             <a
-              className="text-blue-500 underline py-2"
-              href={selectedListing.link}
+              className="text-blue-500 underline py-2 cursor-pointer"
+              onClick={() => {
+                navigate(`/item-details/${selectedListing.id}`, { });
+              }}
               rel="noreferrer"
             >
               Go to listing
