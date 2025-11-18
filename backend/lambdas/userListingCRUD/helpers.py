@@ -33,9 +33,18 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         "image": {"S": data.get("image", "")},
         "created_at": {"N": str(int(time.time()))},        
     }
-
-    dynamodb.put_item(TableName=table_name, Item=item)
-
+    try: 
+        dynamodb.put_item(TableName=table_name, Item=item)
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "listing_id": listing_id,
+            "user_id": user_id,
+            "item_name": data["item_name"],
+            "price": data["price"],
+        }
+        
     return {
         "success": True,
         "message": "Listing created successfully",
