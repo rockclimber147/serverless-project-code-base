@@ -63,7 +63,7 @@ ItemCard.propTypes = {
     listing_id: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
     item_name: PropTypes.string.isRequired,
-    price: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
     location: PropTypes.string,
   }).isRequired,
 };
