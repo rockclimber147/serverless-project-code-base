@@ -54,6 +54,7 @@ export class ProductionStack extends cdk.Stack {
       {
         api: this.gatewayConstruct,
         tables: this.dynamoTable,
+        auth: this.cognitoConstruct,
       }
     );
 

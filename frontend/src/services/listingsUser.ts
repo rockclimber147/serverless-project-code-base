@@ -1,7 +1,10 @@
 import { Listing } from "../models/listing";
 import { BaseServiceWithAuth } from "./baseAuthApi";
+import { ListingAPIService } from "./listingsApi";
 export class ListingCRUDAPIService extends BaseServiceWithAuth {
   private static readonly API = this.API_BASE + "user/listings";
+  private static readonly ALL_USER_LISTINGS_API =
+    this.API_BASE + "user/allListings";
 
   static async createListing(listingData: Listing) {
     const res = await fetch(ListingCRUDAPIService.API, {
@@ -71,5 +74,25 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
       body: file,
     });
     if (!res.ok) throw new Error("Failed to upload image to S3");
+  }
+
+  static async getMyListings() {
+    const hasAuthHeader = true;
+    const errorMessage = "error fetching user listings";
+    try {
+      const res = await this.fetchAPI(
+        this.ALL_USER_LISTINGS_API,
+        "GET",
+        hasAuthHeader,
+        errorMessage
+      );
+
+      const listings: Listing[] = res.listings?.map((item: Listing) =>
+        ListingAPIService.castToListingObject(item)
+      );
+      return listings;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

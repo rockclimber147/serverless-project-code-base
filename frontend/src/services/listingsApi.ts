@@ -94,7 +94,7 @@ export class ListingAPIService {
     return this.castToListingObject(rawListing);
   }
 
-  private static castToListingObject(item: any, is_favourite?: boolean) {
+static castToListingObject(item: any, is_favourite?: boolean) {
     return {
       listing_id: item.listing_id,
       user_id: item.user_id,
