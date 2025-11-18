@@ -15,11 +15,24 @@ export default function AddEditListing() {
   const [image, setImage] = useState(item?.image || null);
   const [imageFile, setImageFile] = useState(null);
   const [title, setTitle] = useState(item?.item_name || "");
-  const [price, setPrice] = useState(item?.price || 0);
+  const [price, setPrice] = useState(item?.price || null);
   const [address, setAddress] = useState(item?.location || "");
   const [details, setDetails] = useState(item?.details || "");
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
+
+  const [errors, setErrors] = useState({ title: "", price: "" });
+
+  const validateForm = () => {
+    const newErrors = { title: "", price: "" };
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!price || isNaN(price) || Number(price) <= 0)
+      newErrors.price = "Price must be a positive number";
+    setErrors(newErrors);
+
+    // Return true if no errors
+    return !newErrors.title && !newErrors.price;
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -42,6 +55,7 @@ export default function AddEditListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
     let coordinates;
     let listingId;
@@ -58,7 +72,7 @@ export default function AddEditListing() {
       }
     }
 
-    const currentData = {
+    const listingFormCreateData = {
       item_name: title,
       price: price,
       details: details,
@@ -70,8 +84,9 @@ export default function AddEditListing() {
     if (!item) {
       // Create Listing
       try {
-        const createdListing =
-          await ListingCRUDAPIService.createListing(currentData);
+        const createdListing = await ListingCRUDAPIService.createListing(
+          listingFormCreateData
+        );
         console.log(createdListing);
         listingId = createdListing.listing_id;
       } catch (err) {
@@ -80,7 +95,7 @@ export default function AddEditListing() {
     } else {
       // Update Listing
       try {
-        const updatedData = getUpdatedFields(item, currentData);
+        const updatedData = getUpdatedFields(item, listingFormCreateData);
         await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
         listingId = item.listing_id;
       } catch (err) {
@@ -160,17 +175,25 @@ export default function AddEditListing() {
         <div className="flex flex-col gap-3 mb-5">
           <input
             value={title}
-            placeholder="Title"
+            placeholder="Title (Required)"
+            required
             onChange={(e) => setTitle(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
+          {errors.title && (
+            <p className="text-red-500 text-sm">{errors.title}</p>
+          )}
           <input
             value={price}
-            placeholder="Price"
+            placeholder="Price (Required)"
             type="number"
+            required
             onChange={(e) => setPrice(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
           />
+          {errors.price && (
+            <p className="text-red-500 text-sm">{errors.price}</p>
+          )}
           <input
             value={address}
             placeholder="Location"
@@ -191,8 +214,9 @@ export default function AddEditListing() {
           ></textarea>
 
           <button
-            className="bg-blue-400 text-white rounded-lg px-2 py-1 hover:bg-blue-500"
+            className="bg-blue-400 text-white rounded-lg px-2 py-1 disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
             type="submit"
+            disabled={!title || !price}
           >
             Save
           </button>
