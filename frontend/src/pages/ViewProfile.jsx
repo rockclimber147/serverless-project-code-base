@@ -3,9 +3,12 @@ import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo } from "@/services/authApi";
+import { ListingAPIService } from "@/services/listingsApi"
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
+  const [myListings, setMyListings] = useState([]);
+  const defaultProfileImage = "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=1024x1024&w=is&k=20&c=ZVVVbYUtoZgPqbVSDxoltjnrW3G_4DLKYk6QZ0uu5_w=";
 
   function signOut() {
     localStorage.removeItem("idToken");
@@ -14,98 +17,55 @@ export default function Profile({ type = "user" }) {
   }
 
   const [profile, setProfileData] = useState({
-  photo: "",
-  name: "",
-  rating: 0,
-  reviews: 0,
-  address: "",
-});
+    photo: defaultProfileImage,
+    name: "",
+    rating: 0,
+    reviews: 0,
+    address: "",
+  });
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      const storedToken = localStorage.getItem("idToken");
-      if (!userId || !storedToken) {
-        navigate("/");
-        return;
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
+
+    const fetchProfile = async () => {
+      try {
+        if (!userId || !storedToken) {
+          navigate("/");
+          return;
+        }
+        const fetchedUserInfo = await getUserInfo({ id: userId });
+        if (fetchedUserInfo) {
+          const user = fetchedUserInfo.data;
+          setProfileData(prev => ({
+            ...prev,
+            photo: user.profileImage || defaultProfileImage,
+            name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
+            address: user.prefLocation ?? "",
+          }));
+        }
+      } catch (err) {
+        console.error(err);
+        navigate("/signin");
       }
-      const fetchedUserInfo = await getUserInfo({ id: userId });
-      if (fetchedUserInfo) {
-        const user = fetchedUserInfo.data;
-        setProfileData(prev => ({
-          ...prev,
-          photo: user.profileImage || "",
-          name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
-          address: user.prefLocation ?? "",
-        }));
+    };
+    fetchProfile();
+  }, [navigate]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const storedToken = localStorage.getItem("idToken");
+    
+    async function fetchInitialListings() {
+      try {
+        const data = await ListingAPIService.getMyListings(userId);
+        setMyListings(data);
+      } catch (err) {
+        console.error("Failed to load My Listings:", err);
       }
-    } catch (err) {
-      console.error(err);
-      navigate("/signin");
     }
-  };
-
-  fetchProfile();
-}, [navigate]);
-
-// TODO: Replace with live user listings
-  const listings = [
-    {
-      id: 1,
-      item_name: "Item1",
-      price: 123,
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      location: "123 Main Street, BC",
-      image: "https://picsum.photos/seed/item1/300/200",
-    },
-    {
-      id: 2,
-      item_name: "Item2",
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      price: 234,
-      location: "234 Oak Avenue, BC",
-      image: "https://picsum.photos/seed/item2/300/200",
-    },
-    {
-      id: 3,
-      item_name: "Item3",
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      price: 345,
-      location: "345 Pine Road, BC",
-      image: "https://picsum.photos/seed/item3/300/200",
-    },
-    {
-      id: 4,
-      item_name: "Item4",
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      price: 456,
-      location: "456 Maple Street, BC",
-      image: "https://picsum.photos/seed/item4/300/200",
-    },
-    {
-      id: 5,
-      item_name: "Item5",
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      price: 567,
-      location: "567 Cedar Drive, BC",
-      image: "https://picsum.photos/seed/item5/300/200",
-    },
-    {
-      id: 6,
-      item_name: "Item6",
-      details:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
-      price: 678,
-      location: "678 Spruce Lane, BC",
-      image: "https://picsum.photos/seed/item6/300/200",
-    },
-  ];
+  fetchInitialListings();
+  }, []);
 
   // TODO: Replace with live user reviews/ratings
   const reviews = [
@@ -197,7 +157,7 @@ useEffect(() => {
 
         {/* Grid Wrapper */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {listings.map((item) => (
+          {myListings && myListings.map((item) => (
             <ItemCard key={item.id} item={item} />
           ))}
         </div>

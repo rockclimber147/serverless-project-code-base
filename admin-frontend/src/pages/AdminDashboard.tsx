@@ -1,60 +1,48 @@
 import DataContainer from "@/components/DataContainer";
 import Loading from "@/components/Loading";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_ENDPOINTS } from "../api/endpoints";
-
-interface Report {
-    reason: string;
-    reported_at: number;
-    reported_by: string;
-}
-
-interface Listing {
-    listing_id: string;
-    user_id: string;
-    item_name: string;
-    is_sold: boolean;
-    is_removed: boolean;
-    reports: Report[];
-}
+import ListingsBarChart from "@/components/ListingsBarChart";
+import { useListings } from "@/hooks/useListing";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
-    const [listings, setListings] = useState<Listing[] | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const {
+        listings,
+        loading: listingsLoading,
+        error: listingsError,
+    } = useListings();
+    const { users, loading: usersLoading, error: usersError } = useUsers();
 
     const activeListingsCount = useMemo(() => {
         return (listings || []).reduce(
-            (count: number, listing: Listing) =>
+            (count: number, listing) =>
                 count + (!listing.is_removed && !listing.is_sold ? 1 : 0),
             0
         );
     }, [listings]);
 
-    const reportedListingCount =
-        listings?.filter((l: Listing) => l.reports).length ?? 0;
-
-    useEffect(() => {
-        async function load() {
-            try {
-                const resListings = await fetch(API_ENDPOINTS.viewAllListings);
-
-                if (!resListings.ok) throw new Error("Failed to load listings");
-
-                const resListingsData = await resListings.json();
-                setListings(resListingsData);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+    const reportedListingCount = useMemo(() => {
+        return (listings ?? []).reduce((count, l) => {
+            if (
+                Array.isArray(l.reports) &&
+                l.reports.length > 0 &&
+                !l.is_removed &&
+                !l.is_sold
+            ) {
+                return count + 1;
             }
-        }
-        load();
-    }, []);
+            return count;
+        }, 0);
+    }, [listings]);
 
-    if (loading) {
+    // This excludes admin role
+    const userCount = useMemo(() => {
+        return users?.body.filter((u) => u.role === "user").length ?? 0;
+    }, [users]);
+
+    if (listingsLoading || usersLoading) {
         return (
             <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
                 <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
@@ -85,13 +73,15 @@ export default function AdminDashboard() {
         );
     }
 
-    if (error) {
+    if (listingsError || usersError) {
         return (
             <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
                 <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                     <p className="font-semibold">Error loading dashboard</p>
-                    <p className="text-sm mt-1">{error}</p>
+                    <p className="text-sm mt-1">
+                        {listingsError || usersError}
+                    </p>
                 </div>
             </div>
         );
@@ -104,14 +94,14 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <DataContainer
                     textColour="text-blue-600"
-                    title="Total Listing"
+                    title="Total Active Listings"
                     data={activeListingsCount}
                     subtitle="Active Listings"
                 />
                 <DataContainer
                     textColour="text-green-600"
                     title="Total Users"
-                    data={0}
+                    data={userCount}
                     subtitle="Registered Users"
                 />
                 <DataContainer
@@ -120,6 +110,7 @@ export default function AdminDashboard() {
                     data={reportedListingCount}
                     subtitle="Reported Listings"
                 />
+                <ListingsBarChart listings={listings ?? []} />
             </div>
 
             <div className="mb-8">
