@@ -3,79 +3,27 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsBarChart from "@/components/ListingsBarChart";
-
-interface Listing {
-    listing_id: string;
-    user_id: string;
-    item_name: string;
-    created_at: number;
-    is_sold: boolean;
-    is_removed: boolean;
-    reports: Report[];
-}
-
-interface User {
-    id: string;
-    role: string;
-    givenName: string;
-    familyName: string;
-    email: string;
-    prefLocation: string;
-}
-
-interface UserBody {
-    statusCode: number;
-    body: User[];
-
-}
+import { useListings } from "@/hooks/useListing";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
-    const [listings, setListings] = useState<Listing[] | null>(null);
-    const [users, setUsers] = useState<UserBody | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const { listings, loading: listingsLoading, error: listingsError } = useListings();
+    const { users, loading: usersLoading, error: usersError } = useUsers();
 
     const activeListingsCount = useMemo(() => {
-    return (listings || []).reduce((count: number, listing: Listing) => count + (!listing.is_removed && !listing.is_sold ? 1 : 0), 0);
+    return (listings || []).reduce((count: number, listings) => count + (!listings.is_removed && !listings.is_sold ? 1 : 0), 0);
     }, [listings]);
 
-    const reportedListingCount = listings?.filter((l: Listing) => l.reports).length ?? 0;
+    const reportedListingCount = listings?.filter((l) => l.reports).length ?? 0;
 
     // This excludes admin role
     const userCount = useMemo(() => {
-        return users?.body.filter((u: User) => u.role === "user").length ?? 0;
+        return users?.body.filter((u) => u.role === "user").length ?? 0;
     }, [users]);
 
-    useEffect(() => {
-        async function load() {
-            try {
-                const [resListings, resUsers] = await Promise.all([
-                    fetch(API_ENDPOINTS.viewAllListings),
-                    fetch(API_ENDPOINTS.viewUsers),
-                ]);
-
-                if (!resListings.ok) throw new Error("Failed to load listings");
-                if (!resUsers.ok) throw new Error("Failed to load users");
-
-                const [resListingsData, resUsersData] = await Promise.all([
-                    resListings.json(),
-                    resUsers.json(),
-                ]);
-
-                setListings(resListingsData);
-                setUsers(resUsersData);
-            } catch (err: any){
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-        load();
-    }, [])
-
-    if (loading) return <p>Loading data</p>;
-    if (error) return <p className="text-red-500">{error}</p>;
+    if (listingsLoading || usersLoading) return <p>Loading data</p>;
+    if (listingsError || usersError) return <p className="text-red-500">{listingsError || usersError}</p>;
 
     return (
         <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
