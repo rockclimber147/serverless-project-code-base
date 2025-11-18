@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { fetchApiGet, fetchApiPost } from "@/services/authApi"
+import { useNavigate } from "react-router-dom";
 
 function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -56,7 +58,11 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
       {/* HEADER */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-300 flex items-center justify-between p-6">
-        <div className="flex items-center gap-4">
+        <div 
+          className="flex items-center gap-4 cursor-pointer"
+          onClick={() => {
+            navigate(`/view-seller-profile/${user.id}`, { state: { user } });
+          }}>
           <img
             src={user.avatar}
             alt={user.name}
