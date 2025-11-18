@@ -5,7 +5,7 @@ import { FaHeart, FaRegHeart, FaPen } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 import { ListingAPIService } from "@/services/listingsApi";
-import { getUserInfo } from "@/services/authApi"
+import { getUserInfo } from "@/services/authApi";
 
 export default function ItemDetails() {
   const location = useLocation();
@@ -18,15 +18,16 @@ export default function ItemDetails() {
   const [favourite, setFavourite] = useState(false);
   const [user, setUser] = useState(null);
 
-  const defaultAvatar = "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
-  
+  const defaultAvatar =
+    "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
+
   useEffect(() => {
-    if (!item) return; 
+    if (!item) return;
     async function getUser() {
       const authToken = localStorage.getItem("idToken");
-      const res = await getUserInfo({id: item.user_id}, authToken);
+      const res = await getUserInfo({ id: item.user_id }, authToken);
       const user = res.data;
-      setUser(user)
+      setUser(user);
     }
     getUser();
   }, [item]);
@@ -84,7 +85,11 @@ export default function ItemDetails() {
             className="bg-blue-500 rounded-lg px-2 py-1 text-white flex-1"
             onClick={() =>
               navigate("/chat", {
-                state: { partnerId: user.id, partnerName: `${user.givenName} ${user.familyName}`, avatar: user.profileImage || defaultAvatar },
+                state: {
+                  partnerId: user.id,
+                  partnerName: `${user.givenName} ${user.familyName}`,
+                  avatar: user.profileImage || defaultAvatar,
+                },
               })
             }
           >
@@ -113,7 +118,13 @@ export default function ItemDetails() {
         </div>
       </div>
 
-      {modalOpen && <ReportPopUp open={modalOpen} setOpen={setModalOpen} />}
+      {modalOpen && (
+        <ReportPopUp
+          open={modalOpen}
+          setOpen={setModalOpen}
+          listingId={item.listing_id}
+        />
+      )}
     </div>
   );
 }

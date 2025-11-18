@@ -38,13 +38,15 @@ async function get(path, queryParams = {}, authToken) {
 
   // Create query string from queryParams object
   const queryString = new URLSearchParams(queryParams).toString();
-  
+
   // If queryParams exist, append them to the path
-  const url = queryString ? `${API_BASE}${path}?${queryString}` : `${API_BASE}${path}`;
+  const url = queryString
+    ? `${API_BASE}${path}?${queryString}`
+    : `${API_BASE}${path}`;
 
   const res = await fetch(url, {
     method: "GET",
-    headers
+    headers,
   });
 
   const text = await res.text();
@@ -103,28 +105,22 @@ export function parseJwt(token) {
 
 const CRUD_API = "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod";
 export async function fetchApiGet(endpoint, idToken) {
-  const response = await fetch(
-    `${CRUD_API}${endpoint}`,
-    {
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-      },
-    }
-  );
+  const response = await fetch(`${CRUD_API}${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  });
   return response;
 }
 
 export async function fetchApiPost(endpoint, body, idToken) {
-  const response = await fetch(
-    `${CRUD_API}${endpoint}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-      },
-      body: JSON.stringify(body),
-    }
-  );
+  const response = await fetch(`${CRUD_API}${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(body),
+  });
   return response;
 }
