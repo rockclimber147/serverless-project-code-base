@@ -65,11 +65,12 @@ export default function UserDashboardGrid() {
       </div>
       <h2 className="text-2xl m-4">Most Recent Listings</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {listings && listings.map((item) => (
-          <div key={item.id}>
-            <ItemCard item={item} />
-          </div>
-        ))}
+        {listings &&
+          listings.map((item) => (
+            <div key={item.listing_id}>
+              <ItemCard item={item} />
+            </div>
+          ))}
       </div>
     </div>
   );
