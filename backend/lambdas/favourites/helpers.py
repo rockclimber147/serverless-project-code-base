@@ -22,9 +22,7 @@ def create_favourite(table_name: str, user_id: str, listing_id: str) -> dict:
 
     return {
         "success": True,
-        "message": "Favourite registered successfully",
-        "listing_id": listing_id,
-        "user_id": user_id
+        "message": "Favourite registered successfully"
     }
 
 def delete_favourite(table_name: str, user_id: str, listing_id: str) -> dict:
@@ -38,8 +36,6 @@ def delete_favourite(table_name: str, user_id: str, listing_id: str) -> dict:
     return {
         "success": True,
         "message": "Favourite deleted successfully",
-        "listing_id": listing_id,
-        "user_id": user_id,
     }
 
 def get_favourite(table_name: str, user_id: str, listing_id: str):
@@ -48,12 +44,16 @@ def get_favourite(table_name: str, user_id: str, listing_id: str):
     if favourite["success"]:
         return {
             "success": True,
-            "is_favourite": True
+            "data": {
+                "is_favourite": True
+            }
         }
     else:
         return {
-            "success": True,
-            "is_favourite": False
+            "success": False,
+            "data": {
+                "is_favourite": False
+            }
         }
 
 def get_all_favourites(table_name: str, user_id: str):
@@ -74,7 +74,7 @@ def get_all_favourites(table_name: str, user_id: str):
 
     return {
         "success": True,
-        "favourites": deserialized_items
+        "data": deserialized_items
     }
 
 def _get_favourite_by_user_and_listing(table_name: str, user_id: str, listing_id: str):
@@ -84,17 +84,7 @@ def _get_favourite_by_user_and_listing(table_name: str, user_id: str, listing_id
     if not item:
         return {
             "success": False,
-            "error": "Favourite not found",
-            "listing_id": listing_id,
-            "user_id": user_id,
-        }
-
-    if item.get("user_id", {}).get("S") != user_id:
-        return {
-            "success": False,
-            "error": "Forbidden - this is not your favourited listing",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "Favourite not found"
         }
     
     deserialized_items = {
@@ -103,7 +93,7 @@ def _get_favourite_by_user_and_listing(table_name: str, user_id: str, listing_id
     
     return {
         "success": True,
-        "item": deserialized_items
+        "data": deserialized_items
     }
 
 def _deserialize_value(value):

@@ -1,102 +1,83 @@
 import { Listing } from "@/models/listing";
 import { Review } from "@/models/review";
-import { FavouritesAPIService } from "@/services/favouritesApi";
+import { BaseServiceWithAuth } from "./baseAuthApi";
+import { FavouritesAPIService } from "./favouritesApi";
 
-export class ListingAPIService {
-  private static readonly API_BASE =
-    "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/public/";
-  private static readonly SEARCH_API = this.API_BASE + `search`;
-  private static readonly GET_LISTING_BY_ID_API = this.API_BASE + `listing`;
+export class ListingAPIService extends BaseServiceWithAuth {
+  private static readonly SEARCH_API = this.API_BASE + "public/search";
+  private static readonly GET_LISTING_BY_ID_API =
+    this.API_BASE + "public/listing";
+  private static readonly GET_USER_LISTINGS_API =
+    this.API_BASE + "public/userListings";
+  private static readonly GET_USER_FAVOURITED_LISTINGS_API =
+    this.API_BASE + "user/favouritedListings";
 
   static async searchListings(query?: string) {
     const url = query
       ? `${this.SEARCH_API}?name=${encodeURIComponent(query)}`
       : this.SEARCH_API;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(res);
-      throw new Error(`Failed to fetch listings: ${res.status}`);
+    const hasAuthHeader = false;
+    const errorMessage = "Error searching listings";
+
+    try {
+      const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+      return this._castToListingsArray(data);
+    } catch (e) {
+      console.log(e);
+      return [];
     }
-
-    const rawListings = await res.json();
-    const stored = sessionStorage.getItem("favourites");
-    const favourites: string[] = stored ? JSON.parse(stored) : [];
-
-    const listings: Listing[] = rawListings.map((item: Listing) => {
-      const is_favourite: boolean = favourites.some(
-        (f) => f === item.listing_id
-      );
-      return this.castToListingObject(item, is_favourite);
-    });
-
-    return listings;
   }
 
-  //TODO: update and link my listings
-  static async getMyListings(userId: string) {
-    const url = `${this.SEARCH_API}?name=${encodeURIComponent(userId)}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(res);
-      throw new Error(`Failed to fetch My Listings: ${res.status}`);
+  static async getUserListings(userId: string) {
+    const url = `${this.GET_USER_LISTINGS_API}?user_id=${encodeURIComponent(userId)}`;
+    try {
+      const hasAuthHeader = false;
+      const errorMessage = "error fetching user listings";
+      const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+
+      return this._castToListingsArray(data);
+    } catch (e) {
+      console.log(e);
+      return [];
     }
-
-    const rawListings = await res.json();
-    const listings: Listing[] = rawListings.map((item: Listing) =>
-      this.castToListingObject(item)
-    );
-
-    return listings;
   }
 
   //TODO: update and link to reviews
-  static async getMyReviews() {
-    const url = this.SEARCH_API;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(res);
-      throw new Error(`Failed to fetch favorite listings: ${res.status}`);
-    }
+  static async getMyReviews() {}
 
-    const rawListings = await res.json();
-    const listings: Review[] = rawListings.map((item: Review) =>
-      this.castToListingObject(item)
-    );
-
-    return listings;
-  }
-
-  //TODO: update and link to favorites
   static async getFavoriteListings() {
-    const favouriteIds = await FavouritesAPIService.getAllFavourites();
-    const url = this.SEARCH_API;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(res);
-      throw new Error(`Failed to fetch favorite listings: ${res.status}`);
+    const url = this.GET_USER_FAVOURITED_LISTINGS_API;
+    const hasAuthHeader = true;
+    const errorMessage = "Failed to fetch favourited listings";
+
+    try {
+      const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+      return this._castToListingsArray(data);
+    } catch (e) {
+      console.log(e);
+      return [];
     }
-
-    const rawListings = await res.json();
-    const favoriteListings = rawListings
-      .filter((item: any) => favouriteIds.includes(String(item.listing_id)))
-      .map((item: Listing) => this.castToListingObject(item, true));
-
-    return favoriteListings;
   }
 
   static async getListingById(id: string) {
     const url = `${this.GET_LISTING_BY_ID_API}?id=${encodeURIComponent(id)}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(res);
-      throw new Error(`Failed to fetch listing: ${res.status}`);
-    }
+    const hasAuthHeader = false;
+    const errorMessage = "Error fetching listing";
+    const userId = localStorage.getItem("userId");
 
-    const rawListing = await res.json();
-    return this.castToListingObject(rawListing);
+    try {
+      const data = this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+      let isFavourite;
+      if (userId) {
+        isFavourite = await FavouritesAPIService.getFavourite(id);
+      }
+      return this.castToListingObject(data, isFavourite);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-static castToListingObject(item: any, is_favourite?: boolean) {
+  static castToListingObject(item: any, is_favourite?: boolean) {
     return {
       listing_id: item.listing_id,
       user_id: item.user_id,
@@ -111,10 +92,11 @@ static castToListingObject(item: any, is_favourite?: boolean) {
         ? item.image
         : "https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=1024x1024&w=is&k=20&c=qToocb5EafYO6QXp9aI01a72r5jcQccjgxbs_6Ae8eQ=",
       created_at: new Date(item.created_at * 1000),
-      is_favourite: is_favourite,
+      is_favourite: item.is_favourite ?? is_favourite,
     } as Listing;
   }
-  private static castToReviewObject(review: any) {
+
+  private static _castToReviewObject(review: any) {
     return {
       review_id: review.review_id,
       reviewer_id: review.reviewer_id,
@@ -123,5 +105,17 @@ static castToListingObject(item: any, is_favourite?: boolean) {
       rating: review.rating,
       created_at: new Date(review.created_at * 1000),
     } as Review;
+  }
+
+  private static async _castToListingsArray(data: any[]) {
+    const favourites = await FavouritesAPIService.getAllFavourites();
+    const listings: Listing[] = data.map((item: Listing) => {
+      const is_favourite: boolean = favourites.some(
+        (f) => f === item.listing_id
+      );
+      return this.castToListingObject(item, is_favourite);
+    });
+
+    return listings;
   }
 }

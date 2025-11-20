@@ -16,8 +16,7 @@ export default function ItemDetails() {
   const [item, setItem] = useState(location.state?.item || null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  //TODO: add logic to populate favourite state on load
-  const [favourite, setFavourite] = useState(false);
+  const [favourite, setFavourite] = useState(!!item.is_favourite);
   const [user, setUser] = useState(null);
   const currentUserId = localStorage.getItem("userId");
   const isOwnListing = currentUserId && item && currentUserId === item.user_id;
@@ -42,6 +41,7 @@ export default function ItemDetails() {
         try {
           const fetchedItem = await ListingAPIService.getListingById(listingId);
           setItem(fetchedItem); // update the state
+          setFavourite(fetchedItem.is_favourite);
         } catch (err) {
           console.error("Failed to fetch item:", err);
         }
