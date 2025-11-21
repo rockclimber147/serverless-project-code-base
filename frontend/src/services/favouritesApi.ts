@@ -3,8 +3,7 @@ import { BaseServiceWithAuth } from "./baseAuthApi";
 export class FavouritesAPIService extends BaseServiceWithAuth {
     private static API = this.API_BASE + "user/favourites";
 
-    static async getAllFavourites() {
-        // get all user favourites
+    static async getAllFavourites(): Promise<string[]> {
         const hasAuthHeader = true;
         const errorMessage = "Error getting user favourites";
         try {
