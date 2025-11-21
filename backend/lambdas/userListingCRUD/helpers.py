@@ -13,8 +13,7 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
     if missing:
         return {
             "success": False,
-            "error": f"Missing fields: {', '.join(missing)}",
-            "user_id": user_id,
+            "error": f"Missing fields: {', '.join(missing)}"
         }
 
     listing_id = f"{user_id}-{int(time.time())}"
@@ -38,20 +37,15 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
     except Exception as e:
         return {
             "success": False,
-            "error": str(e),
-            "listing_id": listing_id,
-            "user_id": user_id,
-            "item_name": data["item_name"],
-            "price": data["price"],
+            "error": str(e)
         }
         
     return {
         "success": True,
         "message": "Listing created successfully",
-        "listing_id": listing_id,
-        "user_id": user_id,
-        "item_name": data["item_name"],
-        "price": data["price"],
+        "data": {
+            "listing_id": listing_id
+        }
     }
 
 
@@ -66,17 +60,13 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
     if not item:
         return {
             "success": False,
-            "error": "Listing not found",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "Listing not found"
         }
 
     if item.get("user_id", {}).get("S") != user_id:
         return {
             "success": False,
-            "error": "Forbidden - you do not own this listing",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "Forbidden - you do not own this listing"
         }
 
     allowed_fields = ["item_name", "details", "price", "is_sold", "location", "latitude", "longitude", "image"]
@@ -85,9 +75,7 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
     if not update_fields:
         return {
             "success": False,
-            "error": "No valid fields to update",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "No valid fields to update"
         }
 
     expr = []
@@ -111,10 +99,7 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
 
     return {
         "success": True,
-        "message": "Listing updated successfully",
-        "listing_id": listing_id,
-        "user_id": user_id,
-        "updated_fields": list(update_fields.keys()),
+        "message": "Listing updated successfully"
     }
 
 
@@ -128,17 +113,13 @@ def delete_listing(table_name: str, listing_id: str, user_id: str) -> dict:
     if not item:
         return {
             "success": False,
-            "error": "Listing not found",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "Listing not found"
         }
 
     if item.get("user_id", {}).get("S") != user_id:
         return {
             "success": False,
-            "error": "Forbidden - you do not own this listing",
-            "listing_id": listing_id,
-            "user_id": user_id,
+            "error": "Forbidden - you do not own this listing"
         }
 
     dynamodb.delete_item(TableName=table_name, Key={"listing_id": {"S": listing_id}})
@@ -146,6 +127,4 @@ def delete_listing(table_name: str, listing_id: str, user_id: str) -> dict:
     return {
         "success": True,
         "message": "Listing deleted successfully",
-        "listing_id": listing_id,
-        "user_id": user_id,
     }

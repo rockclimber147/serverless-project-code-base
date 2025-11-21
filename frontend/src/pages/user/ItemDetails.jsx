@@ -16,7 +16,7 @@ export default function ItemDetails() {
   const [item, setItem] = useState(location.state?.item || null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [favourite, setFavourite] = useState(!!item.is_favourite);
+  const [favourite, setFavourite] = useState(!!item?.is_favourite);
   const [user, setUser] = useState(null);
   const currentUserId = localStorage.getItem("userId");
   const isOwnListing = currentUserId && item && currentUserId === item.user_id;

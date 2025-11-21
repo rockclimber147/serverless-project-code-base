@@ -4,9 +4,9 @@ export class BaseServiceWithAuth {
 
     static getAuthHeader() {
         return {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this._checkAuth()}`,
-      }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this._checkAuth()}`,
+        }
     }
 
     static _checkAuth() {
@@ -17,7 +17,7 @@ export class BaseServiceWithAuth {
         return token;
     }
 
-    static async fetchAPI(url: string, method: "GET" | "POST" | "PATCH" | "DELETE", hasAuthHeader: boolean, errorMessage: string, body?: any) {
+    static async fetchAPI(url: string, method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT", hasAuthHeader: boolean, errorMessage: string, body?: any) {
         const res = await fetch(url, {
             method: method,
             headers: hasAuthHeader ? this.getAuthHeader() : undefined,
