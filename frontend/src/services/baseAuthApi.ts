@@ -2,14 +2,14 @@ export class BaseServiceWithAuth {
     static readonly API_BASE =
         "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/";
 
-    static getAuthHeader() {
+    private static _getAuthHeader() {
         return {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this._checkAuth()}`,
         }
     }
 
-    static _checkAuth() {
+    private static _checkAuth() {
         const token = localStorage.getItem("idToken");
         if (!token) {
             throw new Error("No auth token found in localStorage");
@@ -20,7 +20,7 @@ export class BaseServiceWithAuth {
     static async fetchAPI(url: string, method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT", hasAuthHeader: boolean, errorMessage: string, body?: any) {
         const res = await fetch(url, {
             method: method,
-            headers: hasAuthHeader ? this.getAuthHeader() : undefined,
+            headers: hasAuthHeader ? this._getAuthHeader() : undefined,
             body: body ? JSON.stringify(body) : undefined
         });
 
