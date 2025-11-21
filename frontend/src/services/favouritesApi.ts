@@ -13,7 +13,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
                 hasAuthHeader,
                 errorMessage
             );
-            const favourites = res.map((fav) => fav.listing_id);
+            const favourites = res.map((fav: any) => fav.listing_id);
             sessionStorage.setItem("favourites", JSON.stringify(favourites));
             return favourites;
         } catch (e) {
@@ -50,7 +50,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async getFavourite(listing_id: string): Promise<boolean | void> {
+    static async getFavourite(listing_id: string): Promise<boolean> {
         const hasAuthHeader = true;
         const errorMessage = "Error getting favourite";
         const url = `${this.API}?listing_id=${encodeURIComponent(listing_id)}`;
@@ -59,5 +59,6 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         } catch (e) {
             console.log(e);
         }
+        return false;
     }
 }
