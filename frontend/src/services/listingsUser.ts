@@ -5,18 +5,18 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
     private static readonly API = this.API_BASE + "user/listings";
     private static readonly UPLOAD_PICTURE_API = ListingCRUDAPIService.API + "/photo"
 
-    static async createListing(listingData: Listing) {
+    static async createListing(listingData: Listing): Promise<string | void> {
         const hasAuthHeader = true;
         const errorMessage = "Error creating listing";
         try {
             const data = await this.fetchAPI(ListingCRUDAPIService.API, "POST", hasAuthHeader, errorMessage, listingData);
-            return data;
+            return data.listing_id;
         } catch (e) {
             console.log(e);
         }
     }
 
-    static async updateListing(listingId: string, updatedListingFields: any) {
+    static async updateListing(listingId: string, updatedListingFields: any): Promise<boolean> {
         const hasAuthHeader = true;
         const errorMessage = "Error updating listing";
         const body = {
@@ -25,21 +25,25 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
         };
 
         try {
-            return await this.fetchAPI(ListingCRUDAPIService.API, "PATCH", hasAuthHeader, errorMessage, body);
+            const data = await this.fetchAPI(ListingCRUDAPIService.API, "PATCH", hasAuthHeader, errorMessage, body);
+            return data.success;
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 
-    static async deleteListing(listingId: number) {
+    static async deleteListing(listingId: number): Promise<boolean> {
         const hasAuthHeader = true;
         const errorMessage = "Error deleting listing";
         const body = { listing_id: listingId };
 
         try {
-            await this.fetchAPI(ListingCRUDAPIService.API, "DELETE", hasAuthHeader, errorMessage, body)
+            const data = await this.fetchAPI(ListingCRUDAPIService.API, "DELETE", hasAuthHeader, errorMessage, body);
+            return data.success;
         } catch (e) {
             console.log(e)
+            return false;
         }
     }
 
@@ -57,7 +61,7 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async uploadToS3(uploadUrl: string, file: File) {
+    static async uploadToS3(uploadUrl: string, file: File): Promise<boolean> {
         try {
             const res = await fetch(uploadUrl, {
                 method: "PUT",

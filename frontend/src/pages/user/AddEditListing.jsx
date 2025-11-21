@@ -61,11 +61,11 @@ export default function AddEditListing() {
   };
 
   const createListing = async (listingFormCreateData) => {
-    const createdListing = await ListingCRUDAPIService.createListing(
+    const createdListingId = await ListingCRUDAPIService.createListing(
       listingFormCreateData
     );
-    console.log(createdListing);
-    return createdListing.listing_id;
+    console.log(createdListingId);
+    return createdListingId;
   };
 
   function getUpdatedFields(original, current) {

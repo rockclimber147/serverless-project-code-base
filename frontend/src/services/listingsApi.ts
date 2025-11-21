@@ -12,7 +12,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
     private static readonly GET_USER_FAVOURITED_LISTINGS_API =
         this.API_BASE + "user/favouritedListings";
 
-    static async searchListings(query?: string) {
+    static async searchListings(query?: string): Promise<Listing[]> {
         const url = query
             ? `${this.SEARCH_API}?name=${encodeURIComponent(query)}`
             : this.SEARCH_API;
@@ -28,7 +28,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async getUserListings(userId: string) {
+    static async getUserListings(userId: string): Promise<Listing[]> {
         const url = `${this.GET_USER_LISTINGS_API}?user_id=${encodeURIComponent(userId)}`;
         try {
             const hasAuthHeader = false;
@@ -45,7 +45,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
     //TODO: update and link to reviews
     static async getMyReviews() { }
 
-    static async getFavoriteListings() {
+    static async getFavoriteListings(): Promise<Listing[]> {
         const url = this.GET_USER_FAVOURITED_LISTINGS_API;
         const hasAuthHeader = true;
         const errorMessage = "Failed to fetch favourited listings";
@@ -59,7 +59,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async getListingById(id: string) {
+    static async getListingById(id: string): Promise<Listing | void> {
         const url = `${this.GET_LISTING_BY_ID_API}?id=${encodeURIComponent(id)}`;
         const hasAuthHeader = false;
         const errorMessage = "Error fetching listing";

@@ -22,31 +22,35 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async addFavourite(listing_id: string) {
+    static async addFavourite(listing_id: string): Promise<boolean> {
         const hasAuthHeader = true;
         const body = { listing_id: listing_id };
         const errorMessage = "Error adding favourite listing";
         try {
-            await this.fetchAPI(this.API, "POST", hasAuthHeader, errorMessage, body);
+            const data = await this.fetchAPI(this.API, "POST", hasAuthHeader, errorMessage, body);
+            return data.success;
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 
-    static async deleteFavourite(listing_id: string) {
+    static async deleteFavourite(listing_id: string): Promise<boolean> {
         const hasAuthHeader = true;
         const body = { listing_id: listing_id };
         const errorMessage = "Error deleting favourite listing";
         try {
-            await this.fetchAPI(
+            const data = await this.fetchAPI(
                 this.API,
                 "DELETE",
                 hasAuthHeader,
                 errorMessage,
                 body
             );
+            return data.success;
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 
