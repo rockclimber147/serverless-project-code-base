@@ -10,12 +10,8 @@ export default function Favourites() {
   
   useEffect(() => {
     async function fetchInitialListings() {
-      try {
-        const data = await ListingAPIService.getFavoriteListings();
-        setListings(data);
-      } catch (err) {
-        console.error("Failed to load listings:", err);
-      }
+      const data = await ListingAPIService.getFavoriteListings();
+      setListings(data);
     }
   fetchInitialListings();
   }, []);

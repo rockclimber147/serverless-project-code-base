@@ -11,12 +11,8 @@ export default function DeleteModal(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setOpen(false);
-    try {
-      await ListingCRUDAPIService.deleteListing(listingId);
-      navigate("/view-user-profile");
-    } catch (err) {
-      console.error("Failed to delete listing:", err);
-    }
+    await ListingCRUDAPIService.deleteListing(listingId);
+    navigate("/view-user-profile");
   };
   return (
     <Modal

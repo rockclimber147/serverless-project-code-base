@@ -63,11 +63,15 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
                 method: "PUT",
                 body: file,
             });
-            if (!res.ok) {
-                console.log("Failed to upload image to S3")
+
+            if (res.ok) {
+                return true;
+            } else {
+                console.log("Failed to upload image to S3");
             }
         } catch (e) {
             console.log(e);
         }
+        return false;
     }
 }

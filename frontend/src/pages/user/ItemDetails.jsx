@@ -38,13 +38,9 @@ export default function ItemDetails() {
     // If item is not passed via state, fetch it from the backend
     if (!item && listingId) {
       const fetchItem = async () => {
-        try {
-          const fetchedItem = await ListingAPIService.getListingById(listingId);
-          setItem(fetchedItem); // update the state
-          setFavourite(fetchedItem.is_favourite);
-        } catch (err) {
-          console.error("Failed to fetch item:", err);
-        }
+        const fetchedItem = await ListingAPIService.getListingById(listingId);
+        setItem(fetchedItem); // update the state
+        setFavourite(fetchedItem.is_favourite);
       };
 
       fetchItem();

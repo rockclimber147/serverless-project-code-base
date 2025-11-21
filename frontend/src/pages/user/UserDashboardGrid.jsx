@@ -10,13 +10,9 @@ export default function UserDashboardGrid() {
 
   useEffect(() => {
     async function fetchInitialListings() {
-      try {
-        const data = await ListingAPIService.searchListings();
-        console.log(data);
-        setListings(data);
-      } catch (err) {
-        console.error("Failed to load listings:", err);
-      }
+      const data = await ListingAPIService.searchListings();
+      console.log(data);
+      setListings(data);
     }
     fetchInitialListings();
   }, []);
@@ -31,13 +27,9 @@ export default function UserDashboardGrid() {
     e.preventDefault();
     setSearchText(inputText);
 
-    try {
-      const results = await ListingAPIService.searchListings(inputText);
-      console.log(results);
-      setListings(results);
-    } catch (err) {
-      console.error("Search failed:", err);
-    }
+    const results = await ListingAPIService.searchListings(inputText);
+    console.log(results);
+    setListings(results);
   };
 
   return (

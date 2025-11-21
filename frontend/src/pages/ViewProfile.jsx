@@ -74,12 +74,8 @@ export default function Profile({ type = "user" }) {
     async function fetchInitialListings() {
       console.log(passedUser);
       const userId = passedUser ? passedUser.id : localStorage.getItem("userId");;
-      try {
-        const data = await ListingAPIService.getUserListings(userId);
-        setMyListings(data);
-      } catch (err) {
-        console.error("Failed to load My Listings:", err);
-      }
+      const listings = await ListingAPIService.getUserListings(userId);
+      setMyListings(listings);
     }
   fetchInitialListings();
   }, []);
