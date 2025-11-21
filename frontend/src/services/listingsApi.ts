@@ -69,7 +69,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
             const data = this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
             let isFavourite;
             if (userId) {
-                isFavourite = await FavouritesAPIService.getFavourite(id);
+                isFavourite = await FavouritesAPIService.getFavourite(id) ?? false;
             }
             return this.castToListingObject(data, isFavourite);
         } catch (e) {

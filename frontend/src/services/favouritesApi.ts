@@ -50,7 +50,7 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         }
     }
 
-    static async getFavourite(listing_id: string): Promise<boolean> {
+    static async getFavourite(listing_id: string): Promise<boolean | void> {
         const hasAuthHeader = true;
         const errorMessage = "Error getting favourite";
         const url = `${this.API}?listing_id=${encodeURIComponent(listing_id)}`;
@@ -59,6 +59,5 @@ export class FavouritesAPIService extends BaseServiceWithAuth {
         } catch (e) {
             console.log(e);
         }
-        return false;
     }
 }
