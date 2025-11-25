@@ -1,25 +1,15 @@
 import { Listing } from "../models/listing";
-export class ListingCRUDAPIService {
-  private static readonly API_BASE =
-    "https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/user/listings";
-
-  private static checkAuth() {
-    const token = localStorage.getItem("idToken");
-    if (!token) {
-      throw new Error("No auth token found in localStorage");
-    }
-    return token;
-  }
+import { BaseServiceWithAuth } from "./baseAuthApi";
+import { ListingAPIService } from "./listingsApi";
+export class ListingCRUDAPIService extends BaseServiceWithAuth {
+  private static readonly API = this.API_BASE + "user/listings";
+  private static readonly ALL_USER_LISTINGS_API =
+    this.API_BASE + "user/allListings";
 
   static async createListing(listingData: Listing) {
-    console.log("listing data", listingData);
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify(listingData),
     });
 
@@ -32,14 +22,9 @@ export class ListingCRUDAPIService {
   }
 
   static async updateListing(listingId: string, updatedListingFields: any) {
-    const token = this.checkAuth();
-
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({
         listing_id: String(listingId),
         ...updatedListingFields,
@@ -55,14 +40,9 @@ export class ListingCRUDAPIService {
   }
 
   static async deleteListing(listingId: number) {
-    console.log(listingId);
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE, {
+    const res = await fetch(ListingCRUDAPIService.API, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
@@ -75,13 +55,9 @@ export class ListingCRUDAPIService {
   }
 
   static async getUploadLink(listingId: string) {
-    const token = this.checkAuth();
-    const res = await fetch(ListingCRUDAPIService.API_BASE + "/photo", {
+    const res = await fetch(ListingCRUDAPIService.API + "/photo", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: this.getAuthHeader(),
       body: JSON.stringify({ listing_id: String(listingId) }),
     });
 
@@ -98,5 +74,25 @@ export class ListingCRUDAPIService {
       body: file,
     });
     if (!res.ok) throw new Error("Failed to upload image to S3");
+  }
+
+  static async getMyListings() {
+    const hasAuthHeader = true;
+    const errorMessage = "error fetching user listings";
+    try {
+      const res = await this.fetchAPI(
+        this.ALL_USER_LISTINGS_API,
+        "GET",
+        hasAuthHeader,
+        errorMessage
+      );
+
+      const listings: Listing[] = res.listings?.map((item: Listing) =>
+        ListingAPIService.castToListingObject(item)
+      );
+      return listings;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

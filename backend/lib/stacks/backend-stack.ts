@@ -7,6 +7,7 @@ import { ListingsFeatureConstruct } from "../features/UserListingCRUD";
 import { ListingPhotosBucketConstruct } from "../S3/listingPhotos";
 import { SearchListingsFeatureConstruct } from "../features/SearchListing";
 import { LiveChatFeatureConstruct } from "../features/LiveChat";
+import { FavouritesFeatureConstruct } from "../features/FavouritesCRUD";
 
 export class ProductionStack extends cdk.Stack {
   public readonly cognitoConstruct: CognitoConstruct;
@@ -53,6 +54,7 @@ export class ProductionStack extends cdk.Stack {
       {
         api: this.gatewayConstruct,
         tables: this.dynamoTable,
+        auth: this.cognitoConstruct,
       }
     );
 
@@ -61,5 +63,11 @@ export class ProductionStack extends cdk.Stack {
       tables: this.dynamoTable,
       auth: this.cognitoConstruct,
     });
+
+    const favouritesFeature = new FavouritesFeatureConstruct(this, "FavouritesFature", {
+      api: this.gatewayConstruct,
+      tables:this.dynamoTable,
+      auth: this.cognitoConstruct
+    })
   }
 }

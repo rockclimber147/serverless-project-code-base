@@ -1,5 +1,6 @@
 import { Listing } from "@/models/listing";
 import { Review } from "@/models/review";
+import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export class ListingAPIService {
   private static readonly API_BASE =
@@ -18,16 +19,22 @@ export class ListingAPIService {
     }
 
     const rawListings = await res.json();
-    const listings: Listing[] = rawListings.map((item: Listing) =>
-      this.castToListingObject(item)
-    );
-    
+    const stored = sessionStorage.getItem("favourites");
+    const favourites: string[] = stored ? JSON.parse(stored) : [];
+
+    const listings: Listing[] = rawListings.map((item: Listing) => {
+      const is_favourite: boolean = favourites.some(
+        (f) => f === item.listing_id
+      );
+      return this.castToListingObject(item, is_favourite);
+    });
+
     return listings;
   }
 
   //TODO: update and link my listings
   static async getMyListings(userId: string) {
-    const url = `${this.SEARCH_API}?name=${encodeURIComponent(userId)}`
+    const url = `${this.SEARCH_API}?name=${encodeURIComponent(userId)}`;
     const res = await fetch(url);
     if (!res.ok) {
       console.log(res);
@@ -38,7 +45,7 @@ export class ListingAPIService {
     const listings: Listing[] = rawListings.map((item: Listing) =>
       this.castToListingObject(item)
     );
-    
+
     return listings;
   }
 
@@ -55,12 +62,13 @@ export class ListingAPIService {
     const listings: Review[] = rawListings.map((item: Review) =>
       this.castToListingObject(item)
     );
-    
+
     return listings;
   }
 
   //TODO: update and link to favorites
   static async getFavoriteListings() {
+    const favouriteIds = await FavouritesAPIService.getAllFavourites();
     const url = this.SEARCH_API;
     const res = await fetch(url);
     if (!res.ok) {
@@ -69,11 +77,11 @@ export class ListingAPIService {
     }
 
     const rawListings = await res.json();
-    const listings: Listing[] = rawListings.map((item: Listing) =>
-      this.castToListingObject(item)
-    );
-    
-    return listings;
+    const favoriteListings = rawListings
+      .filter((item: any) => favouriteIds.includes(String(item.listing_id)))
+      .map((item: Listing) => this.castToListingObject(item, true));
+
+    return favoriteListings;
   }
 
   static async getListingById(id: string) {
@@ -88,7 +96,7 @@ export class ListingAPIService {
     return this.castToListingObject(rawListing);
   }
 
-  private static castToListingObject(item: any) {
+static castToListingObject(item: any, is_favourite?: boolean) {
     return {
       listing_id: item.listing_id,
       user_id: item.user_id,
@@ -99,8 +107,11 @@ export class ListingAPIService {
       location: item.location,
       latitude: item.latitude,
       longitude: item.longitude,
-      image: (item.image ? item.image : "https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=1024x1024&w=is&k=20&c=qToocb5EafYO6QXp9aI01a72r5jcQccjgxbs_6Ae8eQ="),
+      image: item.image
+        ? item.image
+        : "https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=1024x1024&w=is&k=20&c=qToocb5EafYO6QXp9aI01a72r5jcQccjgxbs_6Ae8eQ=",
       created_at: new Date(item.created_at * 1000),
+      is_favourite: is_favourite,
     } as Listing;
   }
   private static castToReviewObject(review: any) {

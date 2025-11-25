@@ -28,7 +28,7 @@ function App() {
           <Route path="/user-dashboard-grid" element={<UserDashboardGrid />} />
           <Route path="/view-user-profile" element={<Profile />} />
           <Route
-            path="/view-seller-profile"
+            path="/view-seller-profile/:sellerId"
             element={<Profile type="seller" />}
           />
           <Route path="/item-details/:listingId" element={<ItemDetails />} />

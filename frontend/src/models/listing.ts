@@ -10,4 +10,5 @@ export interface Listing {
   longitude?: number;
   image?: string;
   created_at: Date;
+  is_favourite?: boolean;
 }

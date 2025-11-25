@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsTable from "../components/ListingsTable";
+import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
 
 interface Report {
@@ -70,7 +71,7 @@ export default function ReportedListingActivity() {
     return (
         <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
             <Link to="/dashboard" className="text-blue-600 underline">
-            ← Back to Reported Listings
+                ← Back to Reported Listings
             </Link>
             <h1 className="text-3xl font-bold mb-6 mt-4">
                 Reported Listing Activity
@@ -78,12 +79,7 @@ export default function ReportedListingActivity() {
 
             {loading && (
                 <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-                    <div className="flex flex-col items-center justify-center py-8 mb-6">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
-                        <p className="text-gray-600">
-                            Loading reported listings...
-                        </p>
-                    </div>
+                    <Loading message="Loading reported listings..." size="sm" />
                     {/* Skeleton loader matching table structure */}
                     <table className="min-w-full border-collapse">
                         <thead>

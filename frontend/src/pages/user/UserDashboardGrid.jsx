@@ -3,13 +3,16 @@ import MapGridToggleButton from "@/components/MapGridToggleButton";
 import React from "react";
 import { useState, useEffect } from "react";
 import { ListingAPIService } from "@/services/listingsApi";
+import { FavouritesAPIService } from "@/services/favouritesApi";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
+  const [searchText, setSearchText] = useState([]);
 
   useEffect(() => {
     async function fetchInitialListings() {
       try {
+        await FavouritesAPIService.getAllFavourites();
         const data = await ListingAPIService.searchListings();
         console.log(data);
         setListings(data);
@@ -62,11 +65,12 @@ export default function UserDashboardGrid() {
       </div>
       <h2 className="text-2xl m-4">Most Recent Listings</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {listings && listings.map((item) => (
-          <div key={item.id}>
-            <ItemCard item={item} />
-          </div>
-        ))}
+        {listings &&
+          listings.map((item) => (
+            <div key={item.listing_id}>
+              <ItemCard item={item} />
+            </div>
+          ))}
       </div>
     </div>
   );
