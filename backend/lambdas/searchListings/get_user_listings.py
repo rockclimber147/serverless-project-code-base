@@ -11,21 +11,17 @@ CORS_HEADERS = {
 }
 
 def lambda_handler(event, context):
-    method = event.get("httpMethod")
-    claims = event.get("requestContext", {}).get("authorizer", {}).get("claims", {})
-    user_id = claims.get("sub")
+    query_params = event.get("queryStringParameters") or {}
+    user_id = query_params.get("user_id")
 
     if not user_id:
-        return cors_response(400, {"error": "user is not logged in"})
+        return cors_response(400, {
+            "success": False,
+            "error": "Missing required query parameter: user id"
+        })
     
-    if method == "GET":
-        result = {
-            "listings": get_all_user_listings(LISTINGS_TABLE, user_id)
-        }
-    else:
-        result = {"error": "Unsupported method"}
-
-    return cors_response(200, result)
+    response = get_all_user_listings(LISTINGS_TABLE, user_id)
+    return cors_response(200, response)
 
 def cors_response(status, body_dict):
     return {

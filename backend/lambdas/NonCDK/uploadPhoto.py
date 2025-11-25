@@ -1,12 +1,10 @@
-import os
 import json
 import boto3
 from botocore.exceptions import ClientError
 
 # --- Environment Variables ---
-BUCKET_NAME = os.environ.get("LISTING_PHOTOS_BUCKET")
-REGION = os.environ.get("AWS_REGION", "us-west-2")
-
+BUCKET_NAME = "freddys-crocs-profile-photos"
+REGION ="us-west-2"
 s3_client = boto3.client("s3", region_name=REGION)
 
 CORS_HEADERS = {
@@ -15,23 +13,16 @@ CORS_HEADERS = {
     "Access-Control-Allow-Methods": "OPTIONS,POST",
 }
 
-
 def lambda_handler(event, context):
-    method = event.get("httpMethod")
-    if method == "OPTIONS":
-        return {
-            "statusCode": 200,
-            "headers": CORS_HEADERS,
-            "body": ""
-        }
-    
-    body = json.loads(event.get("body") or "{}")
-    listing_id = body.get("listing_id")
+    body = event
+    if isinstance(body, str):
+        body = json.loads(body)
 
-    if not listing_id:
-        return cors_response(400, {"success": False, "error": "listing_id is required"})
+    user_id = body.get('id')
+    if not user_id:
+        return {'statusCode': 400, 'body': json.dumps({'error': 'id is required'})}
 
-    filename = f"{listing_id}.jpg"
+    filename = f"{user_id}.jpg"
 
     try:
         url = s3_client.generate_presigned_url(
@@ -45,18 +36,11 @@ def lambda_handler(event, context):
             ExpiresIn=300,
         )
     except ClientError as e:
-        return cors_response(500, {"success": False, "error": str(e)})
+        return cors_response(500, {"error": str(e)})
 
     public_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
-    return cors_response(200, {
-        "success": True,
-        "data": {
-            "upload_url": url, 
-            "public_url": public_url
-        }
-    })
-
+    return {'statusCode': 200, 'body': {"upload_url": url, "public_url": public_url}}
 
 def cors_response(status, body_dict):
     return {

@@ -21,10 +21,10 @@ def lambda_handler(event, context):
 
     # add filters later
 
-    listings = search_listing(LISTINGS_TABLE, name)
+    response = search_listing(LISTINGS_TABLE, name)
     status = 200
     
-    return cors_response(status, listings)
+    return cors_response(status, response)
 
 
 def cors_response(status, body_dict):

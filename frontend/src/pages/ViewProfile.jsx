@@ -3,7 +3,6 @@ import ItemCard from "../components/ItemCard";
 import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo } from "@/services/authApi";
-import { ListingCRUDAPIService } from "@/services/listingsUser";
 import { ListingAPIService } from "@/services/listingsApi"
 import { useLocation } from "react-router-dom";
 
@@ -73,12 +72,10 @@ export default function Profile({ type = "user" }) {
 
   useEffect(() => {
     async function fetchInitialListings() {
-      try {
-        const data = await ListingCRUDAPIService.getMyListings();
-        setMyListings(data);
-      } catch (err) {
-        console.error("Failed to load My Listings:", err);
-      }
+      console.log(passedUser);
+      const userId = passedUser ? passedUser.id : localStorage.getItem("userId");;
+      const listings = await ListingAPIService.getUserListings(userId);
+      setMyListings(listings);
     }
   fetchInitialListings();
   }, []);

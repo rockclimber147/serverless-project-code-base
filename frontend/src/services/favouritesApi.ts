@@ -3,49 +3,65 @@ import { BaseServiceWithAuth } from "./baseAuthApi";
 export class FavouritesAPIService extends BaseServiceWithAuth {
     private static API = this.API_BASE + "user/favourites";
 
-    static async getAllFavourites() {
-        // get all user favourites
+    static async getAllFavourites(): Promise<string[]> {
         const hasAuthHeader = true;
         const errorMessage = "Error getting user favourites";
         try {
-            const res = await this.fetchAPI(this.API, "GET", hasAuthHeader, errorMessage);
-            if (res.success == true) {
-                const favourites = res.favourites.map(fav => fav.listing_id);
-                sessionStorage.setItem("favourites", JSON.stringify(favourites))
-                return favourites;
-            } 
+            const res = await this.fetchAPI(
+                this.API,
+                "GET",
+                hasAuthHeader,
+                errorMessage
+            );
+            const favourites = res.map((fav: any) => fav.listing_id);
+            sessionStorage.setItem("favourites", JSON.stringify(favourites));
+            return favourites;
         } catch (e) {
             console.log(e);
+            return [];
         }
     }
 
-    static async addFavourite(listing_id: string) {
+    static async addFavourite(listing_id: string): Promise<boolean> {
         const hasAuthHeader = true;
-        const body = JSON.stringify({ listing_id: String(listing_id) })
+        const body = { listing_id: listing_id };
         const errorMessage = "Error adding favourite listing";
         try {
-            const res = await this.fetchAPI(this.API, "POST", hasAuthHeader, errorMessage, body);
+            const data = await this.fetchAPI(this.API, "POST", hasAuthHeader, errorMessage, body);
+            return data.success;
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 
-    static async deleteFavourite(listing_id: string) {
+    static async deleteFavourite(listing_id: string): Promise<boolean> {
         const hasAuthHeader = true;
-        const body = JSON.stringify({ listing_id: String(listing_id) })
+        const body = { listing_id: listing_id };
         const errorMessage = "Error deleting favourite listing";
         try {
-            const res = await this.fetchAPI(this.API, "DELETE", hasAuthHeader, errorMessage, body);
-
-            if (res.success == true) {
-                console.log("Successfully deleted listing");
-            } 
+            const data = await this.fetchAPI(
+                this.API,
+                "DELETE",
+                hasAuthHeader,
+                errorMessage,
+                body
+            );
+            return data.success;
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 
-    static getFavourite() {
-
+    static async getFavourite(listing_id: string): Promise<boolean | void> {
+        const hasAuthHeader = true;
+        const errorMessage = "Error getting favourite";
+        const url = `${this.API}?listing_id=${encodeURIComponent(listing_id)}`;
+        try {
+            return await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+        } catch (e) {
+            console.log(e);
+        }
     }
 }

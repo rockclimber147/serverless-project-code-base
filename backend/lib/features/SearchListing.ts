@@ -39,7 +39,7 @@ export class SearchListingsFeatureConstruct extends Construct {
       authorizationType: apigateway.AuthorizationType.NONE,
     });
 
-    // Lambda for getting all of user's listings
+    // Lambda for getting all of a user's listings
     const userListingsLambda = new lambda.Function(this, "userListingsLambda", {
       runtime: lambda.Runtime.PYTHON_3_11,
       handler: "get_user_listings.lambda_handler",
@@ -50,9 +50,27 @@ export class SearchListingsFeatureConstruct extends Construct {
     });
     
     props.tables.listingsTable.grantReadData(userListingsLambda);
-    const userListings = props.api.userResource.addResource("allListings");
-    this.addMethodWithAuthorizer(userListings, "GET", userListingsLambda, userAuthorizer);
-    userListings.addCorsPreflight({
+    const userListings = props.api.publicResource.addResource("userListings");
+    userListings.addMethod("GET", new apigateway.LambdaIntegration(userListingsLambda), {
+      authorizationType: apigateway.AuthorizationType.NONE,
+    });
+
+    // Lambda for getting all of logged in user's favourited listings
+    const favouritedListingsLambda = new lambda.Function(this, "favouritedListingsLambda", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: "get_user_favourited_listings.lambda_handler",
+      code: lambda.Code.fromAsset("lambdas/searchListings"),
+      environment: {
+        LISTINGS_TABLE: props.tables.listingsTable.tableName,
+        FAVOURITES_TABLE: props.tables.favouritesTable.tableName
+      },
+    });
+    
+    props.tables.listingsTable.grantReadData(favouritedListingsLambda);
+    props.tables.favouritesTable.grantReadData(favouritedListingsLambda);
+    const favouritedListings = props.api.userResource.addResource("favouritedListings");
+    this.addMethodWithAuthorizer(favouritedListings, "GET", favouritedListingsLambda, userAuthorizer);
+    favouritedListings.addCorsPreflight({
       allowOrigins: ["*"],
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["OPTIONS", "GET"],

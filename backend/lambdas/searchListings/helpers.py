@@ -13,17 +13,20 @@ def get_listing_by_id(table_name: str, listing_id: str):
     item = response.get("Item")
 
     if not item:
-        return {"success": False, "response": {"error": "Listing not found"}}
+        return {"success": False, "error": "Listing not found"}
 
     deserialized_item = {
         k: _deserialize_value(v) for k, v in item.items()
     }
 
-    return {"success": True, "response": deserialized_item}
+    return {"success": True, "data": deserialized_item}
 
 def search_listing(table_name: str, name: str = None):
     items = _search_table_by_pagination(table_name, name)
-    return _sort_by_descending_time(items)
+    return {
+        "success": True,
+        "data": _sort_by_descending_time(items)
+    }
 
 def get_all_user_listings(table_name: str, user_id: str):
     items = []
@@ -51,7 +54,50 @@ def get_all_user_listings(table_name: str, user_id: str):
         if not last_key:
             break
 
-    return _sort_by_descending_time(items)
+    return {
+        "success": True,
+        "data": _sort_by_descending_time(items)
+    }
+
+def get_user_favourited_listings(favourites_table: str, listings_table: str, user_id: str):
+    fav_response = dynamodb.query(
+        TableName=favourites_table,
+        KeyConditionExpression="user_id = :uid",
+        ExpressionAttributeValues={
+            ":uid": {"S": user_id}
+        }
+    )
+
+    favourite_items = fav_response.get("Items", [])
+    if not favourite_items:
+        return []
+
+    listing_ids = [
+        item["listing_id"]["S"]
+        for item in favourite_items
+    ]
+
+    keys = [{"listing_id": {"S": lid}} for lid in listing_ids]
+
+    batch_response = dynamodb.batch_get_item(
+        RequestItems={
+            listings_table: {
+                "Keys": keys
+            }
+        }
+    )
+
+    raw_listings = batch_response["Responses"].get(listings_table, [])
+
+    listings = [
+        {
+            **{k: _deserialize_value(v) for k, v in raw_item.items()},
+            "is_favourite": True
+        }
+        for raw_item in raw_listings
+    ]
+
+    return listings
 
 def _sort_by_descending_time(listings: any):
     return sorted(listings, key=lambda x: int(x["created_at"]), reverse=True)

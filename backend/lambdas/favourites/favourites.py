@@ -27,25 +27,21 @@ def lambda_handler(event, context):
         listing_id = query_params.get("listing_id")
 
         if not listing_id: 
-            items = get_all_favourites(FAVOURITES_TABLE, user_id)
-            return cors_response(200, items)
+            return cors_response(200, get_all_favourites(FAVOURITES_TABLE, user_id))
         
-        result = get_favourite(FAVOURITES_TABLE, user_id, listing_id)
+        return cors_response(200, get_favourite(FAVOURITES_TABLE, user_id, listing_id))
     elif method == "POST" or method == "DELETE":
         body = json.loads(event.get("body") or "{}")
+        listing_id = body.get("listing_id")
 
-        if not body["listing_id"]:
+        if not listing_id:
             return error_response_missing_listing()
         if method == "POST":
-            result = create_favourite(FAVOURITES_TABLE, user_id, body.get("listing_id"))
+            return cors_response(200, create_favourite(FAVOURITES_TABLE, user_id, listing_id))
         else:
-            result = delete_favourite(FAVOURITES_TABLE, user_id, body.get("listing_id"))
-    else:
-        result = {"error": "Unsupported method"}
+            return cors_response(200, delete_favourite(FAVOURITES_TABLE, user_id, listing_id))
 
-    status = 200 if "error" not in result else 400
-    return cors_response(status, result)
-
+    return cors_response(405, {"error": "Method not allowed"})
 
 def cors_response(status, body_dict):
     return {
@@ -55,7 +51,7 @@ def cors_response(status, body_dict):
     }
 
 def error_response_missing_listing():
-    status = 401
+    status = 400
     message = {
         "error": "Missing listing id"
     }
@@ -65,7 +61,7 @@ def error_response_missing_listing():
 def error_response_missing_user():
     status = 401
     message = {
-        "error": "Missing user id"
+        "error": "Missing or invalid user"
     }
 
     return cors_response(status, message)

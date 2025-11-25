@@ -22,34 +22,30 @@ const MapPage = () => {
 
   useEffect(() => {
     async function fetchInitialListings() {
-      try {
-        const data = await ListingAPIService.searchListings();
-        // const res = await fetch("https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/public/search");
-        // if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        // const data = await res.json();
+      const data = await ListingAPIService.searchListings();
+      // const res = await fetch("https://ardhu7a4ye.execute-api.us-west-2.amazonaws.com/prod/public/search");
+      // if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // const data = await res.json();
 
-        const normalized = data
-          .filter(
-            (item) =>
-              typeof item.latitude === "number" &&
-              typeof item.longitude === "number" &&
-              item.latitude !== 0 &&
-              item.longitude !== 0
-          )
-          .map((item) => ({
-            id: item.listing_id,
-            name: item.item_name,
-            price: item.price,
-            image: item.image,
-            description: item.details || "",
-            link: `/item-details/${item.listing_id}`,
-            location: [item.longitude, item.latitude],
-          }));
+      const normalized = data
+        .filter(
+          (item) =>
+            typeof item.latitude === "number" &&
+            typeof item.longitude === "number" &&
+            item.latitude !== 0 &&
+            item.longitude !== 0
+        )
+        .map((item) => ({
+          id: item.listing_id,
+          name: item.item_name,
+          price: item.price,
+          image: item.image,
+          description: item.details || "",
+          link: `/item-details/${item.listing_id}`,
+          location: [item.longitude, item.latitude],
+        }));
 
-        setListings(normalized);
-      } catch (err) {
-        console.error("Failed to load listings:", err);
-      }
+      setListings(normalized);
     }
     fetchInitialListings();
   }, []);
