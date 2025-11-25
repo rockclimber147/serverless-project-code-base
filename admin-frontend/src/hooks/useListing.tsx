@@ -23,7 +23,10 @@ export function useListings() {
         if (!res.ok) throw new Error("Failed to load listings");
 
         const data = await res.json();
-        setListings(data);
+        console.log("API listings response:", data);
+
+        // Most APIs wrap arrays in a "body" field
+        setListings(data.body ?? []);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -36,3 +39,4 @@ export function useListings() {
 
   return { listings, loading, error };
 }
+
