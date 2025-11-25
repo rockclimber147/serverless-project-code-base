@@ -45,7 +45,7 @@ def lambda_handler(event, context):
                 KeyConditionExpression=Key("chatId").eq(chat_id)
             )
             if response.get("Count", 0) == 0:
-                send_email_to_seller(user_id, message)
+                send_email_to_seller(partner_id, message)
         except Exception as e:
             print("Email failed:", e)
 
