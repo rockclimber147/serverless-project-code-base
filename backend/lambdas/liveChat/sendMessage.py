@@ -40,11 +40,14 @@ def lambda_handler(event, context):
         chat_id = "#".join(sorted([user_id, partner_id]))
 
         # Send email notification if first message between seller and buyer
-        response = chat_table.query(
-            KeyConditionExpression=Key("chatId").eq(chat_id)
-        )
-        if response.get("Count", 0) == 0:
-            send_email_to_seller(user_id, message)
+        try:
+            response = chat_table.query(
+                KeyConditionExpression=Key("chatId").eq(chat_id)
+            )
+            if response.get("Count", 0) == 0:
+                send_email_to_seller(user_id, message)
+        except Exception as e:
+            print("Email failed:", e)
 
         # Put item into DynamoDB
         item = {
