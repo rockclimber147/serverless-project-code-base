@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     user_id = claims.get("sub")
 
     if not user_id:
-        return cors_response(401, {"error": "Missing user identity"})
+        return cors_response(401, {"success": False, "error": "Missing user identity"})
 
     body = json.loads(event.get("body") or "{}")
 
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     elif method == "DELETE":
         result = delete_listing(LISTINGS_TABLE, body.get("listing_id"), user_id)
     else:
-        result = {"error": "Unsupported method"}
+        cors_response(405, {"error": "Method not allowed"})
 
     status = 200 if "error" not in result else 400
     return cors_response(status, result)

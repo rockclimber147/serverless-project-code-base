@@ -15,12 +15,15 @@ def lambda_handler(event, context):
     listing_id = query_params.get("id")
 
     if not listing_id:
-        return cors_response(400, {"error": "Missing required query parameter: id"})
+        return cors_response(400, {
+            "success": False,
+            "error": "Missing required query parameter: id"
+        })
 
-    listing = get_listing_by_id(LISTINGS_TABLE, listing_id)
-    status = 200 if listing["success"] else 404
+    response = get_listing_by_id(LISTINGS_TABLE, listing_id)
+    status = 200 if response["success"] else 404
 
-    return cors_response(status, listing["response"])
+    return cors_response(status, response)
 
 def cors_response(status, body_dict):
     return {

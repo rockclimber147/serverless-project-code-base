@@ -2,97 +2,80 @@ import { Listing } from "../models/listing";
 import { BaseServiceWithAuth } from "./baseAuthApi";
 import { ListingAPIService } from "./listingsApi";
 export class ListingCRUDAPIService extends BaseServiceWithAuth {
-  private static readonly API = this.API_BASE + "user/listings";
-  private static readonly ALL_USER_LISTINGS_API =
-    this.API_BASE + "user/allListings";
+    private static readonly API = this.API_BASE + "user/listings";
+    private static readonly UPLOAD_PICTURE_API = ListingCRUDAPIService.API + "/photo"
 
-  static async createListing(listingData: Listing) {
-    const res = await fetch(ListingCRUDAPIService.API, {
-      method: "POST",
-      headers: this.getAuthHeader(),
-      body: JSON.stringify(listingData),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to create listing: ${res.status}`);
+    static async createListing(listingData: Listing): Promise<string | void> {
+        const hasAuthHeader = true;
+        const errorMessage = "Error creating listing";
+        try {
+            const data = await this.fetchAPI(ListingCRUDAPIService.API, "POST", hasAuthHeader, errorMessage, listingData);
+            return data.listing_id;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    const data = await res.json();
-    return data;
-  }
+    static async updateListing(listingId: string, updatedListingFields: any): Promise<boolean> {
+        const hasAuthHeader = true;
+        const errorMessage = "Error updating listing";
+        const body = {
+            listing_id: listingId,
+            ...updatedListingFields
+        };
 
-  static async updateListing(listingId: string, updatedListingFields: any) {
-    const res = await fetch(ListingCRUDAPIService.API, {
-      method: "PATCH",
-      headers: this.getAuthHeader(),
-      body: JSON.stringify({
-        listing_id: String(listingId),
-        ...updatedListingFields,
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to update listing: ${res.status}`);
+        try {
+            const data = await this.fetchAPI(ListingCRUDAPIService.API, "PATCH", hasAuthHeader, errorMessage, body);
+            return data.success;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
     }
 
-    const data = await res.json();
-    return data;
-  }
+    static async deleteListing(listingId: number): Promise<boolean> {
+        const hasAuthHeader = true;
+        const errorMessage = "Error deleting listing";
+        const body = { listing_id: listingId };
 
-  static async deleteListing(listingId: number) {
-    const res = await fetch(ListingCRUDAPIService.API, {
-      method: "DELETE",
-      headers: this.getAuthHeader(),
-      body: JSON.stringify({ listing_id: String(listingId) }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to delete listing: ${res.status}`);
+        try {
+            const data = await this.fetchAPI(ListingCRUDAPIService.API, "DELETE", hasAuthHeader, errorMessage, body);
+            return data.success;
+        } catch (e) {
+            console.log(e)
+            return false;
+        }
     }
 
-    const data = await res.json();
-    return data;
-  }
+    static async getUploadLink(listingId: string) {
+        const hasAuthHeader = true;
+        const errorMessage = "Failed to get image url";
+        const body = { listing_id: listingId };
 
-  static async getUploadLink(listingId: string) {
-    const res = await fetch(ListingCRUDAPIService.API + "/photo", {
-      method: "POST",
-      headers: this.getAuthHeader(),
-      body: JSON.stringify({ listing_id: String(listingId) }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to get upload link: ${res.status}`);
+        try {
+            const data = await this.fetchAPI(ListingCRUDAPIService.UPLOAD_PICTURE_API, "POST", hasAuthHeader, errorMessage, body);
+            console.log(data);
+            return data;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    return res.json(); // returns { upload_url, public_url }
-  }
+    static async uploadToS3(uploadUrl: string, file: File): Promise<boolean> {
+        try {
+            const res = await fetch(uploadUrl, {
+                method: "PUT",
+                body: file,
+            });
 
-  static async uploadToS3(uploadUrl: string, file: File) {
-    const res = await fetch(uploadUrl, {
-      method: "PUT",
-      body: file,
-    });
-    if (!res.ok) throw new Error("Failed to upload image to S3");
-  }
-
-  static async getMyListings() {
-    const hasAuthHeader = true;
-    const errorMessage = "error fetching user listings";
-    try {
-      const res = await this.fetchAPI(
-        this.ALL_USER_LISTINGS_API,
-        "GET",
-        hasAuthHeader,
-        errorMessage
-      );
-
-      const listings: Listing[] = res.listings?.map((item: Listing) =>
-        ListingAPIService.castToListingObject(item)
-      );
-      return listings;
-    } catch (e) {
-      console.log(e);
+            if (res.ok) {
+                return true;
+            } else {
+                console.log("Failed to upload image to S3");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        return false;
     }
-  }
 }

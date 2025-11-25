@@ -29,7 +29,7 @@ def lambda_handler(event, context):
     listing_id = body.get("listing_id")
 
     if not listing_id:
-        return cors_response(400, {"error": "listing_id is required"})
+        return cors_response(400, {"success": False, "error": "listing_id is required"})
 
     filename = f"{listing_id}.jpg"
 
@@ -45,11 +45,17 @@ def lambda_handler(event, context):
             ExpiresIn=300,
         )
     except ClientError as e:
-        return cors_response(500, {"error": str(e)})
+        return cors_response(500, {"success": False, "error": str(e)})
 
     public_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{filename}"
 
-    return cors_response(200, {"upload_url": url, "public_url": public_url})
+    return cors_response(200, {
+        "success": True,
+        "data": {
+            "upload_url": url, 
+            "public_url": public_url
+        }
+    })
 
 
 def cors_response(status, body_dict):
