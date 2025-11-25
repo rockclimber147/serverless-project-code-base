@@ -14,7 +14,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-3xl font-bold">Welcome Home</h1>
+      <h1 className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-[0_0_10px_#00eaff]">
+        Welcome to
+      </h1>
+      <img src="/banner.png" alt="banner.png" className="w-96 h-96" />
 
       {!idToken ? (
         <div className="flex gap-4">
