@@ -2,12 +2,14 @@ import json
 import boto3
 import os
 from datetime import datetime
+from boto3.dynamodb.conditions import Key
+from helpers import send_email_to_seller
 
 dynamodb = boto3.resource("dynamodb")
 chat_table = dynamodb.Table(os.environ["CHAT_TABLE"])
 
 CORS_HEADERS = {
-    "Access-Control-Allow-Origin": "*",  # replace "*" with your frontend URL in production
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type,Authorization",
     "Access-Control-Allow-Methods": "POST,OPTIONS"
 }
@@ -36,6 +38,16 @@ def lambda_handler(event, context):
 
         # Compute chatId for the user pair (order independent)
         chat_id = "#".join(sorted([user_id, partner_id]))
+
+        # Send email notification if first message between seller and buyer
+        try:
+            response = chat_table.query(
+                KeyConditionExpression=Key("chatId").eq(chat_id)
+            )
+            if response.get("Count", 0) == 0:
+                send_email_to_seller(user_id, message)
+        except Exception as e:
+            print("Email failed:", e)
 
         # Put item into DynamoDB
         item = {
