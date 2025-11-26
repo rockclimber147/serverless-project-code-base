@@ -55,7 +55,7 @@ const MapPage = () => {
     selectedListing,
     setSelectedListing
   ) => {
-    if (selectedListing && selectedListing.name === listing.name) {
+    if (selectedListing && selectedListing.id === listing.id) {
       setSelectedListing(null);
     } else {
       setSelectedListing(listing);
