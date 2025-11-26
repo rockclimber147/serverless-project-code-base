@@ -39,7 +39,7 @@ export default function AdminDashboard() {
 
     // This excludes admin role
     const userCount = useMemo(() => {
-        return users?.body.filter((u) => u.role === "user").length ?? 0;
+        return users.filter(u => u.role === "user").length;
     }, [users]);
 
     if (listingsLoading || usersLoading) {
