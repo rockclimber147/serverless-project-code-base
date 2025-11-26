@@ -40,6 +40,7 @@ const MapPage = () => {
           name: item.item_name,
           price: item.price,
           image: item.image,
+          category: item.category,
           description: item.details || "",
           link: `/item-details/${item.listing_id}`,
           location: [item.longitude, item.latitude],
@@ -62,8 +63,10 @@ const MapPage = () => {
     }
   };
 
-  const filteredListings = listings.filter((listing) =>
-    listing.name?.toLowerCase().includes(search.toLowerCase())
+  const filteredListings = listings.filter(
+    (listing) =>
+      listing.name?.toLowerCase().includes(search.toLowerCase()) ||
+      listing.category?.toLowerCase().includes(search.toLowerCase())
   );
 
   const locations = filteredListings.map((listing) => ({
@@ -90,7 +93,7 @@ const MapPage = () => {
 
       <div
         className={`
-                    absolute z-[998] bg-white shadow-lg p-4 md:pt-20
+                    absolute z-[998] bg-gray-100 shadow-lg p-4 md:pt-20
                     w-full max-h-[80vh] overflow-scroll md:w-[25vw] md:max-h-screen md:h-screen
                     bottom-0 md:bottom-auto md:left-0 md:top-0
                     transition-transform duration-300
