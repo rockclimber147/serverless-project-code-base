@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsTable from "../components/ListingsTable";
 import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
+import Button from "../components/Button";
 
 interface Report {
     reason: string;
@@ -15,49 +16,35 @@ interface Listing {
     user_id: string;
     item_name: string;
     reports: Report[];
+    is_sold: boolean;
+    is_removed: boolean;
 }
 
 export default function ReportedListingActivity() {
-    const [listings, setListings] = useState<Listing[]>([]);
+    const [reportedListings, setReportedListings] = useState<Listing[]>([]);
+    const [deletedListings, setDeletedListings] = useState<Listing[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
-
-    // Convert DynamoDB AttributeValue format
-    function parseDynamo(item: any): Listing {
-        const output: any = {};
-
-        for (const key in item) {
-            const value = item[key];
-
-            if (value?.S !== undefined) output[key] = value.S;
-            else if (value?.N !== undefined) output[key] = Number(value.N);
-            else if (value?.BOOL !== undefined) output[key] = value.BOOL;
-            else if (value?.L !== undefined)
-                output[key] = value.L.map(
-                    (x: any) => x.M && parseDynamo(x.M)
-                ).filter(Boolean);
-            else if (value?.M !== undefined) output[key] = parseDynamo(value.M);
-            else output[key] = value;
-        }
-
-        return output as Listing;
-    }
+    const [viewReported, setViewReported] = useState<boolean>(true);
 
     useEffect(() => {
         async function loadData() {
             try {
-                const res = await fetch(API_ENDPOINTS.reportedListings);
-
+                const res = await fetch(API_ENDPOINTS.reportedAndDeletedListings);
                 if (!res.ok) throw new Error("Failed to fetch listings");
 
                 const data = await res.json();
+                
+                const reported = (data.reported || []).filter(
+                    (l: Listing) => !l.is_sold
+                );
 
-                const normalized =
-                    data[0] && data[0].listing_id?.S
-                        ? data.map((d: any) => parseDynamo(d))
-                        : data;
+                const deleted = (data.deleted || []).filter(
+                    (l: Listing) => !l.is_sold
+                );
 
-                setListings(normalized);
+                setReportedListings(reported);
+                setDeletedListings(deleted);
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -68,67 +55,41 @@ export default function ReportedListingActivity() {
         loadData();
     }, []);
 
+    const activeList = viewReported ? reportedListings : deletedListings;
+    const noDataMsg = viewReported
+        ? "No reported listings to display."
+        : "No deleted listings to display.";
+
     return (
         <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
             <Link to="/dashboard" className="text-blue-600 underline">
-                ← Back to Reported Listings
+                ← Back to Admin Dashboard
             </Link>
+
             <h1 className="text-3xl font-bold mb-6 mt-4">
                 Reported Listing Activity
             </h1>
 
+            <div className="mb-4">
+                <Button color={viewReported ? "neutral" : "lightGrey"} className="mx-1" onClick={() => setViewReported(true)}>
+                    Reported Listings
+                </Button>
+
+                <Button color={!viewReported ? "neutral" : "lightGrey"} onClick={() => setViewReported(false)}>
+                    Deleted Listings
+                </Button>
+            </div>
+
             {loading && (
-                <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-                    <Loading message="Loading reported listings..." size="sm" />
-                    {/* Skeleton loader matching table structure */}
-                    <table className="min-w-full border-collapse">
-                        <thead>
-                            <tr className="bg-gray-100">
-                                <th className="p-3 text-left border">Item</th>
-                                <th className="p-3 text-left border">Seller</th>
-                                <th className="p-3 text-left border">
-                                    Total Reports
-                                </th>
-                                <th className="p-3 text-left border">
-                                    Reported At
-                                </th>
-                                <th className="p-3 text-left border">
-                                    Reported By
-                                </th>
-                                <th className="p-3 text-left border">Reason</th>
-                                <th className="p-3 text-left border">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <tr key={i} className="border-b animate-pulse">
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-32"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-12 mx-auto"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-28"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-24"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-40"></div>
-                                    </td>
-                                    <td className="p-3 border">
-                                        <div className="h-4 bg-gray-200 rounded w-16"></div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <Loading
+                        message={
+                            viewReported
+                                ? "Loading reported listings..."
+                                : "Loading deleted listings..."
+                        }
+                        size="sm"
+                    />
                 </div>
             )}
 
@@ -139,16 +100,14 @@ export default function ReportedListingActivity() {
                 </div>
             )}
 
-            {!loading && !error && listings.length === 0 && (
+            {!loading && !error && activeList.length === 0 && (
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <p className="text-gray-500 text-center py-8">
-                        No reported listings to display.
-                    </p>
+                    <p className="text-gray-500 text-center py-8">{noDataMsg}</p>
                 </div>
             )}
 
-            {!loading && !error && listings.length > 0 && (
-                <ListingsTable listings={listings} />
+            {!loading && !error && activeList.length > 0 && (
+                <ListingsTable listings={activeList} />
             )}
         </div>
     );

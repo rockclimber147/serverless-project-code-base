@@ -5,7 +5,7 @@ import { formatDate } from "../utils/dateUtils";
 import Button from "../components/Button";
 import DeleteModal from "../components/DeleteModal";
 import Loading from "../components/Loading";
-import { useOneListing } from "@/hooks/useOneListing"; // <-- import it
+import { useOneListing } from "@/hooks/useOneListing";
 
 export default function ViewListing() {
     const { listingId } = useParams();
@@ -13,7 +13,7 @@ export default function ViewListing() {
         listing,
         loading,
         error,
-        setListing, // you need this for toggle delete/reactivate
+        setListing,
     } = useOneListing(listingId);
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -37,10 +37,8 @@ export default function ViewListing() {
                 }),
             });
 
-            const data = await res.json();
-            console.log("Delete response:", data);
+            const data = await res.json()
 
-            // Update local state
             setListing((prev) =>
                 prev ? { ...prev, is_removed: !prev.is_removed } : prev
             );
@@ -51,7 +49,6 @@ export default function ViewListing() {
         }
     }
 
-    // --- LOADING UI ---
     if (loading) {
         return (
             <div className="container mx-auto px-4 py-6">
@@ -62,7 +59,6 @@ export default function ViewListing() {
         );
     }
 
-    // --- ERROR UI ---
     if (error) {
         return (
             <div className="container mx-auto px-4 py-6">
@@ -86,7 +82,6 @@ export default function ViewListing() {
         );
     }
 
-    // --- NORMAL RENDER ---
     return (
         <div className="container mx-auto px-4 py-6">
             <Link to="/reported-listings" className="text-blue-600 underline">
