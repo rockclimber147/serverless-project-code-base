@@ -48,19 +48,30 @@ const MarkerClusterLayer = ({ locations, selectedListing, enablePopups }) => {
     clusterGroup.clearLayers();
 
     locations.forEach((loc) => {
-      const icon =
-        selectedListing?.id === loc.id
-          ? new L.Icon({
-              iconUrl:
-                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-              shadowUrl:
-                "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-            })
-          : new L.Icon.Default();
+      let isSelected = selectedListing?.id === loc.id;
+      // const icon =
+      //   selectedListing?.id === loc.id
+      //     ? new L.Icon({
+      //         iconUrl:
+      //           "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+      //         shadowUrl:
+      //           "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      //         iconSize: [25, 41],
+      //         iconAnchor: [12, 41],
+      //       })
+      //     : new L.Icon.Default();
 
-      const marker = L.marker(loc.position, { icon });
+      // const marker = L.marker(loc.position, { icon });
+
+      
+      const marker = L.circleMarker(loc.position, {
+        radius: isSelected ? 10 : 7,
+        fillColor: isSelected ? "#FF4136" : "#3388ff",
+        color: "#ffffff",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.9,
+      });
 
       if (enablePopups && loc.popup) marker.bindPopup(loc.popup);
 
@@ -128,7 +139,7 @@ const Map = ({
       whenCreated={(map) => map.on("click", onMapClick)}
     >
       <TileLayer
-        url="http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+        url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
 
