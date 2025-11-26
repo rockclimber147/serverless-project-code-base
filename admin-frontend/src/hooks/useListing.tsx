@@ -23,10 +23,7 @@ export function useListings() {
         if (!res.ok) throw new Error("Failed to load listings");
 
         const data = await res.json();
-        console.log("API listings response:", data);
-
-        // Most APIs wrap arrays in a "body" field
-        setListings(data.body ?? []);
+        setListings(data.data ?? []);
       } catch (err: any) {
         setError(err.message);
       } finally {

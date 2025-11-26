@@ -24,17 +24,17 @@ export default function AdminDashboard() {
     }, [listings]);
 
     const reportedListingCount = useMemo(() => {
-        return (listings ?? []).reduce((count, l) => {
-            if (
+        return (listings ?? []).filter(
+            (l) =>
                 Array.isArray(l.reports) &&
                 l.reports.length > 0 &&
-                !l.is_removed &&
-                !l.is_sold
-            ) {
-                return count + 1;
-            }
-            return count;
-        }, 0);
+                !l.is_sold &&
+                !l.is_removed
+        ).length;
+    }, [listings]);
+
+    const deletedListingsCount = useMemo(() => {
+        return (listings ?? []).filter((l) => l.is_removed === true).length;
     }, [listings]);
 
     // This excludes admin role
@@ -97,6 +97,12 @@ export default function AdminDashboard() {
                     title="Total Active Listings"
                     data={activeListingsCount}
                     subtitle="Active Listings"
+                />
+                <DataContainer
+                    textColour="text-gray-600"
+                    title="Deleted Listings"
+                    data={deletedListingsCount}
+                    subtitle="Admin Removed Listings"
                 />
                 <DataContainer
                     textColour="text-green-600"
