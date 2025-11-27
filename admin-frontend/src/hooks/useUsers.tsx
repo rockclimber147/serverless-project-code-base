@@ -10,14 +10,8 @@ interface User {
     prefLocation: string;
 }
 
-interface UserBody {
-    statusCode: number;
-    body: User[];
-
-}
-
 export function useUsers() {
-  const [users, setUsers] = useState<UserBody | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +22,11 @@ export function useUsers() {
         if (!res.ok) throw new Error("Failed to load users");
 
         const data = await res.json();
-        setUsers(data);
+        const usersArray: User[] = Array.isArray(data.body)
+          ? data.body
+          : JSON.parse(data.body ?? "[]");
+
+        setUsers(usersArray);
       } catch (err: any) {
         setError(err.message);
       } finally {

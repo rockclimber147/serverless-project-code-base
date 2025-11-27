@@ -23,7 +23,7 @@ export function useListings() {
         if (!res.ok) throw new Error("Failed to load listings");
 
         const data = await res.json();
-        setListings(data);
+        setListings(data.data ?? []);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -36,3 +36,4 @@ export function useListings() {
 
   return { listings, loading, error };
 }
+

@@ -5,7 +5,7 @@ import clsx from "clsx";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   to?: string;
-  color?: "red" | "green" | "neutral";
+  color?: "red" | "green" | "neutral" | "lightGrey";
   variant?: "solid" | "outline" | "subtle";
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -27,6 +27,11 @@ const colors = {
     outline: "border border-gray-600 text-gray-700 hover:bg-gray-700 hover:text-white",
     subtle: "bg-gray-500/10 text-gray-700 hover:bg-gray-500/20",
   },
+  lightGrey: {
+    solid: "bg-gray-400 hover:bg-gray-500 text-white",
+    outline: "border border-gray-600 text-gray-700 hover:bg-gray-700 hover:text-white",
+    subtle: "bg-gray-500/10 text-gray-700 hover:bg-gray-500/20",
+  }
 };
 
 const sizes = {
