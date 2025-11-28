@@ -4,11 +4,13 @@ import { FaStar, FaPen } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo } from "@/services/authApi";
 import { ListingAPIService } from "@/services/listingsApi"
+import { ReviewsCRUDAPIService } from "@/services/reviewsApi"
 import { useLocation } from "react-router-dom";
 
 export default function Profile({ type = "user" }) {
   const navigate = useNavigate();
   const [myListings, setMyListings] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const location = useLocation();
 
   const defaultProfileImage = "https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=1024x1024&w=is&k=20&c=ZVVVbYUtoZgPqbVSDxoltjnrW3G_4DLKYk6QZ0uu5_w=";
@@ -27,6 +29,40 @@ export default function Profile({ type = "user" }) {
     address: "",
   });
   const passedUser = location.state?.user || null;
+  const sellerId = passedUser ? passedUser.id : localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchSellerReviews = async () => {
+      if (type === "seller" && sellerId) {
+        try {
+        const fetchedReviews = await ReviewsCRUDAPIService.getReviews(sellerId);
+        const reviewsWithNames = await Promise.all(
+          fetchedReviews.map(async (r, idx) => {
+            let buyer;
+            try {
+              const fetchedUser = await getUserInfo({ id: r.buyer_id });
+              buyer = `${fetchedUser?.data?.givenName ?? ""} ${fetchedUser?.data?.familyName ?? ""}`.trim();
+            } catch (err) {
+              console.log("Failed to fetch buyer info for review", err);
+            }
+
+            return {
+              id: idx,
+              reviewer: buyer,
+              rating: r.rating,
+              comment: r.default_message
+            };
+          })
+        );
+
+        setReviews(reviewsWithNames);
+      } catch (err) {
+        console.error("Error fetching seller reviews:", err);
+      }
+      }
+    };
+    fetchSellerReviews();
+  }, [type, sellerId]);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -79,22 +115,6 @@ export default function Profile({ type = "user" }) {
     }
   fetchInitialListings();
   }, []);
-
-  // TODO: Replace with live user reviews/ratings
-  const reviews = [
-    {
-      id: 1,
-      reviewer: "Alice",
-      rating: 1.5,
-      comment: "Great experience!",
-    },
-    {
-      id: 2,
-      reviewer: "Bob",
-      rating: 4,
-      comment: "Good service",
-    },
-  ];
 
   const renderStars = (count) => {
     console.log("render called")

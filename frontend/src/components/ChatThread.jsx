@@ -201,7 +201,7 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
                               };
                               const review = {
                                 listing_id: parsed.listing_id,
-                                buyer: user.name,
+                                buyer: currentUserId,
                                 seller: parsed.user_id,
                                 rating: star,
                               }
