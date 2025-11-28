@@ -1,9 +1,16 @@
 import boto3
 import decimal
 from boto3.dynamodb.types import TypeDeserializer
+from enum import Enum
 
 dynamodb = boto3.client("dynamodb")
 deserializer = TypeDeserializer()
+
+class SortBy(Enum):
+    PRICE_DESCENDING = "priceDescending"
+    PRICE_ASCENDING = "priceAscending"
+    DATE_DESCENDING = "dateDescending"
+    DATE_ASCENDING = "dateAscending"
 
 def get_listing_by_id(table_name: str, listing_id: str):
     response = dynamodb.get_item(
@@ -21,11 +28,24 @@ def get_listing_by_id(table_name: str, listing_id: str):
 
     return {"success": True, "data": deserialized_item}
 
-def search_listing(table_name: str, name: str = None):
+def search_listing(table_name: str, name: str = None, sort: SortBy = SortBy.DATE_DESCENDING.value):
     items = _search_table_by_pagination(table_name, name)
+
+    match sort:
+        case SortBy.PRICE_DESCENDING.value:
+            data = _sort_by_descending_price(items)
+        case SortBy.PRICE_ASCENDING.value:
+            data = _sort_by_ascending_price(items)
+        case SortBy.DATE_DESCENDING.value:
+            data = _sort_by_descending_time(items)
+        case SortBy.DATE_ASCENDING.value:
+            data = _sort_by_ascending_time(items)
+        case _:
+            data = _sort_by_descending_time(items)
+
     return {
         "success": True,
-        "data": _sort_by_descending_time(items)
+        "data": data
     }
 
 def get_all_user_listings(table_name: str, user_id: str):
@@ -102,29 +122,42 @@ def get_user_favourited_listings(favourites_table: str, listings_table: str, use
 def _sort_by_descending_time(listings: any):
     return sorted(listings, key=lambda x: int(x["created_at"]), reverse=True)
 
+def _sort_by_ascending_time(listings: any):
+    return sorted(listings, key=lambda x: int(x["created_at"])) 
+
+def _sort_by_descending_price(listings: any):
+    return sorted(listings, key=lambda x: x["price"], reverse=True)
+
+def _sort_by_ascending_price(listings: any):
+    return sorted(listings, key=lambda x: x["price"])
+
 def _search_table_by_pagination(table_name: str, name: str = None):
     items = []
     last_evaluated_key = None
 
+    # Lowercase the search term to match search_name / search_details
+    search_val = name.lower() if name else None
+
     while True:
         scan_kwargs = {"TableName": table_name}
 
-        # Expression attribute containers
         expression_names = {"#sold": "is_sold"}
         expression_values = {":false": {"BOOL": False}}
-        filter_expression = "#sold = :false"  # Only active listings
+        filter_expression = "#sold = :false"   # Only unsold listings
 
-        # Optional name filter
-        if name:
-            expression_names["#n"] = "item_name"
-            expression_values[":val"] = {"S": name}
-            filter_expression += " AND contains(#n, :val)"
+        # Optional case-insensitive substring search
+        if search_val:
+            expression_names["#sn"] = "search_name"
+            expression_names["#sd"] = "search_details"
+
+            expression_values[":val"] = {"S": search_val}
+
+            filter_expression += " AND (contains(#sn, :val) OR contains(#sd, :val))"
 
         scan_kwargs["FilterExpression"] = filter_expression
         scan_kwargs["ExpressionAttributeNames"] = expression_names
         scan_kwargs["ExpressionAttributeValues"] = expression_values
 
-        # Handle pagination
         if last_evaluated_key:
             scan_kwargs["ExclusiveStartKey"] = last_evaluated_key
 
@@ -155,3 +188,44 @@ def _convert_nested(val):
         return {k: _convert_nested(v) for k, v in val.items()}
 
     return val
+    """
+    Scans the entire table and adds search_name and search_details fields
+    based on item_name and details. Safe for large tables (uses pagination).
+    """
+    last_key = None
+    updated_count = 0
+
+    while True:
+        scan_kwargs = {"TableName": table_name}
+
+        if last_key:
+            scan_kwargs["ExclusiveStartKey"] = last_key
+
+        response = dynamodb.scan(**scan_kwargs)
+
+        for item in response.get("Items", []):
+            listing_id = item["listing_id"]["S"]
+
+            item_name = item.get("item_name", {}).get("S", "")
+            details = item.get("details", {}).get("S", "")
+
+            search_name = item_name.lower()
+            search_details = details.lower()
+
+            # Update DynamoDB — adds or overwrites the two fields
+            dynamodb.update_item(
+                TableName=table_name,
+                Key={"listing_id": {"S": listing_id}},
+                UpdateExpression="SET search_name = :sn, search_details = :sd",
+                ExpressionAttributeValues={
+                    ":sn": {"S": search_name},
+                    ":sd": {"S": search_details},
+                }
+            )
+
+            updated_count += 1
+            print(f"Updated {listing_id}: search_name='{search_name}', search_details='{search_details}'")
+
+        last_key = response.get("LastEvaluatedKey")
+        if not last_key:
+            break

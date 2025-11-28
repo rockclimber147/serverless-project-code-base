@@ -2,6 +2,7 @@ import { Listing } from "@/models/listing";
 import { Review } from "@/models/review";
 import { BaseServiceWithAuth } from "./baseAuthApi";
 import { FavouritesAPIService } from "./favouritesApi";
+import { SortBy } from "@/models/SortBy";
 
 export class ListingAPIService extends BaseServiceWithAuth {
     private static readonly SEARCH_API = this.API_BASE + "public/search";
@@ -12,9 +13,11 @@ export class ListingAPIService extends BaseServiceWithAuth {
     private static readonly GET_USER_FAVOURITED_LISTINGS_API =
         this.API_BASE + "user/favouritedListings";
 
-    static async searchListings(query?: string): Promise<Listing[]> {
+    static async searchListings(query?: string, sort?: SortBy): Promise<Listing[]> {
+        sort = sort ?? SortBy.DATE_DESCENDING;
+
         const url = query
-            ? `${this.SEARCH_API}?name=${encodeURIComponent(query)}`
+            ? `${this.SEARCH_API}?name=${encodeURIComponent(query)}&sort=${encodeURIComponent(sort)}`
             : this.SEARCH_API;
         const hasAuthHeader = false;
         const errorMessage = "Error searching listings";

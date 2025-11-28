@@ -3,6 +3,7 @@ import MapGridToggleButton from "@/components/MapGridToggleButton";
 import React from "react";
 import { useState, useEffect } from "react";
 import { ListingAPIService } from "@/services/listingsApi";
+import { SortBy } from "@/models/SortBy";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
@@ -27,7 +28,10 @@ export default function UserDashboardGrid() {
     e.preventDefault();
     setSearchText(inputText);
 
-    const results = await ListingAPIService.searchListings(inputText);
+    // TODO: get sort
+    const sort = SortBy.PRICE_DESCENDING;
+
+    const results = await ListingAPIService.searchListings(inputText, sort);
     console.log(results);
     setListings(results);
   };
