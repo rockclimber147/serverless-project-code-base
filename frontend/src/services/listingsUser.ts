@@ -26,7 +26,7 @@ export class ListingCRUDAPIService extends BaseServiceWithAuth {
 
         try {
             const data = await this.fetchAPI(ListingCRUDAPIService.API, "PATCH", hasAuthHeader, errorMessage, body);
-            return data.success;
+            return true; //data.success;
         } catch (e) {
             console.log(e);
             return false;

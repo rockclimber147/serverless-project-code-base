@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { fetchApiGet, fetchApiPost } from "@/services/authApi"
+import { ListingCRUDAPIService } from "@/services/listingsUser";
 import { useNavigate } from "react-router-dom";
 
 function ChatThread({ messages, setMessages, user, currentUserId, idToken, item }) {
@@ -120,7 +121,7 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
               try {
                 parsed = JSON.parse(msg.message);
               } catch {}
-              
+              console.log("MES:", msg.message);
               // If normal text message
               if (!parsed || !parsed.type) return msg.message;
 
@@ -148,11 +149,81 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
                     {isSeller && (
                       <button
                         className="mt-2 px-3 py-2 bg-red-500 text-white rounded w-full"
-                        onClick={() => alert("Mark item as sold logic here")}
+                        onClick={async () => {
+                          try {
+                            await ListingCRUDAPIService.updateListing(parsed.item.listing_id, { is_sold: true });
+                            console.log("Listing Updated");
+                            const reviewMessage = {
+                              type: "reviewRequest",
+                              listing_id: parsed.item.listing_id,
+                              item_name: parsed.item.item_name,
+                              text: `Please rate your experience for "${parsed.item.item_name}":`,
+                            };
+                            
+                            const messageBody = {
+                              partnerId: user.id,
+                              message: JSON.stringify(reviewMessage),
+                            };
+                            
+                            await fetchApiPost("/user/chat/sendMessage", messageBody, idToken);
+                            await handleRefresh();
+
+                          } catch (err) {
+                            console.error(err);
+                            alert("An error occurred while updating the listing or sending review request.");
+                          }
+                        }}
                       >
                         Mark as Sold
                       </button>
                     )}
+                  </div>
+                );
+              }
+              if (parsed?.type === "reviewRequest") {
+                return (
+                  <div className="rounded-lg p-3 w-64">
+                    <div className="font-semibold mb-2">{parsed.text}</div>
+                    <div className="flex gap-1">
+                      {[1,2,3,4,5].map((star) => (
+                        <button
+                          key={star}
+                          className="text-gray-400 text-xl"
+                          onClick={async () => {
+                            try {
+                              const ratingBody = {
+                                partnerId: msg.senderId,
+                                message: JSON.stringify({
+                                  type: "review",
+                                  listing_id: parsed.listing_id,
+                                  rating: star,
+                                  item_name: parsed.item_name,
+                                })
+                              };
+                              await fetchApiPost("/user/chat/sendMessage", ratingBody, idToken);
+                              console.log("ratingBody:", ratingBody);
+                              await handleRefresh();
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}
+                        >
+                          ☆
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              if (parsed?.type === "review") {
+                console.log(parsed);
+                return (
+                  <div className="rounded-lg p-3 w-48">
+                    <div className="font-semibold">Buyer Rating for "{parsed.item_name}":</div>
+                    <div className="text-yellow-500 text-xl">
+                      {"★".repeat(parsed.rating)}
+                      {"☆".repeat(5 - parsed.rating)}
+                    </div>
                   </div>
                 );
               }
