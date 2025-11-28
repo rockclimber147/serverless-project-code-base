@@ -16,6 +16,7 @@ function Chat() {
   const partnerIdFromNav = location.state?.partnerId;
   const partnerNameFromNav = location.state?.partnerName;
   const partnerAvatarFromNav = location.state?.avatar;
+  const itemFromNav = location.state?.item;
   const defaultAvatar = "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
 
   useEffect(() => {
@@ -114,6 +115,7 @@ function Chat() {
           user={selectedUser}
           currentUserId={currentUserId}
           idToken={idToken}
+          item={itemFromNav}
         />
       ) : (
         <div className="flex-1 flex items-center justify-center">

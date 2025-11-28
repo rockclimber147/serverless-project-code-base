@@ -102,6 +102,7 @@ export default function ItemDetails() {
                     partnerId: user.id,
                     partnerName: `${user.givenName} ${user.familyName}`,
                     avatar: user.profileImage || defaultAvatar,
+                    item: item,
                   },
                 })
               }

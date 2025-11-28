@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { fetchApiGet, fetchApiPost } from "@/services/authApi"
 import { useNavigate } from "react-router-dom";
 
-function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
+function ChatThread({ messages, setMessages, user, currentUserId, idToken, item }) {
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
   const navigate = useNavigate();
@@ -54,6 +54,32 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const sendItemCard = async () => {
+      if (!item || !idToken || !user) return;
+
+      const body = {
+        partnerId: user.id,
+        message: JSON.stringify({
+          type: "itemCard",
+          item: item
+        })
+      };
+
+      try {
+        const response = await fetchApiPost("/user/chat/sendMessage", body, idToken);
+        const data = await response.json();
+        if (data.ok) {
+          await handleRefresh();
+        }
+      } catch (err) {
+        console.error("Send item card failed:", err);
+      }
+    };
+
+    sendItemCard();
+  }, [item, user]);
+
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
       {/* HEADER */}
@@ -89,7 +115,48 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken }) {
                 : "bg-gray-200 text-black mr-auto"
             }`}
           >
-            {msg.message}
+            {(() => {
+              let parsed = null;
+              try {
+                parsed = JSON.parse(msg.message);
+              } catch {}
+              
+              // If normal text message
+              if (!parsed || !parsed.type) return msg.message;
+
+              // ITEM CARD MESSAGE
+              if (parsed.type === "itemCard") {
+                const isSeller = msg.senderId === user.id; // recipient side
+                return (
+                  <div className="border rounded-lg bg-white text-black p-3 shadow-md w-64">
+                    <img
+                      src={parsed?.item?.image}
+                      className="w-full h-32 object-cover rounded"
+                      alt="item"
+                    />
+
+                    <div className="mt-2 font-semibold">{parsed?.item?.item_name}</div>
+                    <div className="text-gray-600">${parsed?.item?.price}</div>
+
+                    <button
+                      className="mt-3 px-3 py-2 bg-blue-500 text-white rounded w-full"
+                      onClick={() => navigate(`/item-details/${parsed?.item?.listing_id}`, { state: { item: item ?? parsed?.item } })}
+                    >
+                      View Item
+                    </button>
+
+                    {isSeller && (
+                      <button
+                        className="mt-2 px-3 py-2 bg-red-500 text-white rounded w-full"
+                        onClick={() => alert("Mark item as sold logic here")}
+                      >
+                        Mark as Sold
+                      </button>
+                    )}
+                  </div>
+                );
+              }
+            })()}
           </div>
         ))}
         <div ref={bottomRef}></div>
