@@ -76,19 +76,27 @@ export default function Profile({ type = "user" }) {
         }
         if (type === "seller") {
           if (passedUser) {
+            const fetchedReviews = await ReviewsCRUDAPIService.getReviews(passedUser.id);
+            const avgRating = fetchedReviews.length
+              ? fetchedReviews.reduce((sum, r) => sum + r.rating, 0) / fetchedReviews.length
+              : 0;
             const name = `${passedUser.givenName ?? ""} ${passedUser.familyName ?? ""}`.trim()
               ? passedUser.givenName : passedUser.name;
             setProfileData({
               photo: passedUser?.profileImage || passedUser?.avatar || defaultProfileImage,
               name: name,
-              rating: passedUser.rating ?? 0,
-              reviews: passedUser.reviews ?? 0,
+              rating: avgRating ?? 0,
+              reviews: fetchedReviews.length ?? 0,
               address: passedUser.prefLocation ?? "",
             });
           }
           return; // STOP — do not run the logged-in user logic
         }
         const fetchedUserInfo = await getUserInfo({ id: userId });
+        const fetchedReviews = await ReviewsCRUDAPIService.getReviews(userId);
+        const avgRating = fetchedReviews.length
+          ? fetchedReviews.reduce((sum, r) => sum + r.rating, 0) / fetchedReviews.length
+          : 0;
         if (fetchedUserInfo) {
           const user = fetchedUserInfo.data;
           setProfileData(prev => ({
@@ -96,6 +104,8 @@ export default function Profile({ type = "user" }) {
             photo: user.profileImage || defaultProfileImage,
             name: `${user.givenName ?? ""} ${user.familyName ?? ""}`.trim(),
             address: user.prefLocation ?? "",
+            rating: avgRating,
+            reviews: fetchedReviews?.length || 0,
           }));
         }
       } catch (err) {
@@ -149,7 +159,7 @@ export default function Profile({ type = "user" }) {
               )}
             </div>
 
-            {type === "user" && (
+            {(
               <div className="flex items-center space-x-2 mt-1">
                 <span>{renderStars(profile.rating)}</span>
                 <span className="text-gray-500">
