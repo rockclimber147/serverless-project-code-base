@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { fetchApiGet, fetchApiPost } from "@/services/authApi"
 import { ListingCRUDAPIService } from "@/services/listingsUser";
+import { ReviewsCRUDAPIService } from "@/services/reviewsApi";
 import { useNavigate } from "react-router-dom";
 
 function ChatThread({ messages, setMessages, user, currentUserId, idToken, item }) {
@@ -121,11 +122,8 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
               try {
                 parsed = JSON.parse(msg.message);
               } catch {}
-              console.log("MES:", msg.message);
-              // If normal text message
               if (!parsed || !parsed.type) return msg.message;
 
-              // ITEM CARD MESSAGE
               if (parsed.type === "itemCard") {
                 const isSeller = msg.senderId === user.id; // recipient side
                 return (
@@ -152,11 +150,11 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
                         onClick={async () => {
                           try {
                             await ListingCRUDAPIService.updateListing(parsed.item.listing_id, { is_sold: true });
-                            console.log("Listing Updated");
                             const reviewMessage = {
                               type: "reviewRequest",
                               listing_id: parsed.item.listing_id,
                               item_name: parsed.item.item_name,
+                              user_id: currentUserId,
                               text: `Please rate your experience for "${parsed.item.item_name}":`,
                             };
                             
@@ -198,10 +196,17 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
                                   listing_id: parsed.listing_id,
                                   rating: star,
                                   item_name: parsed.item_name,
+                                  seller: parsed.user_id,
                                 })
                               };
+                              const review = {
+                                listing_id: parsed.listing_id,
+                                buyer: user.name,
+                                seller: parsed.user_id,
+                                rating: star,
+                              }
+                              await ReviewsCRUDAPIService.addReview(review);
                               await fetchApiPost("/user/chat/sendMessage", ratingBody, idToken);
-                              console.log("ratingBody:", ratingBody);
                               await handleRefresh();
                             } catch (err) {
                               console.error(err);
@@ -216,7 +221,6 @@ function ChatThread({ messages, setMessages, user, currentUserId, idToken, item 
                 );
               }
               if (parsed?.type === "review") {
-                console.log(parsed);
                 return (
                   <div className="rounded-lg p-3 w-48">
                     <div className="font-semibold">Buyer Rating for "{parsed.item_name}":</div>
