@@ -55,7 +55,10 @@ export default function ItemCard(props) {
       </div>
 
       <div className="flex justify-between items-center mb-1 w-full">
-        <h5 className="text-lg">{item.item_name}</h5>
+        <h5 className="text-lg">{item.is_sold && (
+            <span className="text-red-500 font-semibold mr-1">[Sold]</span>
+          )}
+          {item.item_name}</h5>
         <b>${item.price}</b>
       </div>
 
