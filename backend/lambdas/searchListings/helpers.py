@@ -141,9 +141,9 @@ def _search_table_by_pagination(table_name: str, name: str = None):
     while True:
         scan_kwargs = {"TableName": table_name}
 
-        expression_names = {"#sold": "is_sold"}
+        expression_names = {"#sold": "is_sold", "#removed": "is_removed"}
         expression_values = {":false": {"BOOL": False}}
-        filter_expression = "#sold = :false"   # Only unsold listings
+        filter_expression = "#sold = :false AND #removed = :false"
 
         # Optional case-insensitive substring search
         if search_val:
