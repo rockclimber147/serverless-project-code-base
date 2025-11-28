@@ -34,7 +34,7 @@ export default function AdminDashboard() {
     }, [listings]);
 
     const deletedListingsCount = useMemo(() => {
-        return (listings ?? []).filter((l) => l.is_removed === true).length;
+        return (listings ?? []).reduce((count: number, listing) => count + (listing.is_removed === true ? 1 : 0), 0)
     }, [listings]);
 
     // This excludes admin role

@@ -23,7 +23,7 @@ export function useListings() {
         if (!res.ok) throw new Error("Failed to load listings");
 
         const data = await res.json();
-        setListings(data.data ?? []);
+        setListings(data.body.Items ?? []);
       } catch (err: any) {
         setError(err.message);
       } finally {
