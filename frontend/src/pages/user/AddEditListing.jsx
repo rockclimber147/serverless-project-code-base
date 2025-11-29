@@ -94,7 +94,7 @@ export default function AddEditListing() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    let listingId;
+    let listingId = item?.listing_id;
 
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
@@ -111,7 +111,7 @@ export default function AddEditListing() {
     if (!item) {
       listingId = await createListing(listingFormCreateData);
     } else {
-      listingId = await updateListing(listingFormCreateData);
+      await updateListing(listingFormCreateData);
     }
 
     if (imageFile instanceof File) {

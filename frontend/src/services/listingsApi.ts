@@ -69,7 +69,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
         const userId = localStorage.getItem("userId");
 
         try {
-            const data = this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+            const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
             let isFavourite;
             if (userId) {
                 isFavourite = await FavouritesAPIService.getFavourite(id) ?? false;
