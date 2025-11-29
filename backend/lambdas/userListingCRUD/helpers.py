@@ -30,7 +30,9 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         "latitude": {"N": str(data.get("latitude", 0.0))},
         "longitude": {"N": str(data.get("longitude", 0.0))},
         "image": {"S": data.get("image", "")},
-        "created_at": {"N": str(int(time.time()))},        
+        "created_at": {"N": str(int(time.time()))},
+        "search_name": {"S": data["item_name"].lower()},
+        "search_details": {"S": data.get("details", "").lower()}        
     }
     try: 
         dynamodb.put_item(TableName=table_name, Item=item)
@@ -48,41 +50,29 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         }
     }
 
-
 def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict) -> dict:
-    """
-    Updates fields in an existing listing if the user owns it.
-    Only allows updates by the listing's creator (user_id).
-    """
     listing = dynamodb.get_item(TableName=table_name, Key={"listing_id": {"S": listing_id}})
     item = listing.get("Item")
 
     if not item:
-        return {
-            "success": False,
-            "error": "Listing not found"
-        }
+        return {"success": False, "error": "Listing not found"}
 
     if item.get("user_id", {}).get("S") != user_id:
-        return {
-            "success": False,
-            "error": "Forbidden - you do not own this listing"
-        }
+        return {"success": False, "error": "Forbidden - you do not own this listing"}
 
     allowed_fields = ["item_name", "details", "price", "is_sold", "location", "latitude", "longitude", "image"]
     update_fields = {k: v for k, v in updates.items() if k in allowed_fields}
 
     if not update_fields:
-        return {
-            "success": False,
-            "error": "No valid fields to update"
-        }
+        return {"success": False, "error": "No valid fields to update"}
 
     expr = []
     values = {}
+
     for i, (k, v) in enumerate(update_fields.items()):
         key_alias = f":val{i}"
         expr.append(f"{k} = {key_alias}")
+
         if isinstance(v, bool):
             values[key_alias] = {"BOOL": v}
         elif isinstance(v, (int, float)):
@@ -90,17 +80,22 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
         else:
             values[key_alias] = {"S": str(v)}
 
+        if k == "item_name":
+            expr.append("search_name = :search_name")
+            values[":search_name"] = {"S": str(v).lower()}
+
+        if k == "details":
+            expr.append("search_details = :search_details")
+            values[":search_details"] = {"S": str(v).lower()}
+
     dynamodb.update_item(
         TableName=table_name,
         Key={"listing_id": {"S": listing_id}},
         UpdateExpression="SET " + ", ".join(expr),
-        ExpressionAttributeValues=values,
+        ExpressionAttributeValues=values
     )
 
-    return {
-        "success": True,
-        "message": "Listing updated successfully"
-    }
+    return {"success": True, "message": "Listing updated successfully"}
 
 
 def delete_listing(table_name: str, listing_id: str, user_id: str) -> dict:
@@ -128,3 +123,47 @@ def delete_listing(table_name: str, listing_id: str, user_id: str) -> dict:
         "success": True,
         "message": "Listing deleted successfully",
     }
+
+
+def _backfill_search_fields(table_name: str):
+    """
+    Scans the entire table and adds search_name and search_details fields
+    based on item_name and details. Safe for large tables (uses pagination).
+    """
+    last_key = None
+    updated_count = 0
+
+    while True:
+        scan_kwargs = {"TableName": table_name}
+
+        if last_key:
+            scan_kwargs["ExclusiveStartKey"] = last_key
+
+        response = dynamodb.scan(**scan_kwargs)
+
+        for item in response.get("Items", []):
+            listing_id = item["listing_id"]["S"]
+
+            item_name = item.get("item_name", {}).get("S", "")
+            details = item.get("details", {}).get("S", "")
+
+            search_name = item_name.lower()
+            search_details = details.lower()
+
+            # Update DynamoDB — adds or overwrites the two fields
+            dynamodb.update_item(
+                TableName=table_name,
+                Key={"listing_id": {"S": listing_id}},
+                UpdateExpression="SET search_name = :sn, search_details = :sd",
+                ExpressionAttributeValues={
+                    ":sn": {"S": search_name},
+                    ":sd": {"S": search_details},
+                }
+            )
+
+            updated_count += 1
+            print(f"Updated {listing_id}: search_name='{search_name}', search_details='{search_details}'")
+
+        last_key = response.get("LastEvaluatedKey")
+        if not last_key:
+            break
