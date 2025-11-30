@@ -25,7 +25,7 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         "price": {"N": str(data["price"])},
         "is_removed": {"BOOL": False},
         "is_sold": {"BOOL": bool(data.get("is_sold", False))},
-        "details": {"S": data.get("details", "")},
+        "item_details": {"S": data.get("details", "")},
         "location": {"S": data.get("location", "")},
         "latitude": {"N": str(data.get("latitude", 0.0))},
         "longitude": {"N": str(data.get("longitude", 0.0))},
