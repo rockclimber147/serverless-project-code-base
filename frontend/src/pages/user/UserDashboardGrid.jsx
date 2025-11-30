@@ -45,8 +45,11 @@ export default function UserDashboardGrid() {
         </div>
 
         {/* Search Section */}
-        <div className="w-full flex justify-center mb-8">
-          <form onSubmit={handleSearch} className="flex shadow-lg rounded-xl">
+        <div className="relative w-full flex justify-center mb-8">
+          <form
+            onSubmit={handleSearch}
+            className="w-full max-w-3xl rounded-xl overflow-hidden"
+          >
             <input
               type="text"
               value={inputText}
@@ -55,12 +58,20 @@ export default function UserDashboardGrid() {
               className="dashboard-search-input"
               onChange={(e) => setInputText(e.target.value)}
             />
-            <button
-              type="submit"
-              className="dashboard-search-btn"
-            >
+
+            <button type="submit" className="dashboard-search-btn mr-3">
               Search
             </button>
+            <select
+              name="sort"
+              id="sort"
+              className="absolute right-0 top-0 h-full px-2 border border-green-400 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              <option value="asc-price">Price (Ascending)</option>
+              <option value="desc-price">Price (Descending)</option>
+              <option value="asc-date">Date Created (Ascending)</option>
+              <option value="desc-date">Date Created (Descending)</option>
+            </select>
           </form>
         </div>
 
