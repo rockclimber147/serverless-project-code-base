@@ -151,7 +151,7 @@ export default function ItemDetails() {
               {item?.item_details || "No description available."}
             </p>
           </div>
-
+        </div>
         {/* Seller Card */}
         <div className="detail-card p-6">
           {user ? <SellerCard user={user} /> : (
