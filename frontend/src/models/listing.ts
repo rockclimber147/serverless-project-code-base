@@ -3,7 +3,7 @@ export interface Listing {
   user_id: string;
   item_name: string;
   price: number;
-  details?: string;
+  item_details?: string;
   is_sold?: boolean;
   location?: string;
   latitude?: number;
@@ -11,4 +11,5 @@ export interface Listing {
   image?: string;
   created_at: Date;
   is_favourite?: boolean;
+  tags?: [String];
 }

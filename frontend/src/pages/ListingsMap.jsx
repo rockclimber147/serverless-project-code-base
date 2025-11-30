@@ -41,7 +41,7 @@ const MapPage = () => {
           price: item.price,
           image: item.image,
           category: item.category,
-          description: item.details || "",
+          description: item.item_details || "",
           link: `/item-details/${item.listing_id}`,
           location: [item.longitude, item.latitude],
         }));
@@ -129,7 +129,7 @@ const MapPage = () => {
             <button
               className="bg-gray-800 text-white text-sm mt-4 px-3 py-2 rounded hover:bg-gray-600 w-full"
               onClick={() => {
-                navigate(`/item-details/${selectedListing.id}`, { });
+                navigate(`/item-details/${selectedListing.id}`, {});
               }}
               rel="noreferrer"
             >
@@ -140,9 +140,9 @@ const MapPage = () => {
       </div>
 
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 container flex justify-end pointer-events-none z-[9999]">
-          <div className="pointer-events-auto">
-            <MapGridToggleButton />
-          </div>
+        <div className="pointer-events-auto">
+          <MapGridToggleButton />
+        </div>
       </div>
 
       <LeafletMap

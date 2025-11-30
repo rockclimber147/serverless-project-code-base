@@ -32,7 +32,8 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
         "image": {"S": data.get("image", "")},
         "created_at": {"N": str(int(time.time()))},
         "search_name": {"S": data["item_name"].lower()},
-        "search_details": {"S": data.get("details", "").lower()}        
+        "search_details": {"S": data.get("details", "").lower()},
+        "tags": {"L": [{"S": t.lower()} for t in data.get("tags", [])]}       
     }
     try: 
         dynamodb.put_item(TableName=table_name, Item=item)
@@ -60,7 +61,7 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
     if item.get("user_id", {}).get("S") != user_id:
         return {"success": False, "error": "Forbidden - you do not own this listing"}
 
-    allowed_fields = ["item_name", "details", "price", "is_sold", "location", "latitude", "longitude", "image"]
+    allowed_fields = ["item_name", "item_details", "price", "is_sold", "location", "latitude", "longitude", "image", "tags"]
     update_fields = {k: v for k, v in updates.items() if k in allowed_fields}
 
     if not update_fields:
@@ -84,9 +85,12 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
             expr.append("search_name = :search_name")
             values[":search_name"] = {"S": str(v).lower()}
 
-        if k == "details":
+        if k == "item_details":
             expr.append("search_details = :search_details")
             values[":search_details"] = {"S": str(v).lower()}
+
+        elif k == "tags" and isinstance(v, list):
+            values[key_alias] = {"L": [{"S": str(tag)} for tag in v]}
 
     dynamodb.update_item(
         TableName=table_name,
@@ -166,4 +170,49 @@ def _backfill_search_fields(table_name: str):
 
         last_key = response.get("LastEvaluatedKey")
         if not last_key:
+            break
+
+
+def migrate_listings(table_name: str):
+    last_evaluated_key = None
+
+    while True:
+        scan_kwargs = {"TableName": table_name}
+        if last_evaluated_key:
+            scan_kwargs["ExclusiveStartKey"] = last_evaluated_key
+
+        response = dynamodb.scan(**scan_kwargs)
+
+        for item in response.get("Items", []):
+            listing_id = item["listing_id"]["S"]
+
+            update_expr = []
+            expr_attr_names = {}
+            expr_attr_values = {}
+
+            # Add tags if not present
+            if "tags" not in item:
+                update_expr.append("#tags = :tags")
+                expr_attr_names["#tags"] = "tags"
+                expr_attr_values[":tags"] = {"L": []}  # empty list
+
+            # Rename details -> item_details
+            if "details" in item:
+                update_expr.append("#item_details = :details")
+                expr_attr_names["#item_details"] = "item_details"
+                expr_attr_values[":details"] = {"S": item["details"]["S"]}  # extract string
+
+            if update_expr:
+                update_expression = "SET " + ", ".join(update_expr)
+                dynamodb.update_item(
+                    TableName=table_name,
+                    Key={"listing_id": {"S": listing_id}},
+                    UpdateExpression=update_expression,
+                    ExpressionAttributeNames=expr_attr_names,
+                    ExpressionAttributeValues=expr_attr_values
+                )
+                print(f"Updated listing {listing_id}")
+
+        last_evaluated_key = response.get("LastEvaluatedKey")
+        if not last_evaluated_key:
             break
