@@ -40,7 +40,8 @@ const MapPage = () => {
           name: item.item_name,
           price: item.price,
           image: item.image,
-          category: item.category,
+          tags: item.tags,
+          tagsCombined: item.tags.join(" ").toLowerCase(),
           description: item.item_details || "",
           link: `/item-details/${item.listing_id}`,
           location: [item.longitude, item.latitude],
@@ -66,7 +67,7 @@ const MapPage = () => {
   const filteredListings = listings.filter(
     (listing) =>
       listing.name?.toLowerCase().includes(search.toLowerCase()) ||
-      listing.category?.toLowerCase().includes(search.toLowerCase())
+      listing.tagsCombined?.toLowerCase().includes(search.toLowerCase())
   );
 
   const locations = filteredListings.map((listing) => ({
