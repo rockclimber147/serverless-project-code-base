@@ -89,7 +89,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
       user_id: item.user_id,
       item_name: item.item_name,
       price: item.price,
-      item_details: item.details,
+      item_details: item.item_details,
       is_sold: item.is_sold,
       location: item.location,
       latitude: item.latitude,

@@ -125,7 +125,7 @@ export default function ItemDetails() {
           <div>
             <h3 className="text-2xl">Details</h3>
 
-            <p>{item?.details || "No description available."}</p>
+            <p>{item?.item_details || "No description available."}</p>
           </div>
 
           <div>

@@ -18,7 +18,7 @@ export default function AddEditListing() {
   const [title, setTitle] = useState(item?.item_name || "");
   const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
-  const [details, setDetails] = useState(item?.details || "");
+  const [item_details, setItemDetails] = useState(item?.item_details || "");
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
 
@@ -102,7 +102,7 @@ export default function AddEditListing() {
     const listingFormCreateData = {
       item_name: title,
       price: Number(price),
-      details: details,
+      item_details: item_details,
       location: address,
       latitude: coordinates?.latitude,
       longitude: coordinates?.longitude,
@@ -230,10 +230,10 @@ export default function AddEditListing() {
         <div className="flex flex-col gap-2">
           <h3 className="text-2xl">Details</h3>
           <textarea
-            value={details}
+            value={item_details}
             rows={6}
             placeholder="Include a description of the item."
-            onChange={(e) => setDetails(e.target.value)}
+            onChange={(e) => setItemDetails(e.target.value)}
             className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md mb-4"
           ></textarea>
 
