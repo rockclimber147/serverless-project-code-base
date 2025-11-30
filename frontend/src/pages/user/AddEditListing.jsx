@@ -19,6 +19,7 @@ export default function AddEditListing() {
   const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
   const [item_details, setItemDetails] = useState(item?.item_details || "");
+  const [tags, setTags] = useState(item?.tags || "");
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
 
@@ -96,6 +97,8 @@ export default function AddEditListing() {
 
     let listingId = item?.listing_id;
 
+    const tagList = tags.split(",").map((tag) => tag.trim());
+
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
 
@@ -106,7 +109,9 @@ export default function AddEditListing() {
       location: address,
       latitude: coordinates?.latitude,
       longitude: coordinates?.longitude,
+      tags: tagList,
     };
+    console.log(listingFormCreateData);
 
     if (!item) {
       listingId = await createListing(listingFormCreateData);
@@ -125,11 +130,16 @@ export default function AddEditListing() {
       if (!res.upload_url) return;
 
       // Step 2: Upload to S3
-      const uploadSuccess = await ListingCRUDAPIService.uploadToS3(uploadUrl, imageFile);
+      const uploadSuccess = await ListingCRUDAPIService.uploadToS3(
+        uploadUrl,
+        imageFile
+      );
       if (!uploadSuccess) return;
 
       // Step 3: Patch listing with public URL
-      await ListingCRUDAPIService.updateListing(listingId, { image: publicUrl });
+      await ListingCRUDAPIService.updateListing(listingId, {
+        image: publicUrl,
+      });
     } else if (!image) {
       await ListingCRUDAPIService.updateListing(listingId, { image: "" });
     }
@@ -167,7 +177,10 @@ export default function AddEditListing() {
   }, [navigate]);
 
   return (
-    <div className="detail-page flex w-full gap-6 min-h-screen pt-14" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div
+      className="detail-page flex w-full gap-6 min-h-screen pt-14"
+      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+    >
       {/* Image */}
       <div className="flex-[3] overflow-hidden bg-gradient-to-br from-green-50 to-green-100 flex justify-center items-center m-6 mr-0 rounded-2xl border border-green-200">
         {image ? (
@@ -190,17 +203,34 @@ export default function AddEditListing() {
         ) : (
           <div className="text-center p-8">
             <div className="mb-4 text-green-600">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <svg
+                className="w-16 h-16 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <label className="cursor-pointer">
               <span className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:from-green-700 hover:to-green-800 transition-all inline-block">
                 Upload Image
               </span>
-              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
             </label>
-            <p className="text-green-600 mt-3 text-sm">Click to upload a photo of your item</p>
+            <p className="text-green-600 mt-3 text-sm">
+              Click to upload a photo of your item
+            </p>
           </div>
         )}
       </div>
@@ -212,7 +242,9 @@ export default function AddEditListing() {
         {/* Item main info */}
         <div className="flex flex-col gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-green-800 mb-1.5">Title *</label>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">
+              Title *
+            </label>
             <input
               value={title}
               placeholder="Enter item title"
@@ -226,9 +258,13 @@ export default function AddEditListing() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-green-800 mb-1.5">Price *</label>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">
+              Price *
+            </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-medium">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-medium">
+                $
+              </span>
               <input
                 value={price}
                 placeholder="0.00"
@@ -244,7 +280,9 @@ export default function AddEditListing() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-green-800 mb-1.5">Location</label>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">
+              Location
+            </label>
             <input
               value={address}
               placeholder="Enter pickup location"
@@ -256,12 +294,25 @@ export default function AddEditListing() {
 
         {/* Description */}
         <div className="flex flex-col gap-2 flex-1">
-          <label className="block text-sm font-medium text-green-800 mb-1.5">Details</label>
+          <label className="block text-sm font-medium text-green-800 mb-1.5">
+            Details
+          </label>
           <textarea
             value={item_details}
             rows={6}
             placeholder="Describe your item - condition, size, brand, etc."
             onChange={(e) => setItemDetails(e.target.value)}
+            className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
+          ></textarea>
+
+          <label className="block text-sm font-medium text-green-800 mb-1.5">
+            Tags
+          </label>
+          <textarea
+            value={tags}
+            rows={3}
+            placeholder="Add tags separated by comma"
+            onChange={(e) => setTags(e.target.value)}
             className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
           ></textarea>
 
@@ -271,7 +322,7 @@ export default function AddEditListing() {
               type="submit"
               disabled={!title || !price}
             >
-              {item ? 'Save Changes' : 'Create Listing'}
+              {item ? "Save Changes" : "Create Listing"}
             </button>
             <button
               type="button"
