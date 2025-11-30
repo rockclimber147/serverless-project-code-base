@@ -41,14 +41,6 @@ export class ListingAPIService extends BaseServiceWithAuth {
       return [];
     }
   }
-    try {
-      const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
-      return this._castToListingsArray(data);
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
-  }
 
   static async getUserListings(userId: string): Promise<Listing[]> {
     const url = `${this.GET_USER_LISTINGS_API}?user_id=${encodeURIComponent(userId)}`;
@@ -65,7 +57,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
   }
 
   //TODO: update and link to reviews
-  static async getMyReviews() { }
+  static async getMyReviews() {}
 
   static async getFavoriteListings(): Promise<Listing[]> {
     const url = this.GET_USER_FAVOURITED_LISTINGS_API;
