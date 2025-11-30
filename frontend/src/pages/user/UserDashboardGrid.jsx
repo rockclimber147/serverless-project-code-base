@@ -22,7 +22,7 @@ export default function UserDashboardGrid() {
   }, [listings]);
 
   const [inputText, setInputText] = useState("");
-  const [sortValue, setSortValue] = useState(SortBy.PRICE_DESCENDING);
+  const [sortValue, setSortValue] = useState(SortBy.DATE_DESCENDING);
 
   const handleSearch = async (e) => {
     e.preventDefault();
