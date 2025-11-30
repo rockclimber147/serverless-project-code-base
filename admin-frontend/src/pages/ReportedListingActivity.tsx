@@ -3,7 +3,6 @@ import { API_ENDPOINTS } from "../api/endpoints";
 import ListingsTable from "../components/ListingsTable";
 import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
-import Button from "../components/Button";
 
 interface Report {
     reason: string;
@@ -34,7 +33,7 @@ export default function ReportedListingActivity() {
                 if (!res.ok) throw new Error("Failed to fetch listings");
 
                 const data = await res.json();
-                
+
                 const reported = (data.reported || []).filter(
                     (l: Listing) => !l.is_sold
                 );
@@ -61,54 +60,62 @@ export default function ReportedListingActivity() {
         : "No deleted listings to display.";
 
     return (
-        <div className="flex flex-col min-h-screen w-full container mx-auto pt-4 px-4">
-            <Link to="/dashboard" className="text-blue-600 underline">
-                ← Back to Admin Dashboard
-            </Link>
+        <div className="admin-page pt-16">
+            <div className="container mx-auto px-6 py-8">
+                <Link to="/dashboard" className="admin-link inline-flex items-center gap-2 mb-6">
+                    <span>←</span> Back to Admin Dashboard
+                </Link>
 
-            <h1 className="text-3xl font-bold mb-6 mt-4">
-                Reported Listing Activity
-            </h1>
+                <h1 className="admin-title mb-8">
+                    Reported Listing Activity
+                </h1>
 
-            <div className="mb-4">
-                <Button color={viewReported ? "neutral" : "lightGrey"} className="mx-1" onClick={() => setViewReported(true)}>
-                    Reported Listings
-                </Button>
+                <div className="flex gap-3 mb-6">
+                    <button
+                        className={`admin-tab ${viewReported ? 'admin-tab-active' : 'admin-tab-inactive'}`}
+                        onClick={() => setViewReported(true)}
+                    >
+                        Reported Listings
+                    </button>
 
-                <Button color={!viewReported ? "neutral" : "lightGrey"} onClick={() => setViewReported(false)}>
-                    Deleted Listings
-                </Button>
+                    <button
+                        className={`admin-tab ${!viewReported ? 'admin-tab-active' : 'admin-tab-inactive'}`}
+                        onClick={() => setViewReported(false)}
+                    >
+                        Deleted Listings
+                    </button>
+                </div>
+
+                {loading && (
+                    <div className="admin-card p-6">
+                        <Loading
+                            message={
+                                viewReported
+                                    ? "Loading reported listings..."
+                                    : "Loading deleted listings..."
+                            }
+                            size="sm"
+                        />
+                    </div>
+                )}
+
+                {error && (
+                    <div className="admin-error">
+                        <p className="font-semibold">Error loading listings</p>
+                        <p className="text-sm mt-1">{error}</p>
+                    </div>
+                )}
+
+                {!loading && !error && activeList.length === 0 && (
+                    <div className="admin-empty">
+                        <p>{noDataMsg}</p>
+                    </div>
+                )}
+
+                {!loading && !error && activeList.length > 0 && (
+                    <ListingsTable listings={activeList} />
+                )}
             </div>
-
-            {loading && (
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <Loading
-                        message={
-                            viewReported
-                                ? "Loading reported listings..."
-                                : "Loading deleted listings..."
-                        }
-                        size="sm"
-                    />
-                </div>
-            )}
-
-            {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    <p className="font-semibold">Error loading listings</p>
-                    <p className="text-sm mt-1">{error}</p>
-                </div>
-            )}
-
-            {!loading && !error && activeList.length === 0 && (
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <p className="text-gray-500 text-center py-8">{noDataMsg}</p>
-                </div>
-            )}
-
-            {!loading && !error && activeList.length > 0 && (
-                <ListingsTable listings={activeList} />
-            )}
         </div>
     );
 }

@@ -12,10 +12,10 @@ export default function DataContainer({
   textColour
 }: DataContainerProps) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-2">{title}</h2>
-      <p className={`text-3xl font-bold ${textColour}`}>{data}</p>
-      <p className="text-gray-500 text-sm mt-2">{subtitle}</p>
+    <div className="admin-card p-6">
+      <h2 className="admin-card-title mb-3">{title}</h2>
+      <p className={`admin-card-value ${textColour}`}>{data}</p>
+      <p className="admin-card-subtitle mt-2">{subtitle}</p>
     </div>
   );
 }
