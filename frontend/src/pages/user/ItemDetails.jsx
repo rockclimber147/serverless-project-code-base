@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 import { ListingAPIService } from "@/services/listingsApi";
 import { getUserInfo } from "@/services/authApi";
+import Chip from "@mui/material/Chip";
 
 export default function ItemDetails() {
   const location = useLocation();
@@ -159,12 +160,16 @@ export default function ItemDetails() {
           </div>
 
           {/* Description */}
-          <div>
+          <div className="mb-10">
             <h3 className="detail-section-title">Details</h3>
             <p className="text-gray-700 leading-relaxed">
               {item?.item_details || "No description available."}
             </p>
           </div>
+
+          {item.tags.map((tag, index) => (
+            <Chip key={index} label={tag} className="mr-2"></Chip>
+          ))}
         </div>
         {/* Seller Card */}
         <div className="detail-card p-6">
