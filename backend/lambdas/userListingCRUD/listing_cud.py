@@ -1,7 +1,7 @@
 import os
 import json
 import boto3
-from helpers import create_listing, update_listing, delete_listing
+from helpers import create_listing, update_listing, delete_listing, migrate_listings
 
 LISTINGS_TABLE = os.environ.get("LISTINGS_TABLE")
 REGION = os.environ.get("AWS_REGION", "us-west-2")
@@ -16,6 +16,11 @@ CORS_HEADERS = {
 
 
 def lambda_handler(event, context):
+
+    if event.get("action") == "migrate":
+        result = migrate_listings(LISTINGS_TABLE)
+        return cors_response(200, {"success": True, "result": result})
+
     method = event.get("httpMethod")
     claims = event.get("requestContext", {}).get("authorizer", {}).get("claims", {})
     user_id = claims.get("sub")

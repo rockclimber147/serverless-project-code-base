@@ -41,6 +41,14 @@ export class ListingAPIService extends BaseServiceWithAuth {
       return [];
     }
   }
+    try {
+      const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
+      return this._castToListingsArray(data);
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }
 
   static async getUserListings(userId: string): Promise<Listing[]> {
     const url = `${this.GET_USER_LISTINGS_API}?user_id=${encodeURIComponent(userId)}`;
@@ -57,7 +65,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
   }
 
   //TODO: update and link to reviews
-  static async getMyReviews() {}
+  static async getMyReviews() { }
 
   static async getFavoriteListings(): Promise<Listing[]> {
     const url = this.GET_USER_FAVOURITED_LISTINGS_API;
@@ -97,7 +105,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
       user_id: item.user_id,
       item_name: item.item_name,
       price: item.price,
-      details: item.details,
+      item_details: item.item_details,
       is_sold: item.is_sold,
       location: item.location,
       latitude: item.latitude,
@@ -107,6 +115,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
         : "https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=1024x1024&w=is&k=20&c=qToocb5EafYO6QXp9aI01a72r5jcQccjgxbs_6Ae8eQ=",
       created_at: new Date(item.created_at * 1000),
       is_favourite: item.is_favourite ?? is_favourite,
+      tags: item.tags,
     } as Listing;
   }
 

@@ -148,11 +148,10 @@ export default function ItemDetails() {
           <div>
             <h3 className="detail-section-title">Details</h3>
             <p className="text-gray-700 leading-relaxed">
-              {item?.details || "No description available."}
+              {item?.item_details || "No description available."}
             </p>
           </div>
         </div>
-
         {/* Seller Card */}
         <div className="detail-card p-6">
           {user ? <SellerCard user={user} /> : (
