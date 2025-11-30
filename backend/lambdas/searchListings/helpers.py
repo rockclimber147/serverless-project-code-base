@@ -146,23 +146,12 @@ def _search_table_by_pagination(table_name: str, name: str = None, tags: list[st
         expression_values = {":false": {"BOOL": False}}
         filter_expression = "#sold = :false AND #removed = :false"
 
-        # Name/details search
+        # Name/details search (still done in DynamoDB)
         if search_val:
             expression_names["#sn"] = "search_name"
             expression_names["#sd"] = "search_details"
             expression_values[":val"] = {"S": search_val}
             filter_expression += " AND (contains(#sn, :val) OR contains(#sd, :val))"
-
-        # Tag search (AND logic)
-        if tag_vals:
-            expression_names["#tags"] = "tags"
-            for i, t in enumerate(tag_vals):
-                key = f":tag{i}"
-                expression_values[key] = {"S": t.lower()}
-                # Only filter items that have tags
-                filter_expression += f" AND attribute_exists(#tags) AND contains(#tags, {key})"
-
-
 
         scan_kwargs["FilterExpression"] = filter_expression
         scan_kwargs["ExpressionAttributeNames"] = expression_names
@@ -175,6 +164,12 @@ def _search_table_by_pagination(table_name: str, name: str = None, tags: list[st
 
         for raw_item in response.get("Items", []):
             item = {k: _deserialize_value(v) for k, v in raw_item.items()}
+
+            if tag_vals:
+                item_tags = [t.lower() for t in item.get("tags", [])]
+                if not all(tag in item_tags for tag in tag_vals):
+                    continue  # skip items that don't have all tags
+
             items.append(item)
 
         last_evaluated_key = response.get("LastEvaluatedKey")
