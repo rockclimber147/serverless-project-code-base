@@ -60,17 +60,17 @@ export default function UserDashboardGrid() {
         </div>
 
         {/* Search Section */}
-        <div className="relative w-full flex justify-center mb-8">
+        <div className="relative w-full flex mb-8 ">
           <form
             onSubmit={handleSearch}
-            className="w-full max-w-3xl rounded-xl overflow-hidden"
+            className="w-full  rounded-xl overflow-hidden flex "
           >
             <input
               type="text"
               value={inputText}
               name="query"
               placeholder="Search for items..."
-              className="dashboard-search-input"
+              className="dashboard-search-input flex-1 "
               onChange={(e) => setInputText(e.target.value)}
             />
 
@@ -82,7 +82,7 @@ export default function UserDashboardGrid() {
               id="sort"
               value={sortValue}
               onChange={(e) => setSortValue(e.target.value)}
-              className="absolute right-0 top-0 h-full px-2 border border-green-400 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="p-3 border-2 border-green-200 rounded-xl focus:outline-none w-1/4"
             >
               <option value={SortBy.PRICE_DESCENDING}>
                 Price (Descending)

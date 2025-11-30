@@ -152,7 +152,6 @@
   border: 2px solid var(--green-200);
   border-radius: 0.75rem 0 0 0.75rem;
   font-size: 1rem;
-  width: 35rem;
   transition: all 0.2s ease;
   background: white;
 }
