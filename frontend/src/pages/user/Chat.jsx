@@ -65,7 +65,7 @@ function Chat() {
         }
 
         const data = await response.json();
-  
+
         const partnerUsers = Array.isArray(data)
           ? await Promise.all(
             data.map(async (partnerId) => {
@@ -100,7 +100,7 @@ function Chat() {
   }, [idToken, currentUserId]);
 
   return (
-    <div className="flex h-[calc(100vh-3rem)]">
+    <div className="flex h-screen pt-14">
       <ChatSideBar
         users={users}
         selectedUser={selectedUser}
@@ -118,8 +118,11 @@ function Chat() {
           item={itemFromNav}
         />
       ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <p>Loading chat...</p>
+        <div className="flex-1 flex items-center justify-center bg-green-50" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+          <div className="text-center">
+            <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-green-700 font-medium">Loading chat...</p>
+          </div>
         </div>
       )}
     </div>

@@ -13,15 +13,18 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="flex items-center justify-between bg-gray-800 p-2 text-white fixed top-0 left-0 w-full z-50">
-            <div className="text-xl font-bold">
-                <Link to="/dashboard">Admin CrockList</Link>
+        <nav className="navbar-themed flex items-center justify-between px-6 py-3 fixed top-0 left-0 w-full z-50">
+            <div className="text-xl font-bold tracking-tight">
+                <Link to="/dashboard" className="flex items-center gap-2">
+                    <span className="text-green-300">Admin</span>
+                    <span className="text-white">CrockList</span>
+                </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
                 <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 hover:text-gray-300 transition"
+                    className="nav-btn-logout flex items-center gap-2"
                 >
                     <FaSignOutAlt className="text-lg" />
                     <span>Logout</span>
