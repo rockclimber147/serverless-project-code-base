@@ -21,6 +21,7 @@ export default function ItemDetails() {
   const [user, setUser] = useState(null);
   const currentUserId = localStorage.getItem("userId");
   const isOwnListing = currentUserId && item && currentUserId === item.user_id;
+  console.log(item);
 
   const defaultAvatar =
     "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
@@ -167,7 +168,7 @@ export default function ItemDetails() {
             </p>
           </div>
 
-          {item.tags.map((tag, index) => (
+          {item?.tags?.map((tag, index) => (
             <Chip key={index} label={tag} className="m-1"></Chip>
           ))}
         </div>

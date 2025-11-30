@@ -97,7 +97,10 @@ export default function AddEditListing() {
 
     let listingId = item?.listing_id;
 
-    const tagList = tags.split(",").map((tag) => tag.trim());
+    const tagList = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== "");
 
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
