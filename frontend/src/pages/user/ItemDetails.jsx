@@ -168,7 +168,7 @@ export default function ItemDetails() {
           </div>
 
           {item.tags.map((tag, index) => (
-            <Chip key={index} label={tag} className="mr-2"></Chip>
+            <Chip key={index} label={tag} className="m-1"></Chip>
           ))}
         </div>
         {/* Seller Card */}
