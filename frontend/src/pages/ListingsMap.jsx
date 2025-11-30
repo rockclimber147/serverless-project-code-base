@@ -40,8 +40,9 @@ const MapPage = () => {
           name: item.item_name,
           price: item.price,
           image: item.image,
-          category: item.category,
-          description: item.details || "",
+          tags: item.tags,
+          tagsCombined: item.tags.join(" ").toLowerCase(),
+          description: item.item_details || "",
           link: `/item-details/${item.listing_id}`,
           location: [item.longitude, item.latitude],
         }));
@@ -66,7 +67,7 @@ const MapPage = () => {
   const filteredListings = listings.filter(
     (listing) =>
       listing.name?.toLowerCase().includes(search.toLowerCase()) ||
-      listing.category?.toLowerCase().includes(search.toLowerCase())
+      listing.tagsCombined?.toLowerCase().includes(search.toLowerCase())
   );
 
   const locations = filteredListings.map((listing) => ({
@@ -131,7 +132,7 @@ const MapPage = () => {
             <button
               className="bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold mt-4 px-4 py-3 rounded-xl hover:from-green-700 hover:to-green-800 w-full shadow-md transition-all hover:shadow-lg"
               onClick={() => {
-                navigate(`/item-details/${selectedListing.id}`, { });
+                navigate(`/item-details/${selectedListing.id}`, {});
               }}
               rel="noreferrer"
             >
@@ -142,9 +143,9 @@ const MapPage = () => {
       </div>
 
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 container flex justify-end pointer-events-none z-[9999]">
-          <div className="pointer-events-auto">
-            <MapGridToggleButton />
-          </div>
+        <div className="pointer-events-auto">
+          <MapGridToggleButton />
+        </div>
       </div>
 
       <LeafletMap
