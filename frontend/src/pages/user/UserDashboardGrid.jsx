@@ -7,11 +7,10 @@ import { SortBy } from "@/models/SortBy";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
-  const [searchText, setSearchText] = useState([]);
 
   useEffect(() => {
     async function fetchInitialListings() {
-      const data = await ListingAPIService.searchListings();
+      const data = await ListingAPIService.searchListings(null, sortValue);
       console.log(data);
       setListings(data);
     }
@@ -23,18 +22,34 @@ export default function UserDashboardGrid() {
   }, [listings]);
 
   const [inputText, setInputText] = useState("");
+  const [sortValue, setSortValue] = useState(SortBy.PRICE_DESCENDING);
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    setSearchText(inputText);
 
-    // TODO: get sort
-    const sort = SortBy.PRICE_DESCENDING;
+    const results = await ListingAPIService.searchListings(
+      inputText,
+      sortValue
+    );
 
-    const results = await ListingAPIService.searchListings(inputText, sort);
-    console.log(results);
     setListings(results);
   };
+
+  useEffect(() => {
+    const updateListingsWithSort = async () => {
+      try {
+        const results = await ListingAPIService.searchListings(
+          inputText,
+          sortValue
+        );
+        setListings(results);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      }
+    };
+
+    updateListingsWithSort();
+  }, [sortValue]);
 
   return (
     <div className="dashboard-page flex flex-col min-h-screen w-full pt-16">
@@ -65,12 +80,20 @@ export default function UserDashboardGrid() {
             <select
               name="sort"
               id="sort"
+              value={sortValue}
+              onChange={(e) => setSortValue(e.target.value)}
               className="absolute right-0 top-0 h-full px-2 border border-green-400 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
             >
-              <option value="asc-price">Price (Ascending)</option>
-              <option value="desc-price">Price (Descending)</option>
-              <option value="asc-date">Date Created (Ascending)</option>
-              <option value="desc-date">Date Created (Descending)</option>
+              <option value={SortBy.PRICE_DESCENDING}>
+                Price (Descending)
+              </option>
+              <option value={SortBy.PRICE_ASCENDING}>Price (Ascending)</option>
+              <option value={SortBy.DATE_ASCENDING}>
+                Date Created (Ascending)
+              </option>
+              <option value={SortBy.DATE_DESCENDING}>
+                Date Created (Descending)
+              </option>
             </select>
           </form>
         </div>
