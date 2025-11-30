@@ -101,7 +101,15 @@ export default function ViewListing() {
                     <strong>Total Reports:</strong> {listing.reports.length}
                 </p>
 
-                <Button color="neutral">View Listing</Button>
+                <Button
+                    color="neutral"
+                    onClick={() => {
+                        const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+                        window.open(`${frontendUrl}/item-details/${listing.listing_id}`, '_blank');
+                    }}
+                >
+                    View Listing
+                </Button>
 
                 <Button
                     color={deleteButtonColor}
