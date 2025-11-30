@@ -125,7 +125,7 @@ export default function ViewListing() {
                             className="detail-btn-secondary"
                             onClick={() => {
                                 const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
-                                window.open(`${frontendUrl}/item-details/${listing.listing_id}`, '_blank');
+                                window.open(`${frontendUrl}item-details/${listing.listing_id}`, '_blank');
                             }}
                         >
                             View Listing
