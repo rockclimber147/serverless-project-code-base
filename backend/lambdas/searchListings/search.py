@@ -18,11 +18,12 @@ def lambda_handler(event, context):
     query_params = event.get("queryStringParameters") or {}
 
     name = query_params.get("name")
+    tags = query_params.get("tags", [])
     sort = query_params.get("sort") 
 
     # add filters later
 
-    response = search_listing(LISTINGS_TABLE, name, sort)
+    response = search_listing(LISTINGS_TABLE, name, sort, tags)
     status = 200
     
     return cors_response(status, response)

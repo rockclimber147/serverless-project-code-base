@@ -1,3 +1,4 @@
+from typing import List
 import boto3
 import decimal
 from boto3.dynamodb.types import TypeDeserializer
@@ -28,8 +29,8 @@ def get_listing_by_id(table_name: str, listing_id: str):
 
     return {"success": True, "data": deserialized_item}
 
-def search_listing(table_name: str, name: str = None, sort: SortBy = SortBy.DATE_DESCENDING.value):
-    items = _search_table_by_pagination(table_name, name)
+def search_listing(table_name: str, name: str = None, tags: List[str] = None, sort: SortBy = SortBy.DATE_DESCENDING.value):
+    items = _search_table_by_pagination(table_name, name, tags)
 
     match sort:
         case SortBy.PRICE_DESCENDING.value:
@@ -131,12 +132,12 @@ def _sort_by_descending_price(listings: any):
 def _sort_by_ascending_price(listings: any):
     return sorted(listings, key=lambda x: x["price"])
 
-def _search_table_by_pagination(table_name: str, name: str = None):
+def _search_table_by_pagination(table_name: str, name: str = None, tags: list[str] = None):
     items = []
     last_evaluated_key = None
 
-    # Lowercase the search term to match search_name / search_details
     search_val = name.lower() if name else None
+    tag_vals = [t.lower() for t in tags] if tags else []
 
     while True:
         scan_kwargs = {"TableName": table_name}
@@ -145,14 +146,23 @@ def _search_table_by_pagination(table_name: str, name: str = None):
         expression_values = {":false": {"BOOL": False}}
         filter_expression = "#sold = :false AND #removed = :false"
 
-        # Optional case-insensitive substring search
+        # Name/details search
         if search_val:
             expression_names["#sn"] = "search_name"
             expression_names["#sd"] = "search_details"
-
             expression_values[":val"] = {"S": search_val}
-
             filter_expression += " AND (contains(#sn, :val) OR contains(#sd, :val))"
+
+        # Tag search (AND logic)
+        if tag_vals:
+            expression_names["#tags"] = "tags"
+            for i, t in enumerate(tag_vals):
+                key = f":tag{i}"
+                expression_values[key] = {"S": t.lower()}
+                # Only filter items that have tags
+                filter_expression += f" AND attribute_exists(#tags) AND contains(#tags, {key})"
+
+
 
         scan_kwargs["FilterExpression"] = filter_expression
         scan_kwargs["ExpressionAttributeNames"] = expression_names
