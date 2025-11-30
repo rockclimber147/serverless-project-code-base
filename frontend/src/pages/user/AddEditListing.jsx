@@ -111,7 +111,6 @@ export default function AddEditListing() {
       longitude: coordinates?.longitude,
       tags: tagList,
     };
-    console.log(listingFormCreateData);
 
     if (!item) {
       listingId = await createListing(listingFormCreateData);
