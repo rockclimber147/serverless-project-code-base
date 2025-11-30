@@ -7,11 +7,10 @@ import { SortBy } from "@/models/SortBy";
 
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
-  const [searchText, setSearchText] = useState([]);
 
   useEffect(() => {
     async function fetchInitialListings() {
-      const data = await ListingAPIService.searchListings();
+      const data = await ListingAPIService.searchListings(null, sortValue);
       console.log(data);
       setListings(data);
     }
@@ -23,18 +22,34 @@ export default function UserDashboardGrid() {
   }, [listings]);
 
   const [inputText, setInputText] = useState("");
+  const [sortValue, setSortValue] = useState(SortBy.DATE_DESCENDING);
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    setSearchText(inputText);
 
-    // TODO: get sort
-    const sort = SortBy.PRICE_DESCENDING;
+    const results = await ListingAPIService.searchListings(
+      inputText,
+      sortValue
+    );
 
-    const results = await ListingAPIService.searchListings(inputText, sort);
-    console.log(results);
     setListings(results);
   };
+
+  useEffect(() => {
+    const updateListingsWithSort = async () => {
+      try {
+        const results = await ListingAPIService.searchListings(
+          inputText,
+          sortValue
+        );
+        setListings(results);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      }
+    };
+
+    updateListingsWithSort();
+  }, [sortValue]);
 
   return (
     <div className="dashboard-page flex flex-col min-h-screen w-full pt-16">
@@ -45,22 +60,41 @@ export default function UserDashboardGrid() {
         </div>
 
         {/* Search Section */}
-        <div className="w-full flex justify-center mb-8">
-          <form onSubmit={handleSearch} className="flex shadow-lg rounded-xl">
+        <div className="relative w-full flex mb-8 ">
+          <form
+            onSubmit={handleSearch}
+            className="w-full  rounded-xl overflow-hidden flex "
+          >
             <input
               type="text"
               value={inputText}
               name="query"
               placeholder="Search for items..."
-              className="dashboard-search-input"
+              className="dashboard-search-input flex-1 "
               onChange={(e) => setInputText(e.target.value)}
             />
-            <button
-              type="submit"
-              className="dashboard-search-btn"
-            >
+
+            <button type="submit" className="dashboard-search-btn mr-3">
               Search
             </button>
+            <select
+              name="sort"
+              id="sort"
+              value={sortValue}
+              onChange={(e) => setSortValue(e.target.value)}
+              className="p-3 border-2 border-green-200 rounded-xl focus:outline-none w-1/4"
+            >
+              <option value={SortBy.PRICE_DESCENDING}>
+                Price (Descending)
+              </option>
+              <option value={SortBy.PRICE_ASCENDING}>Price (Ascending)</option>
+              <option value={SortBy.DATE_ASCENDING}>
+                Date Created (Ascending)
+              </option>
+              <option value={SortBy.DATE_DESCENDING}>
+                Date Created (Descending)
+              </option>
+            </select>
           </form>
         </div>
 

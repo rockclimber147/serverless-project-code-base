@@ -18,10 +18,18 @@ export class ListingAPIService extends BaseServiceWithAuth {
     sort?: SortBy
   ): Promise<Listing[]> {
     sort = sort ?? SortBy.DATE_DESCENDING;
-
-    const url = query
-      ? `${this.SEARCH_API}?name=${encodeURIComponent(query)}&sort=${encodeURIComponent(sort)}`
-      : this.SEARCH_API;
+    console.log("here", sort);
+    let url = this.SEARCH_API;
+    let params = [];
+    if (query) {
+      params.push(`name=${encodeURIComponent(query)}`);
+    }
+    if (sort) {
+      params.push(`sort=${encodeURIComponent(sort)}`);
+    }
+    if (params.length > 0) {
+      url += "?" + params.join("&");
+    }
     const hasAuthHeader = false;
     const errorMessage = "Error searching listings";
 
@@ -49,7 +57,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
   }
 
   //TODO: update and link to reviews
-  static async getMyReviews() { }
+  static async getMyReviews() {}
 
   static async getFavoriteListings(): Promise<Listing[]> {
     const url = this.GET_USER_FAVOURITED_LISTINGS_API;
