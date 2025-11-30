@@ -39,17 +39,17 @@ export default function ListingsTable({ listings }: ListingsTableProps) {
     }, [listings]);
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
-            <table className="min-w-full border-collapse">
+        <div className="admin-card p-6 overflow-x-auto">
+            <table className="admin-table min-w-full">
                 <thead>
-                    <tr className="bg-gray-100">
-                        <th className="p-3 text-left border">Item</th>
-                        <th className="p-3 text-left border">Seller</th>
-                        <th className="p-3 text-left border">Total Reports</th>
-                        <th className="p-3 text-left border">Reported At</th>
-                        <th className="p-3 text-left border">Reported By</th>
-                        <th className="p-3 text-left border">Reason</th>
-                        <th className="p-3 text-left border">Actions</th>
+                    <tr>
+                        <th>Item</th>
+                        <th>Seller</th>
+                        <th>Total Reports</th>
+                        <th>Reported At</th>
+                        <th>Reported By</th>
+                        <th>Reason</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

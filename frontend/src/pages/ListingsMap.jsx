@@ -78,34 +78,36 @@ const MapPage = () => {
   }));
 
   return (
-    <div className="w-screen h-[calc(100vh-2.75rem)] relative flex overflow-hidden">
+    <div className="fixed top-14 left-0 right-0 bottom-0 flex overflow-hidden">
       <div className="absolute z-[999] md:w-[25vw] pe-8 w-[60%] pointer-events-none">
         <div className="p-[1.25rem]">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search listings..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pointer-events-auto px-4 py-2 w-full md:w-full rounded-lg shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="pointer-events-auto px-4 py-3 w-full md:w-full rounded-xl shadow-lg border-2 border-green-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
+            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
           />
         </div>
       </div>
 
       <div
         className={`
-                    absolute z-[998] bg-gray-100 shadow-lg p-4 md:pt-20
-                    w-full max-h-[80vh] overflow-scroll md:w-[25vw] md:max-h-screen md:h-screen
-                    bottom-0 md:bottom-auto md:left-0 md:top-0
-                    transition-transform duration-300
+                    absolute z-[998] bg-white shadow-xl p-5 pt-20 md:pt-20
+                    w-full max-h-[80vh] overflow-scroll md:w-[25vw] md:max-h-full md:h-full
+                    bottom-0 md:bottom-0 md:left-0 md:top-0
+                    transition-transform duration-300 border-r border-green-100
                     ${
                       selectedListing
                         ? "translate-y-0 md:translate-x-0"
                         : "translate-y-full md:translate-y-0 md:-translate-x-full"
                     }
                 `}
+        style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
       >
         <button
-          className="absolute h-12 text-xl top-4 right-5 text-gray-500 hover:text-gray-800"
+          className="absolute h-10 w-10 flex items-center justify-center text-lg top-20 md:top-20 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           onClick={() => setSelectedListing(null)}
           aria-label="Close"
         >
@@ -114,20 +116,20 @@ const MapPage = () => {
 
         {selectedListing && (
           <>
-            <h2 className="font-bold text-lg">{selectedListing.name}</h2>
-            <p className="text-green-600 font-semibold">
+            <h2 className="font-bold text-xl text-green-900">{selectedListing.name}</h2>
+            <p className="text-green-600 font-semibold text-lg mt-1">
               ${selectedListing.price}
             </p>
             {selectedListing.image && (
               <img
-                className="py-2"
+                className="py-3 rounded-lg"
                 src={selectedListing.image}
                 alt="Product image"
               />
             )}
-            <p className="py-2">{selectedListing.description}</p>
+            <p className="py-2 text-gray-600">{selectedListing.description}</p>
             <button
-              className="bg-gray-800 text-white text-sm mt-4 px-3 py-2 rounded hover:bg-gray-600 w-full"
+              className="bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold mt-4 px-4 py-3 rounded-xl hover:from-green-700 hover:to-green-800 w-full shadow-md transition-all hover:shadow-lg"
               onClick={() => {
                 navigate(`/item-details/${selectedListing.id}`, {});
               }}

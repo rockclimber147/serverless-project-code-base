@@ -51,9 +51,11 @@ export default function ViewListing() {
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4 py-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <Loading message="Loading listing details..." />
+            <div className="detail-page pt-16">
+                <div className="container mx-auto px-6 py-8">
+                    <div className="detail-card p-8">
+                        <Loading message="Loading listing details..." />
+                    </div>
                 </div>
             </div>
         );
@@ -61,10 +63,12 @@ export default function ViewListing() {
 
     if (error) {
         return (
-            <div className="container mx-auto px-4 py-6">
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    <p className="font-semibold">Error loading listing</p>
-                    <p className="text-sm mt-1">{error}</p>
+            <div className="detail-page pt-16">
+                <div className="container mx-auto px-6 py-8">
+                    <div className="detail-card p-6 border-l-4 border-l-red-500">
+                        <p className="font-semibold text-red-700">Error loading listing</p>
+                        <p className="text-sm mt-2 text-gray-600">{error}</p>
+                    </div>
                 </div>
             </div>
         );
@@ -72,115 +76,133 @@ export default function ViewListing() {
 
     if (!listing) {
         return (
-            <div className="container mx-auto px-4 py-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                    <p className="text-gray-500 text-center py-8">
-                        No listing found.
-                    </p>
+            <div className="detail-page pt-16">
+                <div className="container mx-auto px-6 py-8">
+                    <div className="detail-card p-8">
+                        <p className="text-gray-500 text-center py-8">
+                            No listing found.
+                        </p>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-6">
-            <Link to="/reported-listings" className="text-blue-600 underline">
-                ← Back to Reported Listings
-            </Link>
+        <div className="detail-page pt-16">
+            <div className="container mx-auto px-6 py-8">
+                {/* Back Link */}
+                <Link to="/reported-listings" className="detail-link inline-flex items-center gap-2 mb-6">
+                    <span>←</span> Back to Reported Listings
+                </Link>
 
-            <h1 className="text-3xl font-bold mt-4">Listing Details</h1>
+                {/* Page Title */}
+                <h1 className="detail-title text-4xl mb-6">Listing Details</h1>
 
-            <div className="bg-white p-6 rounded-lg shadow-md mt-4">
-                <p>
-                    <strong>Item:</strong> {listing.item_name}
-                </p>
-                <p>
-                    <strong>Seller User ID:</strong> {listing.user_id}
-                </p>
-                <p>
-                    <strong>Total Reports:</strong> {listing.reports.length}
-                </p>
+                {/* Listing Info Card */}
+                <div className="detail-card p-8 mb-8">
+                    <div className="grid gap-4 mb-6">
+                        <div className="flex items-baseline gap-3">
+                            <span className="detail-label">Item:</span>
+                            <span className="detail-value text-lg">{listing.item_name}</span>
+                        </div>
+                        <div className="flex items-baseline gap-3">
+                            <span className="detail-label">Seller User ID:</span>
+                            <span className="detail-value font-mono text-sm bg-green-50 px-2 py-1 rounded">{listing.user_id}</span>
+                        </div>
+                        <div className="flex items-baseline gap-3">
+                            <span className="detail-label">Total Reports:</span>
+                            <span className="detail-value">
+                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 font-semibold">
+                                    {listing.reports.length}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
 
-                <Button
-                    color="neutral"
-                    onClick={() => {
-                        const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
-                        window.open(`${frontendUrl}/item-details/${listing.listing_id}`, '_blank');
-                    }}
-                >
-                    View Listing
-                </Button>
+                    <div className="flex gap-3 pt-4 border-t border-green-100">
+                        <button
+                            className="detail-btn-secondary"
+                            onClick={() => {
+                                const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+                                window.open(`${frontendUrl}/item-details/${listing.listing_id}`, '_blank');
+                            }}
+                        >
+                            View Listing
+                        </button>
 
-                <Button
-                    color={deleteButtonColor}
-                    onClick={() => setDeleteModalOpen(true)}
-                    className="mx-1"
-                >
-                    {deleteButtonText}
-                </Button>
-            </div>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">Reports</h2>
-
-            <table className="min-w-full border-collapse bg-white shadow-md rounded-lg">
-                <thead>
-                    <tr className="bg-gray-100">
-                        <th className="p-3 text-left border">#</th>
-                        <th className="p-3 text-left border">Reported At</th>
-                        <th className="p-3 text-left border">Reason</th>
-                        <th className="p-3 text-left border">Reported By</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {listing.reports.map((r, index) => (
-                        <tr key={index} className="border-b">
-                            <td className="p-3 border">{index + 1}</td>
-                            <td className="p-3 border">
-                                {formatDate(r.reported_at)}
-                            </td>
-                            <td className="p-3 border">{r.reason}</td>
-                            <td className="p-3 border">{r.reported_by}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {/* Delete/Reactivate Modal */}
-            <DeleteModal
-                open={deleteModalOpen}
-                onClose={() => setDeleteModalOpen(false)}
-                title={
-                    listing.is_removed
-                        ? "Reactivate Listing"
-                        : "Enter the reason for deleting (*)"
-                }
-            >
-                {!listing.is_removed && (
-                    <textarea
-                        className="w-full border rounded-lg p-2 h-28 resize-none focus:ring-primary focus:border-primary"
-                        placeholder="Type your reason..."
-                        value={deleteReason}
-                        onChange={(e) => setDeleteReason(e.target.value)}
-                    />
-                )}
-
-                <div className="flex justify-end mt-4 gap-2">
-                    <Button
-                        color="neutral"
-                        variant="outline"
-                        onClick={() => setDeleteModalOpen(false)}
-                    >
-                        Cancel
-                    </Button>
-
-                    <Button color={deleteButtonColor} onClick={handleDelete}>
-                        {listing.is_removed
-                            ? "Reactivate Listing"
-                            : "Delete Listing"}
-                    </Button>
+                        <button
+                            className={listing?.is_removed ? "detail-btn-success" : "detail-btn-danger"}
+                            onClick={() => setDeleteModalOpen(true)}
+                        >
+                            {deleteButtonText}
+                        </button>
+                    </div>
                 </div>
-            </DeleteModal>
+
+                {/* Reports Section */}
+                <h2 className="detail-subtitle text-2xl mb-4">Reports</h2>
+
+                <table className="detail-table min-w-full">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Reported At</th>
+                            <th>Reason</th>
+                            <th>Reported By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {listing.reports.map((r, index) => (
+                            <tr key={index}>
+                                <td className="font-medium">{index + 1}</td>
+                                <td>{formatDate(r.reported_at)}</td>
+                                <td>{r.reason}</td>
+                                <td className="font-mono text-sm">{r.reported_by}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {/* Delete/Reactivate Modal */}
+                <DeleteModal
+                    open={deleteModalOpen}
+                    onClose={() => setDeleteModalOpen(false)}
+                    title={
+                        listing.is_removed
+                            ? "Reactivate Listing"
+                            : "Enter the reason for deleting (*)"
+                    }
+                >
+                    {!listing.is_removed && (
+                        <textarea
+                            className="detail-textarea w-full h-28"
+                            placeholder="Type your reason..."
+                            value={deleteReason}
+                            onChange={(e) => setDeleteReason(e.target.value)}
+                        />
+                    )}
+
+                    <div className="flex justify-end mt-6 gap-3">
+                        <button
+                            className="detail-btn-secondary"
+                            onClick={() => setDeleteModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            className={listing?.is_removed ? "detail-btn-success" : "detail-btn-danger"}
+                            onClick={handleDelete}
+                        >
+                            {listing.is_removed
+                                ? "Reactivate Listing"
+                                : "Delete Listing"}
+                        </button>
+                    </div>
+                </DeleteModal>
+            </div>
         </div>
     );
 }

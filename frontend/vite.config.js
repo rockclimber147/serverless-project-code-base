@@ -16,9 +16,9 @@ export default defineConfig({
     include: ["leaflet", "leaflet.markercluster"],
     exclude: ["maplibre-gl"],
   },
-  build: {
-    commonjsOptions: {
-      include: [/leaflet/, /leaflet\.markercluster/],
-    },
-  },
+  // build: {
+  //   commonjsOptions: {
+  //     include: [/leaflet/, /leaflet\.markercluster/],
+  //   },
+  // },
 });

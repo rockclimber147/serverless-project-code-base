@@ -37,34 +37,45 @@ export default function UserDashboardGrid() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full container mx-auto pt-4">
-      <MapGridToggleButton />
-      <div className="w-full flex flex-wrap justify-center mt-4">
-        <form onSubmit={handleSearch}>
-          <input
-            type="text"
-            value={inputText}
-            name="query"
-            placeholder="Search..."
-            className="p-2 rounded-l-lg w-80"
-            onChange={(e) => setInputText(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="p-2 rounded-r-lg bg-blue-500 text-white hover:bg-blue-600"
-          >
-            Search
-          </button>
-        </form>
-      </div>
-      <h2 className="text-2xl m-4">Most Recent Listings</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {listings &&
-          listings.map((item) => (
-            <div key={item.listing_id}>
-              <ItemCard item={item} />
-            </div>
-          ))}
+    <div className="dashboard-page flex flex-col min-h-screen w-full pt-16">
+      <div className="container mx-auto px-6 pt-6">
+        {/* Toggle Button */}
+        <div className="mb-6">
+          <MapGridToggleButton />
+        </div>
+
+        {/* Search Section */}
+        <div className="w-full flex justify-center mb-8">
+          <form onSubmit={handleSearch} className="flex shadow-lg rounded-xl">
+            <input
+              type="text"
+              value={inputText}
+              name="query"
+              placeholder="Search for items..."
+              className="dashboard-search-input"
+              onChange={(e) => setInputText(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="dashboard-search-btn"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+
+        {/* Section Title */}
+        <h2 className="dashboard-section-title mb-8">Most Recent Listings</h2>
+
+        {/* Listings Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-8">
+          {listings &&
+            listings.map((item) => (
+              <div key={item.listing_id}>
+                <ItemCard item={item} />
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

@@ -167,11 +167,11 @@ export default function AddEditListing() {
   }, [navigate]);
 
   return (
-    <div className="flex w-full gap-4 h-screen">
+    <div className="detail-page flex w-full gap-6 min-h-screen pt-14" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       {/* Image */}
-      <div className="flex-[3] overflow-hidden bg-gray-200 flex justify-center items-center">
+      <div className="flex-[3] overflow-hidden bg-gradient-to-br from-green-50 to-green-100 flex justify-center items-center m-6 mr-0 rounded-2xl border border-green-200">
         {image ? (
-          <div className="relative w-full h-full overflow-hidden">
+          <div className="relative w-full h-full overflow-hidden rounded-2xl">
             <img
               src={image}
               alt="Preview"
@@ -182,86 +182,114 @@ export default function AddEditListing() {
                 setImage(null);
                 setImageFile(null);
               }}
-              className="absolute top-2 right-2 bg-red-400 text-white px-3 py-1 rounded-lg"
+              className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-medium shadow-lg transition-all"
             >
-              Clear
+              Clear Image
             </button>
           </div>
         ) : (
-          <input type="file" accept="image/*" onChange={handleImageChange} />
+          <div className="text-center p-8">
+            <div className="mb-4 text-green-600">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <label className="cursor-pointer">
+              <span className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:from-green-700 hover:to-green-800 transition-all inline-block">
+                Upload Image
+              </span>
+              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+            </label>
+            <p className="text-green-600 mt-3 text-sm">Click to upload a photo of your item</p>
+          </div>
         )}
       </div>
 
       {/* Item details */}
-      <form className="m-4 flex-[1]" onSubmit={handleSubmit}>
-        <h2 className="text-2xl mb-2">{pageTitle}</h2>
+      <form className="flex-[1] p-6 flex flex-col" onSubmit={handleSubmit}>
+        <h2 className="text-3xl font-bold text-green-900 mb-6">{pageTitle}</h2>
+
         {/* Item main info */}
-        <div className="flex flex-col gap-3 mb-5">
-          <input
-            value={title}
-            placeholder="Title (Required)"
-            required
-            onChange={(e) => setTitle(e.target.value)}
-            className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
-          />
-          {errors.title && (
-            <p className="text-red-500 text-sm">{errors.title}</p>
-          )}
-          <input
-            value={price}
-            placeholder="Price (Required)"
-            type="number"
-            required
-            onChange={(e) => setPrice(e.target.value)}
-            className="rounded-lg focus:border-blue-400 border w-full p-2 shadow-md"
-          />
-          {errors.price && (
-            <p className="text-red-500 text-sm">{errors.price}</p>
-          )}
-          <input
-            value={address}
-            placeholder="Location"
-            onChange={(e) => setAddress(e.target.value)}
-            className="rounded-lg focus:border-blue-400 border w-full shadow-md p-2"
-          />
+        <div className="flex flex-col gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">Title *</label>
+            <input
+              value={title}
+              placeholder="Enter item title"
+              required
+              onChange={(e) => setTitle(e.target.value)}
+              className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"
+            />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">Price *</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 font-medium">$</span>
+              <input
+                value={price}
+                placeholder="0.00"
+                type="number"
+                required
+                onChange={(e) => setPrice(e.target.value)}
+                className="rounded-xl border-2 border-green-200 w-full p-3 pl-7 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"
+              />
+            </div>
+            {errors.price && (
+              <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-green-800 mb-1.5">Location</label>
+            <input
+              value={address}
+              placeholder="Enter pickup location"
+              onChange={(e) => setAddress(e.target.value)}
+              className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all"
+            />
+          </div>
         </div>
 
         {/* Description */}
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl">Details</h3>
+        <div className="flex flex-col gap-2 flex-1">
+          <label className="block text-sm font-medium text-green-800 mb-1.5">Details</label>
           <textarea
             value={item_details}
             rows={6}
-            placeholder="Include a description of the item."
+            placeholder="Describe your item - condition, size, brand, etc."
             onChange={(e) => setItemDetails(e.target.value)}
-            className="rounded-lg focus:border-blue-400 border w-full p-1 shadow-md mb-4"
+            className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
           ></textarea>
 
-          <button
-            className="bg-blue-400 text-white rounded-lg px-2 py-1 disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed"
-            type="submit"
-            disabled={!title || !price}
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            className="border-neutral-400 border rounded-lg px-2 py-1 hover:bg-neutral-500 hover:text-white"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </button>
-          {item && (
+          <div className="flex flex-col gap-3 mt-auto">
+            <button
+              className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl px-4 py-3 font-semibold shadow-md hover:from-green-700 hover:to-green-800 transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none"
+              type="submit"
+              disabled={!title || !price}
+            >
+              {item ? 'Save Changes' : 'Create Listing'}
+            </button>
             <button
               type="button"
-              className="bg-red-500 text-white border rounded-lg px-2 py-1
-            hover:text-white"
-              onClick={() => setOpenDeleteModal(true)}
+              className="border-2 border-green-200 text-green-700 rounded-xl px-4 py-3 font-semibold hover:bg-green-50 transition-all"
+              onClick={() => navigate(-1)}
             >
-              {" "}
-              Delete
+              Cancel
             </button>
-          )}
+            {item && (
+              <button
+                type="button"
+                className="bg-red-500 hover:bg-red-600 text-white rounded-xl px-4 py-3 font-semibold shadow-md transition-all"
+                onClick={() => setOpenDeleteModal(true)}
+              >
+                Delete Listing
+              </button>
+            )}
+          </div>
         </div>
       </form>
       {deleteModal && (
