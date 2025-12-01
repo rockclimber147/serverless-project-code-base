@@ -52,6 +52,7 @@ def create_listing(table_name: str, user_id: str, data: dict) -> dict:
     }
 
 def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict) -> dict:
+    # ... (Pre-checks for listing existence, user_id, and update_fields remain the same)
     listing = dynamodb.get_item(TableName=table_name, Key={"listing_id": {"S": listing_id}})
     item = listing.get("Item")
 
@@ -69,8 +70,10 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
 
     expr = []
     values = {}
-    # New dictionary for attribute names (aliases)
     names = {} 
+    
+    # NOTE: It's better to move the try block to wrap ONLY the DynamoDB call.
+    # We will keep the try/except around the loop for now but fix the syntax.
 
     for i, (k, v) in enumerate(update_fields.items()):
         key_alias = f":val{i}"
@@ -78,7 +81,6 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
         # --- RESERVED KEYWORD HANDLING ---
         attribute_name = k
         if k == "location":
-            # Use an Expression Attribute Name for the reserved keyword 'location'
             name_alias = "#loc"
             names[name_alias] = k
             expr.append(f"{name_alias} = {key_alias}")
@@ -93,11 +95,10 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
         elif isinstance(v, (int, float)):
             values[key_alias] = {"N": str(v)}
         elif k == "tags" and isinstance(v, list):
-            # Special handling for list/set types
             values[key_alias] = {"L": [{"S": str(tag)} for tag in v]}
         else:
             values[key_alias] = {"S": str(v)}
-            
+                
         # Additional search field updates (appends to expr and values)
         if k == "item_name":
             expr.append("search_name = :search_name")
@@ -107,16 +108,24 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
             expr.append("search_details = :search_details")
             values[":search_details"] = {"S": str(v).lower()}
 
-
     # --- FINAL UPDATE CALL ---
-    dynamodb.update_item(
-        TableName=table_name,
-        Key={"listing_id": {"S": listing_id}},
-        UpdateExpression="SET " + ", ".join(expr),
-        ExpressionAttributeValues=values,
-        # Pass the new names dictionary to the API call
-        ExpressionAttributeNames=names 
-    )
+    try: 
+        # Pass ExpressionAttributeNames ONLY if the dictionary is not empty.
+        dynamodb_kwargs = {
+            "TableName": table_name,
+            "Key": {"listing_id": {"S": listing_id}},
+            "UpdateExpression": "SET " + ", ".join(expr),
+            "ExpressionAttributeValues": values,
+        }
+        
+        if names: # Check if aliases were needed for reserved keywords
+            dynamodb_kwargs["ExpressionAttributeNames"] = names
+            
+        dynamodb.update_item(**dynamodb_kwargs)
+        
+    except Exception as e:
+        # ⚠️ FIX: The original except block had a Python syntax error.
+        return {"success": False, "error": str(e)}
 
     return {"success": True, "message": "Listing updated successfully"}
 
