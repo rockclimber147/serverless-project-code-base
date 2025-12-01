@@ -19,7 +19,7 @@ export default function AddEditListing() {
   const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
   const [item_details, setItemDetails] = useState(item?.item_details || "");
-  const [tags, setTags] = useState(item?.tags || "");
+  const [tags, setTags] = useState(item?.tags?.[0] ? [item.tags[0]] : []);
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
 
@@ -82,7 +82,7 @@ export default function AddEditListing() {
 
   const updateListing = async (listingFormCreateData) => {
     const updatedData = getUpdatedFields(item, listingFormCreateData);
-
+    console.log(updatedData);
     if (Object.keys(updatedData).length > 0) {
       await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
     }
@@ -91,16 +91,31 @@ export default function AddEditListing() {
     return listingId;
   };
 
+  const generateTagList = (tags) => {
+    let rawTags = [];
+
+    if (typeof tags === "string") {
+      rawTags = tags.split(",");
+    } else if (Array.isArray(tags)) {
+      rawTags = tags;
+    } else {
+      return [];
+    }
+
+    const tagList = rawTags
+      .map((tag) => String(tag).trim()) // Use String(tag) to handle non-string array elements if necessary
+      .filter((tag) => tag !== "");
+    console.log("end", tagList);
+    return tagList;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     let listingId = item?.listing_id;
 
-    const tagList = tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag !== "");
+    const tagList = generateTagList(tags);
 
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
@@ -294,6 +309,25 @@ export default function AddEditListing() {
           </div>
         </div>
 
+        <label className="block text-sm font-medium text-green-800 mb-1.5">
+          Tags
+        </label>
+
+        <select
+          name="clothing-filter"
+          id="clothing-filter"
+          className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
+          value={tags[0] || ""} // show the first tag in the array
+          onChange={(e) => setTags([e.target.value])}
+        >
+          <option value="">Select a category</option>
+          <option value="tops">Tops</option>
+          <option value="bottoms">Bottoms</option>
+          <option value="dresses">Dresses</option>
+          <option value="outerwear">Outerwear</option>
+          <option value="accessories">Accessories</option>
+          <option value="footwear">Footwear</option>
+        </select>
         {/* Description */}
         <div className="flex flex-col gap-2 flex-1">
           <label className="block text-sm font-medium text-green-800 mb-1.5">
@@ -304,17 +338,6 @@ export default function AddEditListing() {
             rows={6}
             placeholder="Describe your item - condition, size, brand, etc."
             onChange={(e) => setItemDetails(e.target.value)}
-            className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
-          ></textarea>
-
-          <label className="block text-sm font-medium text-green-800 mb-1.5">
-            Tags
-          </label>
-          <textarea
-            value={tags}
-            rows={3}
-            placeholder="Add tags separated by comma"
-            onChange={(e) => setTags(e.target.value)}
             className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
           ></textarea>
 
