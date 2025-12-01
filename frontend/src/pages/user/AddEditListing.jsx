@@ -96,11 +96,7 @@ export default function AddEditListing() {
     if (!validateForm()) return;
 
     let listingId = item?.listing_id;
-
-    const tagList = tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag !== "");
+    console.log(item);
 
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
@@ -112,7 +108,7 @@ export default function AddEditListing() {
       location: address,
       latitude: coordinates?.latitude,
       longitude: coordinates?.longitude,
-      tags: tagList,
+      tags: [tags],
     };
 
     if (!item) {
@@ -294,6 +290,24 @@ export default function AddEditListing() {
           </div>
         </div>
 
+        <label className="block text-sm font-medium text-green-800 mb-1.5">
+          Tags
+        </label>
+
+        <select
+          name="clothing-filter"
+          id="clothing-filter"
+          className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
+          onChange={(e) => setTags(e.target.value)}
+        >
+          <option value="">Select a category</option>
+          <option value="tops">Tops</option>
+          <option value="bottoms">Bottoms</option>
+          <option value="dresses">Dresses</option>
+          <option value="outerwear">Outerwear</option>
+          <option value="accessories">Accessories</option>
+          <option value="footwear">Footwear</option>
+        </select>
         {/* Description */}
         <div className="flex flex-col gap-2 flex-1">
           <label className="block text-sm font-medium text-green-800 mb-1.5">
@@ -304,17 +318,6 @@ export default function AddEditListing() {
             rows={6}
             placeholder="Describe your item - condition, size, brand, etc."
             onChange={(e) => setItemDetails(e.target.value)}
-            className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
-          ></textarea>
-
-          <label className="block text-sm font-medium text-green-800 mb-1.5">
-            Tags
-          </label>
-          <textarea
-            value={tags}
-            rows={3}
-            placeholder="Add tags separated by comma"
-            onChange={(e) => setTags(e.target.value)}
             className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
           ></textarea>
 
