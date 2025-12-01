@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ReportPopUp from "@/components/ReportPopUp";
 import { ListingAPIService } from "@/services/listingsApi";
 import { getUserInfo } from "@/services/authApi";
+import Chip from "@mui/material/Chip";
 
 export default function ItemDetails() {
   const location = useLocation();
@@ -20,6 +21,7 @@ export default function ItemDetails() {
   const [user, setUser] = useState(null);
   const currentUserId = localStorage.getItem("userId");
   const isOwnListing = currentUserId && item && currentUserId === item.user_id;
+  console.log(item);
 
   const defaultAvatar =
     "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=1024x1024&w=is&k=20&c=oGqYHhfkz_ifeE6-dID6aM7bLz38C6vQTy1YcbgZfx8=";
@@ -59,6 +61,15 @@ export default function ItemDetails() {
     );
   }
 
+  const date = new Date(item?.created_at).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+
   return (
     <div className="detail-page detail-page-container flex w-full gap-6 p-6 pt-20">
       {/* Image Section */}
@@ -85,11 +96,13 @@ export default function ItemDetails() {
           <div className="mb-6">
             <div className="flex justify-between items-start mb-3">
               <div className="flex items-center gap-3">
-                <h2 className="detail-title text-3xl">{item?.item_name}</h2>
+                <h2 className="detail-title text-5xl">{item?.item_name}</h2>
                 {isOwnListing && (
                   <button
                     className="p-2 rounded-lg bg-green-50 hover:bg-green-100 transition-colors"
-                    onClick={() => navigate("/add-listing", { state: { item } })}
+                    onClick={() =>
+                      navigate("/add-listing", { state: { item } })
+                    }
                   >
                     <FaPen className="text-green-600 hover:text-green-700 cursor-pointer" />
                   </button>
@@ -110,8 +123,11 @@ export default function ItemDetails() {
 
             <p className="detail-price text-3xl mb-2">${item?.price}</p>
             <p className="text-gray-600 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span className="w-2 h-2 bg-green-400 rounded-full "></span>
               {item?.location || "No location available."}
+            </p>
+            <p className="text-gray-400 flex items-center gap-2 mt-4">
+              Listed: {date || "No date available"}
             </p>
           </div>
 
@@ -145,16 +161,22 @@ export default function ItemDetails() {
           </div>
 
           {/* Description */}
-          <div>
+          <div className="mb-10">
             <h3 className="detail-section-title">Details</h3>
             <p className="text-gray-700 leading-relaxed">
               {item?.item_details || "No description available."}
             </p>
           </div>
+
+          {item?.tags?.map((tag, index) => (
+            <Chip key={index} label={tag} className="m-1"></Chip>
+          ))}
         </div>
         {/* Seller Card */}
         <div className="detail-card p-6">
-          {user ? <SellerCard user={user} /> : (
+          {user ? (
+            <SellerCard user={user} />
+          ) : (
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
               <p className="text-gray-500">Loading seller...</p>
