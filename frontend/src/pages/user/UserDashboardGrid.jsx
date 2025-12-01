@@ -8,13 +8,12 @@ import { SortBy } from "@/models/SortBy";
 export default function UserDashboardGrid() {
   const [listings, setListings] = useState([]);
   const [inputText, setInputText] = useState("");
-  const [tagsInput, setTagsInput] = useState("");
+  const [tags, setTags] = useState("");
   const [sortValue, setSortValue] = useState(SortBy.DATE_DESCENDING);
 
   const fetchListings = async (query, sort, tags) => {
     try {
       const data = await ListingAPIService.searchListings(query, sort, tags); // Pass tags here
-      console.log(data);
       setListings(data);
     } catch (error) {
       console.error("Error fetching listings:", error);
@@ -23,15 +22,16 @@ export default function UserDashboardGrid() {
   };
 
   useEffect(() => {
-    fetchListings(inputText, sortValue, tagsInput);
-  }, []);
+    fetchListings(inputText, sortValue, tags);
+  }, [tags, sortValue]);
+
   useEffect(() => {
-    console.log("Listings state updated:", listings);
-  }, [listings]);
+    fetchListings(inputText, sortValue, tags);
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    fetchListings(inputText, sortValue, tagsInput);
+    fetchListings(inputText, sortValue, tags);
   };
 
   return (
@@ -49,7 +49,7 @@ export default function UserDashboardGrid() {
             className="w-full rounded-xl overflow-hidden flex flex-col sm:flex-row gap-3" // Adjusted classes for better layout
           >
             {/* Input and Tags side-by-side on larger screens, stacked on smaller */}
-            <div className="flex w-full flex-col md:flex-row gap-3">
+            <div className="flex w-full flex-col md:flex-row ">
               <input
                 type="text"
                 value={inputText}
@@ -58,23 +58,31 @@ export default function UserDashboardGrid() {
                 className="dashboard-search-input flex-1 p-3 border-2 border-gray-200 rounded-xl focus:outline-none w-full"
                 onChange={(e) => setInputText(e.target.value)}
               />
-
-              {/* 3. New input for Tags */}
-              <input
-                type="text"
-                value={tagsInput}
-                name="tags"
-                placeholder="Search by tags (e.g., tech, laptop)"
-                className="p-3 border-2 border-gray-200 rounded-xl focus:outline-none w-full md:w-1/2"
-                onChange={(e) => setTagsInput(e.target.value)}
-              />
+              <button
+                type="submit"
+                className="dashboard-search-btn p-3 rounded-xl flex-shrink-0"
+              >
+                Search
+              </button>
             </div>
 
             {/* Button and Sort side-by-side */}
             <div className="flex w-full sm:w-auto gap-3">
-              <button type="submit" className="dashboard-search-btn p-3 rounded-xl flex-shrink-0">
-                Search
-              </button>
+              <select
+                name="clothing-filter"
+                id="clothing-filter"
+                className="p-3 border-2 border-green-200 rounded-xl focus:outline-none w-full sm:w-48 flex-shrink-0"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              >
+                <option value="">Select a category</option>
+                <option value="tops">Tops</option>
+                <option value="bottoms">Bottoms</option>
+                <option value="dresses">Dresses</option>
+                <option value="outerwear">Outerwear</option>
+                <option value="accessories">Accessories</option>
+                <option value="footwear">Footwear</option>
+              </select>
 
               <select
                 name="sort"
