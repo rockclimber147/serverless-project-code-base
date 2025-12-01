@@ -82,7 +82,7 @@ export default function AddEditListing() {
 
   const updateListing = async (listingFormCreateData) => {
     const updatedData = getUpdatedFields(item, listingFormCreateData);
-
+    console.log(updatedData)
     if (Object.keys(updatedData).length > 0) {
       await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
     }
@@ -96,10 +96,8 @@ export default function AddEditListing() {
     if (!validateForm()) return;
 
     let listingId = item?.listing_id;
-
-    const tagList = tags
-      .split(",")
-      .map((tag) => tag.trim())
+    console.log(tags)
+    const tagList = tags.map((tag) => tag.trim())
       .filter((tag) => tag !== "");
 
     // Fetch coordinates
