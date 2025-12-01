@@ -38,6 +38,7 @@ export default function ItemDetails() {
 
   useEffect(() => {
     // If item is not passed via state, fetch it from the backend
+
     if (!item && listingId) {
       const fetchItem = async () => {
         const fetchedItem = await ListingAPIService.getListingById(listingId);
@@ -168,7 +169,10 @@ export default function ItemDetails() {
             </p>
           </div>
 
-          <Chip label={item?.tags} className="m-1"></Chip>
+          <Chip
+            label={item?.tags?.length ? item.tags[0] : "No listed category"}
+            className="m-1"
+          ></Chip>
         </div>
         {/* Seller Card */}
         <div className="detail-card p-6">
