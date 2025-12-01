@@ -121,6 +121,8 @@ export default function Profile({ type = "user" }) {
       console.log(passedUser);
       const userId = passedUser ? passedUser.id : localStorage.getItem("userId");;
       const listings = await ListingAPIService.getUserListings(userId);
+      console.log("user listings")
+      console.log(listings)
       setMyListings(listings);
     }
   fetchInitialListings();
