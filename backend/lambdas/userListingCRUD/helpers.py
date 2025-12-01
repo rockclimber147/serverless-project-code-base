@@ -69,18 +69,36 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
 
     expr = []
     values = {}
+    # New dictionary for attribute names (aliases)
+    names = {} 
 
     for i, (k, v) in enumerate(update_fields.items()):
         key_alias = f":val{i}"
-        expr.append(f"{k} = {key_alias}")
+        
+        # --- RESERVED KEYWORD HANDLING ---
+        attribute_name = k
+        if k == "location":
+            # Use an Expression Attribute Name for the reserved keyword 'location'
+            name_alias = "#loc"
+            names[name_alias] = k
+            expr.append(f"{name_alias} = {key_alias}")
+            attribute_name = name_alias
+        else:
+            expr.append(f"{k} = {key_alias}")
+        # --- END RESERVED KEYWORD HANDLING ---
 
+        # Value handling remains the same (mapping to DynamoDB types)
         if isinstance(v, bool):
             values[key_alias] = {"BOOL": v}
         elif isinstance(v, (int, float)):
             values[key_alias] = {"N": str(v)}
+        elif k == "tags" and isinstance(v, list):
+            # Special handling for list/set types
+            values[key_alias] = {"L": [{"S": str(tag)} for tag in v]}
         else:
             values[key_alias] = {"S": str(v)}
-
+            
+        # Additional search field updates (appends to expr and values)
         if k == "item_name":
             expr.append("search_name = :search_name")
             values[":search_name"] = {"S": str(v).lower()}
@@ -89,14 +107,15 @@ def update_listing(table_name: str, listing_id: str, user_id: str, updates: dict
             expr.append("search_details = :search_details")
             values[":search_details"] = {"S": str(v).lower()}
 
-        elif k == "tags" and isinstance(v, list):
-            values[key_alias] = {"L": [{"S": str(tag)} for tag in v]}
 
+    # --- FINAL UPDATE CALL ---
     dynamodb.update_item(
         TableName=table_name,
         Key={"listing_id": {"S": listing_id}},
         UpdateExpression="SET " + ", ".join(expr),
-        ExpressionAttributeValues=values
+        ExpressionAttributeValues=values,
+        # Pass the new names dictionary to the API call
+        ExpressionAttributeNames=names 
     )
 
     return {"success": True, "message": "Listing updated successfully"}
@@ -195,12 +214,6 @@ def migrate_listings(table_name: str):
                 update_expr.append("#tags = :tags")
                 expr_attr_names["#tags"] = "tags"
                 expr_attr_values[":tags"] = {"L": []}  # empty list
-
-            # Rename details -> item_details
-            if "details" in item:
-                update_expr.append("#item_details = :details")
-                expr_attr_names["#item_details"] = "item_details"
-                expr_attr_values[":details"] = {"S": item["details"]["S"]}  # extract string
 
             if update_expr:
                 update_expression = "SET " + ", ".join(update_expr)
