@@ -15,7 +15,8 @@ export class ListingAPIService extends BaseServiceWithAuth {
 
   static async searchListings(
     query?: string,
-    sort?: SortBy
+    sort?: SortBy,
+    tags?: string,
   ): Promise<Listing[]> {
     sort = sort ?? SortBy.DATE_DESCENDING;
     console.log("here", sort);
@@ -27,12 +28,15 @@ export class ListingAPIService extends BaseServiceWithAuth {
     if (sort) {
       params.push(`sort=${encodeURIComponent(sort)}`);
     }
+    if (tags) {
+      params.push(`tags=${encodeURIComponent(tags)}`);
+    }
     if (params.length > 0) {
       url += "?" + params.join("&");
     }
     const hasAuthHeader = false;
     const errorMessage = "Error searching listings";
-
+    console.log(url)
     try {
       const data = await this.fetchAPI(url, "GET", hasAuthHeader, errorMessage);
       return this._castToListingsArray(data);
@@ -99,7 +103,7 @@ export class ListingAPIService extends BaseServiceWithAuth {
       price: item.price,
       item_details: item.item_details,
       is_sold: item.is_sold,
-      location: item.location,
+      item_location: item.item_location,
       latitude: item.latitude,
       longitude: item.longitude,
       image: item.image

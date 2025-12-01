@@ -82,7 +82,7 @@ export default function AddEditListing() {
 
   const updateListing = async (listingFormCreateData) => {
     const updatedData = getUpdatedFields(item, listingFormCreateData);
-
+    console.log(updatedData);
     if (Object.keys(updatedData).length > 0) {
       await ListingCRUDAPIService.updateListing(item.listing_id, updatedData);
     }
@@ -96,7 +96,9 @@ export default function AddEditListing() {
     if (!validateForm()) return;
 
     let listingId = item?.listing_id;
-    console.log(item);
+    console.log(tags);
+
+    const tagList = generateTagList(tags);
 
     // Fetch coordinates
     const coordinates = await fetchCoordinates();
@@ -147,6 +149,30 @@ export default function AddEditListing() {
     } else {
       navigate(`/item-details/${listingId}`);
     }
+  };
+
+  const generateTagList = (tags) => {
+    let rawTags = [];
+
+    // Case 1: The input is a string (assumed comma-separated)
+    if (typeof tags === "string") {
+      rawTags = tags.split(",");
+    }
+    // Case 2: The input is already an array of strings
+    else if (Array.isArray(tags)) {
+      rawTags = tags;
+    }
+    // Handle other types (e.g., null, undefined, or incorrect types)
+    else {
+      return [];
+    }
+
+    // Common processing: trim whitespace and filter out empty strings
+    const tagList = rawTags
+      .map((tag) => String(tag).trim()) // Use String(tag) to handle non-string array elements if necessary
+      .filter((tag) => tag !== "");
+
+    return tagList;
   };
 
   useEffect(() => {
