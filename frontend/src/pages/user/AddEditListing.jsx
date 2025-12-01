@@ -19,7 +19,7 @@ export default function AddEditListing() {
   const [price, setPrice] = useState(item?.price || "");
   const [address, setAddress] = useState(item?.location || "");
   const [item_details, setItemDetails] = useState(item?.item_details || "");
-  const [tags, setTags] = useState(item?.tags || "");
+  const [tags, setTags] = useState(item?.tags?.[0] ? [item.tags[0]] : []);
 
   const pageTitle = item ? "Edit Item Listing" : "Add Item Listing";
 
@@ -91,12 +91,29 @@ export default function AddEditListing() {
     return listingId;
   };
 
+  const generateTagList = (tags) => {
+    let rawTags = [];
+
+    if (typeof tags === "string") {
+      rawTags = tags.split(",");
+    } else if (Array.isArray(tags)) {
+      rawTags = tags;
+    } else {
+      return [];
+    }
+
+    const tagList = rawTags
+      .map((tag) => String(tag).trim()) // Use String(tag) to handle non-string array elements if necessary
+      .filter((tag) => tag !== "");
+    console.log("end", tagList);
+    return tagList;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     let listingId = item?.listing_id;
-    console.log(tags);
 
     const tagList = generateTagList(tags);
 
@@ -110,7 +127,7 @@ export default function AddEditListing() {
       location: address,
       latitude: coordinates?.latitude,
       longitude: coordinates?.longitude,
-      tags: [tags],
+      tags: tagList,
     };
 
     if (!item) {
@@ -149,30 +166,6 @@ export default function AddEditListing() {
     } else {
       navigate(`/item-details/${listingId}`);
     }
-  };
-
-  const generateTagList = (tags) => {
-    let rawTags = [];
-
-    // Case 1: The input is a string (assumed comma-separated)
-    if (typeof tags === "string") {
-      rawTags = tags.split(",");
-    }
-    // Case 2: The input is already an array of strings
-    else if (Array.isArray(tags)) {
-      rawTags = tags;
-    }
-    // Handle other types (e.g., null, undefined, or incorrect types)
-    else {
-      return [];
-    }
-
-    // Common processing: trim whitespace and filter out empty strings
-    const tagList = rawTags
-      .map((tag) => String(tag).trim()) // Use String(tag) to handle non-string array elements if necessary
-      .filter((tag) => tag !== "");
-
-    return tagList;
   };
 
   useEffect(() => {
@@ -324,7 +317,8 @@ export default function AddEditListing() {
           name="clothing-filter"
           id="clothing-filter"
           className="rounded-xl border-2 border-green-200 w-full p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all resize-none mb-4"
-          onChange={(e) => setTags(e.target.value)}
+          value={tags[0] || ""} // show the first tag in the array
+          onChange={(e) => setTags([e.target.value])}
         >
           <option value="">Select a category</option>
           <option value="tops">Tops</option>

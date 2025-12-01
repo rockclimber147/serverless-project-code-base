@@ -18,7 +18,9 @@ const MapPage = () => {
 
   // New state for tags search input
   const [search, setSearch] = useState("");
-  const [tagsSearch, setTagsSearch] = useState("");
+  // const [tagsSearch, setTagsSearch] = useState("");
+
+  const [tags, setTags] = useState("");
   const [listings, setListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState(null);
 
@@ -77,17 +79,13 @@ const MapPage = () => {
       listing.tagsCombined?.toLowerCase().includes(search.toLowerCase());
 
     // 2. Tags search
-    const tagSearchTerms = tagsSearch
-      .toLowerCase()
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
+
+    const tagsMatch =
+      !tags || // if no tag selected, automatically true
+      listing.tagsCombined?.toLowerCase().includes(tags.toLowerCase());
 
     // If no tags are searched, this condition is automatically true.
     // If tags are searched, check if ALL search tags are included in the listing's tags.
-    const tagsMatch = tagSearchTerms.every((searchTerm) =>
-      listing.tagsCombined?.includes(searchTerm)
-    );
 
     return textMatch && tagsMatch;
   });
@@ -116,14 +114,21 @@ const MapPage = () => {
           />
 
           {/* New Tags Search Input */}
-          <input
-            type="text"
-            placeholder="Search tags (e.g., tech, book)"
-            value={tagsSearch}
-            onChange={(e) => setTagsSearch(e.target.value)}
-            className="pointer-events-auto px-4 py-3 flex-1 rounded-xl shadow-lg border-2 border-green-200 bg-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
-            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
-          />
+          <select
+            name="clothing-filter"
+            id="clothing-filter"
+            className="p-3 border-2 border-green-200 rounded-xl focus:outline-none w-full sm:w-48 flex-shrink-0 pointer-events-auto"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          >
+            <option value="">Select a category</option>
+            <option value="tops">Tops</option>
+            <option value="bottoms">Bottoms</option>
+            <option value="dresses">Dresses</option>
+            <option value="outerwear">Outerwear</option>
+            <option value="accessories">Accessories</option>
+            <option value="footwear">Footwear</option>
+          </select>
         </div>
       </div>
 
